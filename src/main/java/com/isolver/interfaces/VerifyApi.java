@@ -88,6 +88,6 @@ public interface VerifyApi {
 	 * @param userId
 	 * @return
 	 */
-	@RequestMapping(value = "/verify/applyHistory", method = RequestMethod.POST)
+	@RequestMapping(value = "/applyHistory", method = RequestMethod.POST)
 	public Result<Object> applyHistoryInit(Long userId);
 }

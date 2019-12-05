@@ -1,0 +1,22 @@
+/**
+ * 
+ */
+package com.isolver.common.constant;
+
+/**
+ * 路径类常量
+ * @author 游传松
+ * 2019/01/17
+ */
+public class SysUrlConst {
+
+	// 图片临时路径
+	public static  String FILEPATH = "/home/isolver/img";
+
+	// 图片存储虚拟路径
+	public static  String PICPATH = "http://192.168.100.13:7080/photo/";
+	
+	//图片服务器接口
+	public static  String PICSERVERPATH = "http://192.168.100.220:6080/pic";
+
+}

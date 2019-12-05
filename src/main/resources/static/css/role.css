@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+#app {
+	width: 1500px;
+	margin: 20px auto;
+}
+
+.form-box {
+	margin: 10px auto;
+}
+
+.form-info {
+	margin-left: 5px;
+}
+
+.ivu-form .ivu-form-item-label {
+	font-weight: bolder;
+	font-size: 14px;
+}
+
+.ivu-divider-inner-text {
+	font-size: 20px;
+}
+
+.pageable {
+	text-align: right;
+	margin: 15px 0px;
+}
+
+.bench-apply {
+	float: left;
+}
+
+.result-table table {
+	width: auto !important;
+}
+
+/* .result-table table .ivu-table-cell {
+	padding-left: 8px;
+	padding-right: 8px;
+} */
+
+.link-error i {
+	font-size: 20px;
+}
+
+.result-table table thead tr th:nth-child(1),.result-table table tbody tr td:nth-child(1){
+	display:none;
+}
+
+.table-col-5{
+	width:18%;
+}
+
+.table-col-10{
+	width:50%;
+}
