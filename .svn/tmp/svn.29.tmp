@@ -10,6 +10,7 @@
 <script src="./js/vue/vue.min.js"></script>
 <script src="./js/layer/layer.js"></script>
 <script src="./js/common/common.js"></script>
+<script src="./js/common/ajax.js"></script>
 <script src="./js/iview/iview.min.js"></script>
 <script th:src="@{/js/common/ajax.js}"></script>
 </head>
@@ -63,11 +64,11 @@
 	    	</modal>
 	    	<!-- ·增加/修改组织 模态框  -->
 			<modal v-model="orgModal" :loading="loading" title="编辑组织" :mask-closable="false" :closable="false">
-	        	<i-form :model="orgModalForm" ref='orgModalForm' :rules="orgFormValidate" :label-width="120" id="orgModalForm">
-	        		<div id="orgForm">
+	        	<i-form :model="orgModalForm" ref='orgModalForm' :rules="orgFormValidation" :label-width="120"  id="orgModalForm">
+	        		<div id = "orgForm">
 						<row>
 							<i-col span="16">
-								<form-item label="组织名称:" prop="orgName">
+								<form-item label="部门名称:">
 									<i-input v-model="orgModalForm.orgName" placeholder="请输入组织名称"></i-input>
 								</form-item>
 							</i-col>
