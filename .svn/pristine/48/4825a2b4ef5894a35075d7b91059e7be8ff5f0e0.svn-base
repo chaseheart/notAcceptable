@@ -1,0 +1,270 @@
+package com.isolver.controller.wechat;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.entity.ClaimingExpenses;
+import com.isolver.entity.User;
+import com.isolver.form.wechat.ClaimingExpensesForm;
+import com.isolver.service.PendingService;
+import com.isolver.service.UserService;
+import com.isolver.service.wechat.ClamingExpensesService;
+import com.isolver.service.wechat.VerifyService;
+
+@RestController
+@RequestMapping(value = "/weixin")
+public class ClaimingExpensesController {
+
+	private static final Logger logger = LoggerFactory.getLogger(ClaimingExpensesController.class);
+
+	@Autowired
+	private ClamingExpensesService clamingExpensesService;
+
+	@Autowired
+	private VerifyService verifyService;
+
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private PendingService pendingService;
+
+	/**
+	 * 提交报销申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/claimingExpenses/init", method = RequestMethod.GET)
+	public Result<Object> claimingExpensesInit() {
+		try {
+			Map<String, Object> result = clamingExpensesService.init();
+			return new Result<>(SysStatusCodeConst.SUCCESS, result);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("初始化失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 提交报销申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/claimingExpenses/insert", method = RequestMethod.POST)
+	public Result<Object> insert(@ModelAttribute ClaimingExpensesForm claimingExpensesForm) {
+		try {
+			if(claimingExpensesForm.getId() != null && !"".equals(claimingExpensesForm.getId())) {
+				return clamingExpensesService.insertClamingExpenses(claimingExpensesForm);
+			}else {
+				return clamingExpensesService.insertClamingExpenses(claimingExpensesForm);
+			}
+			
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("提交失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 审批报销申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/claimingExpenses/dealApplication", method = RequestMethod.POST)
+	public Result<Object> agreeApplication(String assigner, Long ruFlow, Long userId) {
+		try {
+			User assign = new User();
+			// 下步审批人
+			if (!StringUtils.isBlank(assigner)) {
+				assign = userService.getUserById(Long.valueOf(assigner));
+			}
+			// 自己
+			User user = userService.getUserById(userId);
+			clamingExpensesService.nextStep(assign, ruFlow, user);
+			return new Result<>(SysStatusCodeConst.SUCCESS);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("提交失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 我的申请-初始化
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/verify/reimbursement/my", method = RequestMethod.POST)
+	public Result<Object> verifyInit(Long userId) {
+		try {
+			User user = userService.getUserById(userId);
+
+			List<ClaimingExpenses> claimingExpensesList = verifyService.getClaimingExpensesList(user);
+
+			return new Result<>(SysStatusCodeConst.SUCCESS, claimingExpensesList);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("检索我的申请失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 申请历史-初始化
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/verify/reimbursement/history", method = RequestMethod.POST)
+	public Result<Object> verifyHistoryInit(Long userId) {
+		try {
+			User user = userService.getUserById(userId);
+
+			List<ClaimingExpenses> claimingExpensesList = verifyService.getClaimingExpensesHistoryList(user);
+
+			return new Result<>(SysStatusCodeConst.SUCCESS, claimingExpensesList);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("检索我的申请失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 我的审核-初始化
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/verify/reimbursement/examine", method = RequestMethod.POST)
+	public Result<Object> verifyExamineInit(Long userId) {
+		try {
+			User user = userService.getUserById(userId);
+			Map<String, Object> claimingExpensesList = verifyService.findAllPendingClaimingExpensesByUserWechat(user);
+
+			return new Result<>(SysStatusCodeConst.SUCCESS, claimingExpensesList);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("检索我的申请失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 我的申请详情-初始化
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/verify/reimbursement/init", method = RequestMethod.POST)
+	public Result<Object> applyInit(Long id) {
+		try {
+			Map<String, Object> claimingExpenses = verifyService.getAppliocationDetail(id);
+			return new Result<>(SysStatusCodeConst.SUCCESS, claimingExpenses);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("检索我的申请详情失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 我的审核详情-初始化
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/verify/reimbursement/examineInit", method = RequestMethod.POST)
+	public Result<Object> examineInit(Long id, Long userId) {
+		try {
+			User user = userService.getUserById(userId);
+			Long role = user.getRole().getId() + 1;
+			Map<String, Object> claimingExpenses = verifyService.getAppliocationDetailVerify(id, role);
+			return new Result<>(SysStatusCodeConst.SUCCESS, claimingExpenses);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("检索我的审核详情失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 我的申请详情-修改初始化
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/verify/reimbursement/editInit", method = RequestMethod.POST)
+	public Result<Object> applyEditInit(Long id) {
+		try {
+			Map<String, Object> claimingExpenses = verifyService.getAppliocationDetailView(id);
+			return new Result<>(SysStatusCodeConst.SUCCESS, claimingExpenses);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("检索我的申请详情失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * 审批报销驳回
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/claimingExpenses/rejectFlow", method = RequestMethod.POST)
+	public Result<Object> rejectFlow(Long ruFlow, Long userId) {
+		try {
+			User user = userService.getUserById(userId);
+			pendingService.rejectApply(ruFlow, user);
+			return new Result<>(SysStatusCodeConst.SUCCESS);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("驳回失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * 审批报销拒絕
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/claimingExpenses/refuseApply", method = RequestMethod.POST)
+	public Result<Object> refuseApply(Long ruFlow, Long userId) {
+		try {
+			User user = userService.getUserById(userId);
+			pendingService.refuseApply(ruFlow, user);
+			return new Result<>(SysStatusCodeConst.SUCCESS);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("拒絕失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+}

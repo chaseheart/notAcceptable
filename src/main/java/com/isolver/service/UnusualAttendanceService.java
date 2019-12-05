@@ -1,0 +1,143 @@
+package com.isolver.service;
+
+import java.sql.Timestamp;
+import java.util.Calendar;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.ProcessEngineUtil;
+import com.isolver.dao.hiFlow.HiFlowRepository;
+import com.isolver.dao.oaFlow.OaFlowRepository;
+import com.isolver.dao.ruFlow.RuFlowRepository;
+import com.isolver.dao.servicePerformance.ServicePerformanceRepository;
+import com.isolver.dao.unusualAttendance.UnusualAttendanceRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.entity.HiFlow;
+import com.isolver.entity.OaFlow;
+import com.isolver.entity.RuFlow;
+import com.isolver.entity.ServicePerformance;
+import com.isolver.entity.UnusualAttendance;
+import com.isolver.entity.User;
+import com.isolver.form.UnusualAttendanceForm;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/18
+ * @class UnusualAttendanceService.java
+ */
+@Service
+public class UnusualAttendanceService {
+	@Autowired
+	private ActivityService activityService;
+	@Autowired
+	private OaFlowRepository oaFlowRepository;
+	@Autowired
+	private ServicePerformanceRepository servicePerformanceRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private RuFlowRepository ruFlowRepository;
+	@Autowired
+	private HiFlowRepository hiFlowRepository;
+
+	@Autowired
+	private UnusualAttendanceRepository unusualAttendanceRepository;
+	@Autowired
+	/** ·流程处理  **/
+	private PendingService pendingService;
+
+	/**
+	 * ·非正常 启动流程
+	 * @param unusualAttendanceForm 申请表单
+	 * @param user 申请者
+	 */
+	public void startFlow(UnusualAttendanceForm unusualAttendanceForm, User user) {
+
+		OaFlow oaFlow = oaFlowRepository.findOne(1l);
+		ServicePerformance servicePerformance = servicePerformanceRepository.findOne(Long.valueOf(unusualAttendanceForm.getServicePerformance()));
+		User assigner = userRepository.findOne(Long.valueOf(unusualAttendanceForm.getAssigner()));
+		Timestamp tm = Dateutil.getTimestamp();
+		// ·流程启动 191203 yy
+		RuFlow ruFlow = pendingService.startFlow(assigner, oaFlow, user);
+		
+		/** ·保存申请表单 **/
+		UnusualAttendance unusualAttendance = new UnusualAttendance();
+		unusualAttendance.setUser(user);
+		unusualAttendance.setUnusualAttendanceDate(Timestamp.valueOf(unusualAttendanceForm.getDate().replaceAll("/", "-") + " 00:00:00"));
+		unusualAttendance.setUnusualAttendanceType(Integer.valueOf(unusualAttendanceForm.getType()));
+		unusualAttendance.setHasDocument(unusualAttendanceForm.getHasDocument() != null ? true : false);
+		unusualAttendance.setReason(unusualAttendanceForm.getReason());
+		unusualAttendance.setRuFlow(ruFlow);
+		unusualAttendance.setInsertTime(tm);
+		unusualAttendance.setInsertUserId(user.getId());
+		unusualAttendance.setUpdateTime(tm);
+		unusualAttendance.setUpdateUserId(user.getId());
+		unusualAttendance.setServicePerformance(servicePerformance);
+		unusualAttendanceRepository.saveAndFlush(unusualAttendance);
+	}
+
+	/**
+	 * ·下一步骤
+	 * 
+	 * @param assign   审批人
+	 * @param ruFlowId
+	 * @param user     提交用户
+	 */
+	public void nextStep(User assign, Long ruFlowId, User user) {
+		Boolean endFlg = pendingService.nextStep(assign, ruFlowId, user);
+		//·流程正常结束，修改出勤的结算时间9点~18点
+		if(endFlg) {
+			RuFlow ruFlow = new RuFlow();
+			ruFlow.setId(ruFlowId);
+			ruFlow.setVersion(1);
+			// ·申请表
+			UnusualAttendance unusualAttendance = unusualAttendanceRepository.findByRuFlow(ruFlow);
+			// ·考勤表
+			ServicePerformance servicePerformance = unusualAttendance.getServicePerformance();
+			Timestamp tm = Dateutil.getTimestamp();
+			Calendar t = Calendar.getInstance();
+			// 9:00
+			t.set(Calendar.HOUR_OF_DAY, 9);
+			servicePerformance.setOaFinalStart(t.getTime());
+			// 18:00
+			t.set(Calendar.HOUR_OF_DAY, 18);
+			servicePerformance.setOaFinalEnd(t.getTime());
+			
+			servicePerformance.setUpdateTime(tm);
+			servicePerformance.setUpdateUserId(user.getId());
+			servicePerformanceRepository.saveAndFlush(servicePerformance);
+		}
+	}
+
+	/**
+	 *· 非正常考勤 - 再申请
+	 * @param unusualAttendanceForm
+	 * @param user
+	 * @param ruFlowId
+	 */
+	public void restartFlow(UnusualAttendanceForm unusualAttendanceForm, User user, Long ruFlowId) {
+
+		User assigner = userRepository.findOne(Long.valueOf(unusualAttendanceForm.getAssigner()));
+		RuFlow ruFlowModel = ruFlowRepository.findOne(ruFlowId);
+		Timestamp tm = Dateutil.getTimestamp();
+		/** ·流程运行  **/
+		pendingService.nextStep(assigner, ruFlowId, user);
+
+		/** ·更新申请表单 **/
+
+		UnusualAttendance unusualAttendanceModel = unusualAttendanceRepository.findByRuFlow(ruFlowModel);
+		UnusualAttendance unusualAttendanceEntity = new UnusualAttendance();
+		BeanUtils.copyProperties(unusualAttendanceModel, unusualAttendanceEntity);
+		unusualAttendanceEntity.setUnusualAttendanceDate(Timestamp.valueOf(unusualAttendanceForm.getDate().replaceAll("/", "-") + " 00:00:00"));
+		unusualAttendanceEntity.setUnusualAttendanceType(Integer.valueOf(unusualAttendanceForm.getType()));
+		unusualAttendanceEntity.setHasDocument(unusualAttendanceForm.getHasDocument() != null ? true : false);
+		unusualAttendanceEntity.setReason(unusualAttendanceForm.getReason());
+		unusualAttendanceEntity.setUpdateTime(tm);
+		unusualAttendanceEntity.setUpdateUserId(user.getId());
+		unusualAttendanceRepository.saveAndFlush(unusualAttendanceEntity);
+	}
+}

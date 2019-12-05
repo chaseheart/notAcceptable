@@ -1,0 +1,29 @@
+package com.isolver.dao.oaFlowStep;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.isolver.entity.OaFlowStep;
+
+
+
+/**
+ * 查询流程步骤与角色等级对应关系
+ * @author IS1907011
+ * @date 2019/12/03
+ * @class OaFlowStepRepository.java
+ */
+public interface OaFlowStepRepository extends JpaRepository<OaFlowStep,Long>, OaFlowStepRepositoryCustom{
+	
+	/**
+	 * 查找本角色之后流程步骤的角色层级对应关系
+	 * 取第一个即为下一步
+	 * @param level	 本角色层级
+	 * @param flowId 流程定义id
+	 * @return
+	 */
+	@Query("SELECT o FROM OaFlowStep o WHERE o.flow.id =:flowId AND o.flowState > (SELECT b.flowState From OaFlowStep b Where b.roleLevel =:level AND b.flow.id =:flowId) ORDER BY o.flowState")
+	public List<OaFlowStep> getNextStepLevel(Integer level, Long flowId);
+}

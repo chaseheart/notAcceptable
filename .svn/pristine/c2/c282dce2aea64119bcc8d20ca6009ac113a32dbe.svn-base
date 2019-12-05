@@ -1,0 +1,20 @@
+package com.isolver.dao.unusualAttendance;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.UnusualAttendance;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/18
+ * @class UnusualAttendanceRepository.java
+ */
+@Repository
+public interface UnusualAttendanceRepository extends JpaRepository<UnusualAttendance, Long> {
+
+	public List<UnusualAttendance> findByUnusualAttendanceDateBetween(Timestamp startTime, Timestamp endTime);
+}

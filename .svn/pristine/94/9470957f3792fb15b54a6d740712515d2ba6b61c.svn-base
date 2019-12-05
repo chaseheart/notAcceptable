@@ -1,0 +1,58 @@
+package com.isolver.controller;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.JsonUtil;
+import com.isolver.dto.WorkSearchDto;
+import com.isolver.service.ServicePerformanceService;
+import com.isolver.service.UserService;
+
+/**
+ * 社内出勤记录
+ * 
+ * @author IS1907005
+ * @date 2019/11/27
+ * @class WorkSearchController.java
+ */
+@RestController
+@RequestMapping(value = "/workSearch")
+public class WorkSearchController {
+
+	private static final Logger logger = LoggerFactory.getLogger(WorkSearchController.class);
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private ServicePerformanceService servicePerformanceService;
+
+	/**
+	 * main初始化数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView() {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("workSearch");
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -1);
+		int firstDay = cal.getMinimum(Calendar.DATE);
+		int lastDay = cal.getActualMaximum(Calendar.DATE);
+		Date startDate = Dateutil.LocalDateToDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, firstDay);
+		Date endDate = Dateutil.LocalDateToDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, lastDay);
+		List<WorkSearchDto> dtoList = servicePerformanceService.getWorkSearch(startDate, endDate);
+		modelAndView.addObject("workSearch", JsonUtil.objectToJSON(dtoList));
+		return modelAndView;
+	}
+}

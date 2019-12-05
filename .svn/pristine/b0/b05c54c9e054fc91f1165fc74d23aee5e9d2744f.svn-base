@@ -1,0 +1,43 @@
+package com.isolver.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.config.AuthenticationFacade;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.dto.UserDto;
+import com.isolver.entity.User;
+import com.isolver.service.UserService;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/13
+ * @class UserController.java
+ */
+@RestController
+@RequestMapping(value = "/user")
+public class UserController {
+
+	@Autowired
+	private UserService userService;
+
+	/**
+	 * 通过部门和角色查找用户（复数）
+	 * 
+	 * @param departId
+	 * @return
+	 */
+	@RequestMapping(value = "/findUserByDepartAndRole", method = RequestMethod.POST)
+	public Result<Object> findUserByDepartAndRole(Long departId) {
+		Long id = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(id);
+		List<UserDto> userDto = userService.findUserByDepartAndRole(departId, user.getRole().getLevel());
+		return new Result<Object>(SysStatusCodeConst.SUCCESS, userDto);
+
+	}
+}

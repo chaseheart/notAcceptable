@@ -1,0 +1,131 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem : {
+			workId : '',
+			user : '',
+			org : '',
+			depart : '',
+			date : ''
+		},
+		orgList : [ {
+			value : '1',
+			label : 'ISOLVER集团'
+		}, {
+			value : '2',
+			label : '对日外包模块'
+		}, {
+			value : '3',
+			label : 'ISOLVER上海'
+		} ],
+		departList : [ {
+			value : '1',
+			label : '综合管理部'
+		}, {
+			value : '2',
+			label : '丰通开发室'
+		}, {
+			value : '3',
+			label : 'NDS开发室'
+		} ],
+		resultTable : [ {
+			title : '工号',
+			key : 'id',
+			className:'table-col-3',
+			render : function(h, params) {
+				var functionList = [];
+				var show = h('a', {
+					props : {
+						type : 'error',
+					},
+					attrs:{
+						href:'#',
+						'class':'link-error'
+					},
+					on : {
+						click : function() {
+						}
+					}
+				}, params.row.id);
+				functionList.push(show);
+				return h('span', {
+
+				}, functionList);
+			}
+		}, {
+			title : '姓名',
+			key : 'user',
+			className:'table-col-1'
+		}, {
+			title : '部门',
+			key : 'depart',
+			className:'table-col-3'
+		}, {
+			title : '加班[小时]',
+			key : 'overtime',
+			className:'table-col-3'
+		}, {
+			title : '非正常考勤[次]',
+			key : 'abnormal',
+			className:'table-col-3'
+		}, {
+			title : '缺勤[小时]',
+			key : 'absenceFromDuty',
+			className:'table-col-1'
+		}, {
+			title : '事假[天]',
+			key : 'absence',
+			className:'table-col-1'
+		}, {
+			title : '病假[天]',
+			key : 'sick',
+			className:'table-col-1'
+		}, {
+			title : '带薪休假[天]',
+			key : 'paid',
+			className:'table-col-3'
+		}, {
+			title : '出勤率',
+			key : 'percent',
+			className:'table-col-1'
+		}, {
+			title : '实勤[小时]',
+			key : 'actualAttendance',
+			className:'table-col-1'
+		}, {
+			title : '备注',
+			key : 'content',
+			className:'table-col-1'
+		} ],
+		resultData : [ {
+			id : 'IS1907007',
+			user : 'Dong',
+			depart : '丰通开发室',
+			overtime : '1',
+			abnormal : '1',
+			absenceFromDuty : '1',
+			absence : '1',
+			sick : '1',
+			paid : '1',
+			percent : '50%',
+			actualAttendance : '10',
+			content : ''
+		}, {
+			id : 'IS1907007',
+			user : 'Dong',
+			depart : '丰通开发室',
+			overtime : '2',
+			abnormal : '2',
+			absenceFromDuty : '1',
+			absence : '2',
+			sick : '1',
+			paid : '1',
+			percent : '25%',
+			actualAttendance : '10',
+			content : ''
+		} ]
+	},
+	methods : {},
+	created : function() {
+	}
+});

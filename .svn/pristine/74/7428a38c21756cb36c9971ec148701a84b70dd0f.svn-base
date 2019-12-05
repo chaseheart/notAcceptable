@@ -1,0 +1,113 @@
+package com.isolver.dao.user.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+
+import com.alibaba.druid.util.StringUtils;
+import com.isolver.common.util.StrUtil;
+import com.isolver.dao.user.UserRepositoryCustom;
+import com.isolver.dto.SysUserDto;
+import com.isolver.form.PageableForm;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class UserRepositoryImpl.java
+ */
+@SuppressWarnings("unchecked")
+public class UserRepositoryImpl implements UserRepositoryCustom {
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	/**
+	 * 分页检索所有用户
+	 * 
+	 * @param workId
+	 * @param username
+	 * @param org
+	 * @param depart
+	 * @param deleteFlag
+	 * @param pageable
+	 * 
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> findAllUserByPageAndDelete(String workId, String username, Long org, Long depart, Boolean deleteFlag, PageableForm pageable) {
+		Map<String, Object> map = new HashMap<>();
+		List<SysUserDto> userDto = new ArrayList<>();
+		String sql = "";
+		sql += " SELECT "
+			+ " CONCAT(a.id, '') AS id, "
+			+ " CONCAT(a.work_id, '') AS workId, "
+			+ " CONCAT(a.username, '') AS username, "
+			+ " CONCAT(b.org_name, '') AS org, "
+			+ " CONCAT(c.depart_name, '') AS depart, "
+			+ " CONCAT(d.role_name, '') AS roleName, "
+			+ " a.holiday_type AS vacationType "
+			+ " FROM user a LEFT JOIN organization b ON a.org = b.id "
+			+ " LEFT JOIN department c ON a.depart = c.id "
+			+ " LEFT JOIN role d ON a.role = d.id "
+			+ " WHERE a.delete_flag = :deleteFlag ";
+		
+		if(!StringUtils.isEmpty(workId)) {
+			sql += " AND a.work_id like :workId ";
+		}
+		if(!StringUtils.isEmpty(username)) {
+			sql += " AND a.username like :username ";
+		}
+		if(org != null) {
+			sql += " AND a.org = :org ";
+		}
+		if(depart != null) {
+			sql += " AND a.depart = :depart ";
+		}
+		
+		String searchSql = " ORDER BY a.work_id "
+			+ " LIMIT :limit OFFSET :offset ";
+		
+		Query query = entityManager.createNativeQuery(sql + searchSql);
+		Query count = entityManager.createNativeQuery(sql);
+		if(!StringUtils.isEmpty(workId)) {
+			query.setParameter("workId", StrUtil.strWithVague(workId));
+			count.setParameter("workId", StrUtil.strWithVague(workId));
+		}
+		if(!StringUtils.isEmpty(username)) {
+			query.setParameter("username", StrUtil.strWithVague(username));
+			count.setParameter("username", StrUtil.strWithVague(username));
+		}
+		if(org != null) {
+			query.setParameter("org", org);
+			count.setParameter("org", org);
+		}
+		if(depart != null) {
+			query.setParameter("depart", depart);
+			count.setParameter("depart", depart);
+		}
+		
+		query.setParameter("deleteFlag", deleteFlag);
+		count.setParameter("deleteFlag", deleteFlag);
+		
+		query.setParameter("limit", pageable.getSize());
+		query.setParameter("offset", pageable.getSize() * pageable.getPage());
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(SysUserDto.class));
+		count.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(SysUserDto.class));
+		userDto = query.getResultList();
+		int listNum = count.getResultList().size();
+		
+		map.put("content", userDto);
+		map.put("count", listNum);
+		
+		return map;
+	}
+
+}

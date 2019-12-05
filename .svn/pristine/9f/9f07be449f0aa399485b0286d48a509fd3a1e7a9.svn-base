@@ -1,0 +1,294 @@
+package com.isolver.dao.servicePerformance.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+
+import com.isolver.common.util.Timeutil;
+import com.isolver.dao.servicePerformance.ServicePerformanceRepositoryCustom;
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.dto.WorkSearchDto;
+import com.isolver.dto.wechat.WechatServicePerformanceDto;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class ServicePerformanceRepositoryImpl.java
+ */
+@SuppressWarnings("unchecked")
+public class ServicePerformanceRepositoryImpl implements ServicePerformanceRepositoryCustom {
+	@PersistenceContext
+	private EntityManager entityManager;
+
+
+	public List<ServicePerformanceDto> findServicePerformanceByUserAndDeleteFlag(User user, Date monthStart, Date monthEnd, Boolean deleteFlag) {
+		List<ServicePerformanceDto> spDto = new ArrayList<>();
+		String sql = "";
+		sql += 	"SELECT " + 
+				"	CONCAT( a.id, '' ) AS id, " + 
+				"	CONCAT( a.day, '' ) AS day, " + 
+				"	CONCAT( a.oa_start, '' ) AS oaStart, " + 
+				"	CONCAT( a.oa_end, '' ) AS oaEnd, " + 
+				"	CONCAT( a.oa_final_start, '' ) AS oaFinalStart, " + 
+				"	CONCAT( a.oa_final_end, '' ) AS oaFinalEnd, " + 
+				"	CONCAT( a.version, '' ) AS version, " + 
+				"	CONCAT( TIMESTAMPDIFF( HOUR, a.oa_start, a.oa_end ), '' ) AS hour, " + 
+				"	CONCAT( " + 
+				"CASE " + 
+				"	 " + 
+				"	WHEN oa_final_start BETWEEN '09:00:00'  " + 
+				"	AND '09:30:00'  " + 
+				"	AND TIMESTAMPDIFF( HOUR, a.oa_start, a.oa_end ) >= 9  " + 
+				"	AND oa_final_end BETWEEN '18:00:00'  " + 
+				"	AND '18:30:00' THEN " + 
+				"		'n'  " + 
+				"		WHEN oa_final_start BETWEEN '09:00:00'  " + 
+				"		AND '09:30:00'  " + 
+				"		AND oa_final_end BETWEEN '20:00:00'  " + 
+				"		AND '23:59:00' THEN " + 
+				"			'o'  " + 
+				"			WHEN oa_final_start NOT BETWEEN '09:00:00'  " + 
+				"			AND '09:30:00'  " + 
+				"			AND oa_final_end BETWEEN '20:00:00'  " + 
+				"			AND '23:59:00' THEN " + 
+				"				'uo' ELSE 'u'  " + 
+				"			END, " + 
+				"			''  " + 
+				"		) AS state  " + 
+				"FROM " + 
+				"service_performance a"+ 
+				"	WHERE" + 
+				"	a.user = :user " + 
+				"	AND a.day BETWEEN :monthStart AND :monthEnd " + 
+				"	AND a.delete_flag = :deleteFlag" + 
+				" ORDER BY a.day ";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("user", user);
+		query.setParameter("monthStart", monthStart);
+		query.setParameter("monthEnd", monthEnd);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ServicePerformanceDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+	
+	public WechatServicePerformanceDto findServicePerformanceById(User user, Long id, Boolean deleteFlag) {
+		WechatServicePerformanceDto spDto = new WechatServicePerformanceDto();
+		String sql = "";
+		sql += 	"SELECT " + 
+				"	CONCAT( a.id, '' ) AS id, " + 
+				"	CONCAT( a.day, '' ) AS day, " + 
+				"	CONCAT( a.oa_start, '' ) AS oaStart, " + 
+				"	CONCAT( a.oa_end, '' ) AS oaEnd, " + 
+				"	CONCAT( a.oa_final_start, '' ) AS oaFinalStart, " + 
+				"	CONCAT( a.oa_final_end, '' ) AS oaFinalEnd, " + 
+				"	CONCAT( TIMESTAMPDIFF( HOUR, a.oa_start, a.oa_end ), '' ) AS hour, " + 
+				"	CONCAT( " + 
+				"CASE " + 
+				"	 " + 
+				"	WHEN oa_final_start BETWEEN '09:00:00'  " + 
+				"	AND '09:30:00'  " + 
+				"	AND TIMESTAMPDIFF( HOUR, a.oa_start, a.oa_end ) >= 9  " + 
+				"	AND oa_final_end BETWEEN '18:00:00'  " + 
+				"	AND '18:30:00' THEN " + 
+				"		'n'  " + 
+				"		WHEN oa_final_start BETWEEN '09:00:00'  " + 
+				"		AND '09:30:00'  " + 
+				"		AND oa_final_end BETWEEN '20:00:00'  " + 
+				"		AND '23:59:00' THEN " + 
+				"			'o'  " + 
+				"			WHEN oa_final_start NOT BETWEEN '09:00:00'  " + 
+				"			AND '09:30:00'  " + 
+				"			AND oa_final_end BETWEEN '20:00:00'  " + 
+				"			AND '23:59:00' THEN " + 
+				"				'uo' ELSE 'u'  " + 
+				"			END, " + 
+				"			''  " + 
+				"		) AS state,  " + 
+				"  CONCAT( b.work_id, '' ) AS workId, " +
+				"  CONCAT( b.username, '' ) AS username " +
+				"FROM " + 
+				"service_performance a " + 
+				"left join user b on b.id = a.user " +
+				"	WHERE" + 
+				"	a.user = :user " + 
+				"	and a.id = :id " + 
+				"	AND a.delete_flag = :deleteFlag" + 
+				" ORDER BY a.day ";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("user", user);
+		query.setParameter("id", id);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(WechatServicePerformanceDto.class));
+		spDto = (WechatServicePerformanceDto)query.getResultList().get(0);
+		return spDto;
+	}
+
+	
+	public List<WorkSearchDto> getAllWorkSearchDto(Date startDate,Date endDate){
+		
+		String sql = "";
+		sql +=	"SELECT " + 
+				"	CONCAT(b.work_id,'') AS workId, " + 
+				"	CONCAT(b.username,'') AS username, " + 
+				"	CONCAT(c.depart_name,'') AS departName, " + 
+				"	CONCAT(IFNULL( d.overHour, '0' ),'') AS overtimeHour, " + 
+				"	CONCAT(IFNULL( e.times, '0' ),'') AS unusualTime, " + 
+				"	CONCAT(IFNULL( f.absTime, '0' ),'') AS lackHour, " + 
+				"	CONCAT(IFNULL( g.plAbsence, '0' ),'') AS plDay, " + 
+				"	CONCAT(IFNULL( h.slAbsence, '0' ),'') AS slDay, " + 
+				"	CONCAT(i.annual_leave,'') AS annualLeave, " + 
+				"	CONCAT(i.paid_leave,'') AS paidLeave, " + 
+				"	CONCAT(ho.hoSum,'') AS performanceActual  " + 
+				"FROM " + 
+				"	`user` b " + 
+				"	LEFT JOIN department c ON b.depart = c.id " + 
+				"	LEFT JOIN ( " + 
+				"SELECT " + 
+				"	SUM( TIMESTAMPDIFF( HOUR, wo.work_overtime_start, wo.work_overtime_end ) ) AS overHour, " + 
+				"	wo.`user` AS id  " + 
+				"FROM " + 
+				"	work_overtime wo " + 
+				"	LEFT JOIN ru_flow rf ON wo.ru_flow_id = rf.id  " + 
+				"WHERE " + 
+				"	rf.state = 4  " + 
+				"	AND wo.work_overtime_date BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"GROUP BY " + 
+				"	wo.`user`  " + 
+				"	) d ON b.id = d.id " + 
+				"	LEFT JOIN ( " + 
+				"SELECT " + 
+				"	count( * ) AS times, " + 
+				"	u.id  " + 
+				"FROM " + 
+				"	unusual_attendance ua " + 
+				"	LEFT JOIN ru_flow rf ON ua.ru_flow_id = rf.id " + 
+				"	LEFT JOIN `user` u ON ua.`user` = u.id  " + 
+				"WHERE " + 
+				"	rf.state = 4  " + 
+				"	AND ua.unusual_attendance_date BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"GROUP BY " + 
+				"	u.id  " + 
+				"	) e ON b.id = e.id " + 
+				"	LEFT JOIN ( " + 
+				"SELECT " + 
+				"	sum( sp.absence_time ) AS absTime, " + 
+				"	u.id  " + 
+				"FROM " + 
+				"	service_performance sp " + 
+				"	LEFT JOIN `user` u ON sp.`user` = u.id  " + 
+				"WHERE " + 
+				"	sp.`day` BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"GROUP BY " + 
+				"	u.id  " + 
+				"	) AS f ON f.id = b.id " + 
+				"	LEFT JOIN ( " + 
+				"SELECT " + 
+				"	FLOOR( SUM( TIMESTAMPDIFF( HOUR, va.vacation_start, va.vacation_end ) ) / 4 ) / 2 AS plAbsence, " + 
+				"	u.id  " + 
+				"FROM " + 
+				"	vacation va " + 
+				"	LEFT JOIN ru_flow rf ON va.ru_flow_id = rf.id " + 
+				"	LEFT JOIN `user` u ON va.`user` = u.id  " + 
+				"WHERE " + 
+				"	rf.state = 4  " + 
+				"	AND va.vacation_type = 1  " + 
+				"	AND va.vacation_start BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"GROUP BY " + 
+				"	u.id  " + 
+				"	) g ON g.id = b.id " + 
+				"	LEFT JOIN ( " + 
+				"SELECT " + 
+				"	FLOOR( SUM( TIMESTAMPDIFF( HOUR, va.vacation_start, va.vacation_end ) ) / 4 ) / 2 AS slAbsence, " + 
+				"	u.id  " + 
+				"FROM " + 
+				"	vacation va " + 
+				"	LEFT JOIN ru_flow rf ON va.ru_flow_id = rf.id " + 
+				"	LEFT JOIN `user` u ON va.`user` = u.id  " + 
+				"WHERE " + 
+				"	rf.state = 4  " + 
+				"	AND va.vacation_type = 2  " + 
+				"	AND va.vacation_start BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"GROUP BY " + 
+				"	u.id  " + 
+				"	) h ON h.id = b.id " + 
+				"	LEFT JOIN vacation_record i ON i.user_id = b.id " + 
+				"	LEFT JOIN ( " + 
+				"SELECT " + 
+				"	u.id, " + 
+				"	sum( " + 
+				"	TIMESTAMPDIFF( " + 
+				"	HOUR, " + 
+				"	CONCAT( '2010/10/10 ', sp.oa_final_start ), " + 
+				"	CONCAT( '2010/10/10 ', CASE WHEN sp.oa_final_end > '18:00:00' THEN '18:00:00' ELSE sp.oa_final_end END )  " + 
+				"	)  " + 
+				"	) - ho.hoSum AS hoSum  " + 
+				"FROM " + 
+				"	service_performance sp " + 
+				"	LEFT JOIN `user` u ON sp.`user` = u.id " + 
+				"	LEFT JOIN ( " + 
+				"SELECT " + 
+				"	u.id, " + 
+				"	SUM( " + 
+				"	TIMESTAMPDIFF( " + 
+				"	HOUR, " + 
+				"	CONCAT( '2010/10/10 ', sp.oa_final_start ), " + 
+				"	CONCAT( '2010/10/10 ', CASE WHEN sp.oa_final_end > '18:00:00' THEN '18:00:00' ELSE sp.oa_final_end END )  " + 
+				"	)  " + 
+				"	) AS hoSum  " + 
+				"FROM " + 
+				"	service_performance sp " + 
+				"	LEFT JOIN `user` u ON sp.`user` = u.id  " + 
+				"WHERE " + 
+				"	FIND_IN_SET( " + 
+				"	CONCAT( '\"', DATE_FORMAT( sp.DAY, '%d' ), '\"' ), " + 
+				"	( " + 
+				"SELECT " + 
+				"	h.rest_day  " + 
+				"FROM " + 
+				"	holiday h  " + 
+				"WHERE " + 
+				"	CONCAT( h.YEAR, '/', h.`month`, '/1' ) BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"	AND h.type = 0  " + 
+				"	)  " + 
+				"	)  " + 
+				"	AND sp.`day` BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"GROUP BY " + 
+				"	u.id  " + 
+				"	) ho ON ho.id = u.id  " + 
+				"WHERE " + 
+				"	sp.`day` BETWEEN :startDate  " + 
+				"	AND :endDate  " + 
+				"GROUP BY " + 
+				"	u.id, " + 
+				"	ho.hoSum  " + 
+				"	) ho ON ho.id = b.id  " + 
+				"WHERE " + 
+				"	i.date BETWEEN :startDate  " + 
+				"	AND :endDate";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("startDate",Timeutil.datesToStr(startDate) );
+		query.setParameter("endDate", Timeutil.datesToStr(endDate) );
+		// WorkSearchDto
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(WorkSearchDto.class));
+		List<WorkSearchDto> workSearchDto = query.getResultList();
+		return workSearchDto;
+	}
+}

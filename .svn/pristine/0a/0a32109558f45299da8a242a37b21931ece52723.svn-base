@@ -1,0 +1,243 @@
+package com.isolver.entity;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Version;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/06
+ * @class ClaimingExpenses.java
+ * @apiNote 报销
+ */
+public class ClaimingExpenses {
+	/** ID **/
+	private Long id;
+	/** 。费用分类 **/
+	private String expensesType;
+	/** 。金额 **/
+	private BigDecimal money;
+	/** 。项目ID **/
+	private String projectId;
+	/** 。客户名称 **/
+	private String customerName;
+	/** 。承担方 **/
+	private String expenseCompany;
+	/** 。备注 **/
+	private String content;
+
+	/**
+	 * @return the id
+	 */
+	@Id
+	@Column(name = "id")
+	@GeneratedValue
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the expensesType
+	 */
+	@Column(name = "expensesType", nullable = false)
+	public String getExpensesType() {
+		return expensesType;
+	}
+
+	/**
+	 * @param expensesType the expensesType to set
+	 */
+	public void setExpensesType(String expensesType) {
+		this.expensesType = expensesType;
+	}
+
+	/**
+	 * @return the money
+	 */
+	@Column(name = "money", nullable = false)
+	public BigDecimal getMoney() {
+		return money;
+	}
+
+	/**
+	 * @param money the money to set
+	 */
+	public void setMoney(BigDecimal money) {
+		this.money = money;
+	}
+
+	/**
+	 * @return the projectId
+	 */
+	@Column(name = "projectId", nullable = false)
+	public String getProjectId() {
+		return projectId;
+	}
+
+	/**
+	 * @param projectId the projectId to set
+	 */
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
+	/**
+	 * @return the customerName
+	 */
+	@Column(name = "customerName", nullable = false)
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	/**
+	 * @param customerName the customerName to set
+	 */
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	/**
+	 * @return the expenseCompany
+	 */
+	@Column(name = "expenseCompany", nullable = false)
+	public String getExpenseCompany() {
+		return expenseCompany;
+	}
+
+	/**
+	 * @param expenseCompany the expenseCompany to set
+	 */
+	public void setExpenseCompany(String expenseCompany) {
+		this.expenseCompany = expenseCompany;
+	}
+
+	/**
+	 * @return the content
+	 */
+	@Column(name = "content", nullable = false)
+	public String getContent() {
+		return content;
+	}
+
+	/**
+	 * @param content the content to set
+	 */
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	/** 。插入者 **/
+	private Long insertUserId;
+	/** 。插入时间 **/
+	private Timestamp insertTime;
+	/** 。更新者 **/
+	private Long updateUserId;
+	/** 。更新时间 **/
+	private Timestamp updateTime;
+	/** deleteFlag **/
+	private Boolean deleteFlag;
+	/** 。版本 **/
+	private Integer version;
+
+	/**
+	 * @return the insertUserId
+	 */
+	@Column(name = "insertUserId")
+	public Long getInsertUserId() {
+		return insertUserId;
+	}
+
+	/**
+	 * @param insertUserId the insertUserId to set
+	 */
+	public void setInsertUserId(Long insertUserId) {
+		this.insertUserId = insertUserId;
+	}
+
+	/**
+	 * @return the insertTime
+	 */
+	@Column(name = "insertTime")
+	public Timestamp getInsertTime() {
+		return insertTime;
+	}
+
+	/**
+	 * @param insertTime the insertTime to set
+	 */
+	public void setInsertTime(Timestamp insertTime) {
+		this.insertTime = insertTime;
+	}
+
+	/**
+	 * @return the updateUserId
+	 */
+	@Column(name = "updateUserId")
+	public Long getUpdateUserId() {
+		return updateUserId;
+	}
+
+	/**
+	 * @param updateUserId the updateUserId to set
+	 */
+	public void setUpdateUserId(Long updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+
+	/**
+	 * @return the updateTime
+	 */
+	@Column(name = "updateTime")
+	public Timestamp getUpdateTime() {
+		return updateTime;
+	}
+
+	/**
+	 * @param updateTime the updateTime to set
+	 */
+	public void setUpdateTime(Timestamp updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	/**
+	 * @return the deleteFlag
+	 */
+	@Column(name = "deleteFlag")
+	public Boolean getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	/**
+	 * @param deleteFlag the deleteFlag to set
+	 */
+	public void setDeleteFlag(Boolean deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+
+	/**
+	 * @return the version
+	 */
+	@Version
+	@Column(name = "version")
+	public Integer getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version the version to set
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+}

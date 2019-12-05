@@ -1,0 +1,51 @@
+package com.isolver.service.wechat;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.news.NewsRepository;
+import com.isolver.entity.News;
+
+@Service
+public class NewsService {
+
+	@Autowired
+	private NewsRepository newsRepository;
+
+	/**
+	 * 获得新闻/通知/贴士
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<News> getNewsList(Integer type) {
+		List<News> resultList = newsRepository.findByTypeAndDeleteFlag(type, SysStaticConst.NOTDELE);
+		return resultList;
+	}
+
+	/**
+	 * 获得新闻/通知/贴士 详细
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public News getNewsDetail(Long id) {
+		News news = newsRepository.findByIdAndDeleteFlag(id, SysStaticConst.NOTDELE);
+		return news;
+	}
+
+	/**
+	 * 获得新闻/通知/贴士
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<News> searchNews(String content, Integer type) {
+		List<News> resultList = newsRepository.findByContent(content, type, SysStaticConst.NOTDELE);
+		return resultList;
+	}
+
+}

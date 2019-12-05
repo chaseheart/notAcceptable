@@ -1,0 +1,148 @@
+package com.isolver.common.util;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
+public class Dateutil {
+
+	/**
+	 * yyyy-MM-dd HH:mm:ss
+	 */
+	public static final DateTimeFormatter formatter_DateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+	/**
+	 * 获取当前日期
+	 * 
+	 * @return
+	 */
+	public static LocalDate getLocalDate() {
+		return LocalDate.now();
+	}
+
+	/**
+	 * 当前时间LocalDate转Date
+	 * 
+	 * @return
+	 */
+	public static Date nowLocalDateToDate() {
+		LocalDate localDate = LocalDate.now();
+		return Date.from(localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant());
+	}
+
+	/**
+	 * 当前时间String转Date
+	 * 
+	 * @return
+	 */
+	public static Date stringToDate(String date) {
+		String[] dateArr = date.split("-");
+		LocalDate localDate = LocalDate.of(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]),
+				Integer.parseInt(dateArr[2]));
+		return Date.from(localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant());
+	}
+
+	/**
+	 * 任意时间LocalDate转Date
+	 * 
+	 * @return
+	 */
+	public static Date localDateToDate(Integer year, Integer month, Integer day) {
+		LocalDate localDate = LocalDate.of(year, month, day);
+		return Date.from(localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant());
+	}
+
+	/**
+	 * 任意时间LocalDate转long
+	 * 
+	 * @return
+	 */
+	public static Long localDateToTimestamp(Integer year, Integer month, Integer day) {
+		LocalDate localDate = LocalDate.of(year, month, day);
+		return localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli();
+	}
+
+	/**
+	 * Date转LocalDate
+	 * 
+	 * @return
+	 */
+	public static LocalDate dateToLocalDate(Date date) {
+		return date.toInstant().atZone(ZoneOffset.ofHours(8)).toLocalDate();
+	}
+
+	/**
+	 * Date转LocalDate
+	 * 
+	 * @return
+	 */
+	public static LocalDateTime dateToLocalDateTime(Date date) {
+		return date.toInstant().atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
+	}
+
+	/**
+	 * 获取当前Long型毫秒级时间
+	 * 
+	 * @return
+	 */
+	public static Long getMilliSecond() {
+		Long milliSecond = Instant.now().toEpochMilli();
+		return milliSecond;
+	}
+
+	/**
+	 * 返回当前时间yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getDate(Date date) {
+		return dateToLocalDate(date).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	/**
+	 * 返回当前系统时间 yyyy-MM-dd HH:mm:ss
+	 * 
+	 * @return 返回当前系统时间
+	 */
+	public static String getDateTime(Date date) {
+		return dateToLocalDateTime(date).format(formatter_DateTime);
+	}
+
+	/**
+	 * 获取当前Timestamp型毫秒级时间
+	 * 
+	 * @return
+	 */
+	public static Timestamp getTimestamp() {
+		Timestamp milliSecond = new Timestamp(getMilliSecond());
+		return milliSecond;
+	}
+
+	/**
+	 * 获取当月第一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getFirstDayOfMonth() {
+		return getLocalDate().withDayOfMonth(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	/**
+	 * 获取本月最后一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getLastDayOfMonth() {
+		LocalDate localDate = getLocalDate();
+		return localDate.withDayOfMonth(localDate.lengthOfMonth()).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+//	public static void main(String[] args) {
+//		System.err.println(getDate(nowLocalDateToDate()));
+//	}
+
+}

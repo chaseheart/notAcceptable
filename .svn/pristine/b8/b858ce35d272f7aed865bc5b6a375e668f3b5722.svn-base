@@ -1,0 +1,50 @@
+package com.isolver.service.wechat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.claimingExpenses.ClaimingExpensesRepository;
+import com.isolver.dao.fileInfo.FileInfoRepository;
+import com.isolver.entity.ClaimingExpenses;
+import com.isolver.entity.User;
+
+@Service
+public class VerifyService {
+
+	@Autowired
+	private ClaimingExpensesRepository claimingExpensesRepository;
+	
+	@Autowired
+	private FileInfoRepository fileInfoRepository;
+	
+	/** 表名(file_info用) **/
+	private static final String TABLENAME = "claiming_expenses";
+
+	/**
+	 * 我的申请
+	 * 
+	 * @param passwordForm passwordForm
+	 * @return
+	 */
+	public List<ClaimingExpenses> getClaimingExpensesList(User user) {
+		return claimingExpensesRepository.findByUserAndDeleteFlag(user, SysStaticConst.NOTDELE);
+	}
+	
+	/**
+	 * 申请详情
+	 * @param id
+	 * @return
+	 */
+	public Map<String, Object> getAppliocationDetail(Long id) {
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put("imgList", fileInfoRepository.findByTableNameAndTableIdAndDeleteFlag(TABLENAME,id.toString(), SysStaticConst.NOTDELE));
+		resultMap.put("formData", claimingExpensesRepository.findByIdAndDeleteFlag(id, SysStaticConst.NOTDELE));
+		return resultMap;
+	}
+
+}

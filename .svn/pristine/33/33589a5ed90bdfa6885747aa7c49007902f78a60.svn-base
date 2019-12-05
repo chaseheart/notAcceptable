@@ -1,0 +1,42 @@
+package com.isolver.dao.vacation;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.dto.ApplicationDto;
+import com.isolver.dto.PendingDto;
+import com.isolver.entity.RuFlow;
+import com.isolver.entity.User;
+import com.isolver.entity.Vacation;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/15
+ * @class VacationRepository.java
+ */
+@Repository
+public interface VacationRepository extends JpaRepository<Vacation, Long> {
+
+	@Query("select new com.isolver.dto.ApplicationDto(CONCAT(a.ruFlow.id,'' )as appId, CONCAT(a.vacationType,'' ) as typeDetail,"
+			+ " CONCAT(a.vacationStart,'' ) as appStart, CONCAT(a.vacationEnd,'' ) as appEnd, CONCAT(a.ruFlow.dealPeople.username,'' ) as assigner, " + " CONCAT(a.vacationContent,'' ) as content )"
+			+ " from Vacation a where a.user = :user and a.vacationStart Between :startTime and :endTime ")
+	public List<ApplicationDto> findApplicationDtoByVacationStartBetween(@Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime, @Param("user") User user);
+
+	@Query("select new com.isolver.dto.PendingDto(CONCAT(a.ruFlow.id,'' )as appId, "
+			+ " CONCAT(a.user.username,'' ) as appUsername, CONCAT(a.ruFlow.insertTime,'' ) as appStartTime, CONCAT(a.ruFlow.dealPeopleNow.username,'' ) as dealPeople, "
+			+ " CONCAT(a.ruFlow.updateTime,'' ) as appEndtTime )" + " from Vacation a where a.ruFlow.dealPeople= :dealPeople and a.ruFlow.deleteFlag = :deleteFlag")
+	public List<PendingDto> findApplicationDtoByUndo(User dealPeople, Boolean deleteFlag);
+
+	/**
+	 * 根据运行流程申请ID检索 休假申请详情
+	 * 
+	 * @param ruFlow
+	 * @return
+	 */
+	public Vacation findByRuFlow(RuFlow ruFlow);
+}

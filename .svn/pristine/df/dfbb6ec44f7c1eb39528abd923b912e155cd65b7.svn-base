@@ -1,0 +1,65 @@
+package com.isolver.controller.wechat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.dto.OrgDto;
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.service.DepartmentService;
+import com.isolver.service.OrganizationService;
+import com.isolver.service.ServicePerformanceService;
+
+@RestController
+@RequestMapping(value = "/weixin")
+public class WechatUnusualAttendanceController {
+
+	private static final Logger logger = LoggerFactory.getLogger(WechatUnusualAttendanceController.class);
+
+	@Autowired
+	private ServicePerformanceService servicePerformancePcService;
+	@Autowired
+	private OrganizationService organizationService;
+	
+	@Autowired
+	private DepartmentService departmentService;
+
+	@RequestMapping(value = "/unusualAttenendance/init", method = RequestMethod.POST)
+	public Result<Object> getOneDetail(Long id) {
+		try {
+			List<OrgDto> orgdto = organizationService.findAllOrg();
+			ServicePerformanceDto servicePerformanceDto = servicePerformancePcService.findOneServicePerformance(id);
+			Map<String, Object> result = new HashMap<>();
+			result.put("org", orgdto);
+			result.put("servicePerformance", servicePerformanceDto);
+			return new Result<Object>(SysStatusCodeConst.SUCCESS, result);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("初始化失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@RequestMapping(value = "/unusualAttenendance/getDepart", method = RequestMethod.POST)
+	public Result<Object> getDepart(Long id) {
+		try {
+			return new Result<Object>(SysStatusCodeConst.SUCCESS, departmentService.getAimDepartList(id));
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("获取部门失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+}

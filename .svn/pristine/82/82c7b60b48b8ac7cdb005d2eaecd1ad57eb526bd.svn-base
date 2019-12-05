@@ -1,0 +1,55 @@
+package com.isolver.controller.wechat;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.service.wechat.MenuSettingService;
+
+@RestController
+@RequestMapping(value = "/weixin/menu")
+public class MenuController {
+
+	private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
+
+	@Autowired
+	private MenuSettingService menuSettingService;
+
+	/**
+	 * 保存菜单
+	 * @param menuArr
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+	public Result<Object> saveMenu(@RequestParam(value = "menuArr") String[] menuArr,
+			@RequestParam(value = "userId") Long userId) {
+		try {
+			return menuSettingService.saveMenu(menuArr, userId);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("保存菜单失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@RequestMapping(value = "/index", method = RequestMethod.POST)
+	public Result<Object> pageMenu(@RequestParam(value = "userId") Long userId) {
+		try {
+			return menuSettingService.pageMenu(userId);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("获取用户菜单失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+}

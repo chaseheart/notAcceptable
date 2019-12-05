@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>待处理</title>
+<!-- Tell the browser to be responsive to screen width -->
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{/css/iview/iview.css}" rel="stylesheet" />
+<link th:href="@{/css/common.css}" rel="stylesheet" />
+<link th:href="@{/css/pending.css}" rel="stylesheet" />
+<!-- jQuery 3 -->
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/js/vue/vue.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/iview/iview.min.js}" type="text/javascript"></script>
+<!-- <script th:src="@{/js/layer/layer.js}" type="text/javascript"></script> -->
+<!-- Bootstrap 3.3.7 -->
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/common/common.js}"></script>
+<script th:src="@{/js/common/ajax.js}"></script>
+</head>
+<body>
+	<div id="app">
+		<breadcrumb>
+			<breadcrumb-item to="/">Home</breadcrumb-item>
+			<breadcrumb-item>待处理</breadcrumb-item>
+		</breadcrumb>
+		<div class="form-box">
+			<i-form :model="formItem" :label-width="125">
+				<row>
+					<i-col span="8">
+						<form-item label="申请者工号:"><i-input v-model="formItem.workId" placeholder="请输入工号"></i-input></form-item>
+					</i-col>
+					<i-col span="8">
+						<form-item label="申请者姓名:"><i-input v-model="formItem.username" placeholder="请输入姓名"></i-input></form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<i-button @click='searchOA'>检索</i-button>
+					</i-col>
+				</row>
+			</i-form>
+		</div>
+		<div class="pageable">
+			<i-button class="bench-apply" type="primary" @click="showModel" disabled=true>批量审批</i-button>
+			<page :total="40" show-elevator show-sizer />
+		</div>
+		<i-table size="small" @on-selection-change="fun1" stripe ref="selection" :columns="resultTable" :data="resultData" class="result-table"></i-table>
+	</div>
+	<input id="map" type="hidden" th:value="${map}" />
+	<script th:src="@{/js/pending/pending.js}"></script>
+</body>
+</html>

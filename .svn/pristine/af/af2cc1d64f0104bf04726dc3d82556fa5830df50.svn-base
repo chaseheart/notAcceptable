@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>I-Solver</title>
+
+<script src="./js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="./css/iview/iview.css" />
+<link rel="stylesheet" href="./css/main.css" />
+<script src="./js/vue/vue.min.js"></script>
+<script src="./js/layer/layer.js"></script>
+<script src="./js/common/common.js"></script>
+<script src="./js/iview/iview.min.js"></script>
+</head>
+<body>
+	<div id="app">
+		<template>
+    	<div class="layout" style="border-top:0px;">
+        <Sider :style="{position: 'fixed', height: '100vh', left: 0, overflow: 'auto'}">
+            <i-Menu active-name="1-2" theme="dark" width="auto" :open-names="['1']" accordion @on-select="menuSelect">
+            <img src="./images/logo.png" width="180px" class="logo">
+                <Submenu name="1">
+                    <template slot="title">
+                        <Icon type="ios-navigate"></Icon>
+                        	考勤
+                    </template>
+                    <Menu-Item name="/servicePerformance/index">考勤实绩</Menu-Item>
+                </Submenu>
+                <Submenu name="2">
+                    <template slot="title">
+                        <Icon type="ios-keypad"></Icon>
+           					非正常考勤
+                    </template>
+                    <Menu-Item name="/unusualAttendance/index">非正常考勤</Menu-Item>
+                    <Menu-Item name="/workOvertime/index">加班</Menu-Item>
+                    <Menu-Item name="/holiday/index">休假</Menu-Item>
+                    <Menu-Item name="/outBusiness/index">公务外出</Menu-Item>
+                </Submenu>
+                <Submenu name="3">
+                    <template slot="title">
+                        <Icon type="ios-analytics"></Icon>
+                       		设定
+                    </template>
+                    <Menu-Item name="/holidayManage/index">节假日设定</Menu-Item>
+                </Submenu>
+                 <Submenu name="4">
+                    <template slot="title">
+                        <Icon type="ios-analytics"></Icon>
+                       		协同办公
+                    </template>
+                    <Menu-Item name="/workSearch">社内出勤记录</Menu-Item>
+                   	<Menu-Item name="4-2">通讯录</Menu-Item>
+                   	<Menu-Item name="/pending/index">待处理</Menu-Item>
+                </Submenu>
+				<Submenu name="5">
+                    <template slot="title">
+                        <Icon type="ios-analytics"></Icon>
+                       		报销
+                    </template>
+                    <Menu-Item name="/claimingExpenses/index">报销申请</Menu-Item>
+                    <Menu-Item name="/pending/claimingExpensesIndex">报销待处理</Menu-Item>
+                </Submenu>
+            </i-Menu>
+        </Sider>
+        <Layout :style="{marginLeft: '200px'}">
+            <Header class="layout-header-bar">
+            	<a class="logout" href="/login">注销</a>
+            </Header>
+            <Content :style="{padding: '0 16px 16px'}">
+                <Card>
+                    <iframe scrolling="yes" frameborder="0"
+					style="width: 100%; min-height: 800px; overflow: visible; background: #fff;"
+					src="/servicePerformance/index"  id="main" name="iframe">
+					</iframe>
+                </Card>
+            </Content>
+        </Layout>
+    </div>
+		</template>
+	</div>
+</body>
+<script src="./js/main/main.js"></script>
+</html>

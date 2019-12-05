@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+#app {
+	width: 1200px;
+	margin: 20px auto;
+}
+
+.form-box {
+	margin: 10px auto;
+}
+
+.ivu-form .ivu-form-item-label {
+	font-weight: bolder;
+	font-size: 14px;
+}
+
+.form-info {
+	margin-left: 5px;
+}
+
+.ivu-divider-inner-text {
+	font-size: 20px;
+}
+
+/* .ivu-table-tip td{
+	width:100% !important;
+} */
+.result-list table {
+	width: auto !important;
+}
+
+.result-list table .ivu-table-cell {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.table-col-1 {
+	width: 4%;
+}
+
+.table-col-3 {
+	width: 8%;
+}
+
+.table-col-5 {
+	width: 10%;
+}
+
+.ivu-poptip-body-content a {
+	display: block;
+}
+
+.ivu-date-picker {
+	width: 100%;
+}

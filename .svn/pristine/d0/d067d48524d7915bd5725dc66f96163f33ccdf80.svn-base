@@ -1,0 +1,57 @@
+package com.isolver.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.outBusiness.OutBusinessRepository;
+import com.isolver.dao.unusualAttendance.UnusualAttendanceRepository;
+import com.isolver.dao.vacation.VacationRepository;
+import com.isolver.dao.workOvertime.WorkOvertimeRepository;
+import com.isolver.dto.PendingDto;
+import com.isolver.entity.User;
+
+/**
+ * 待处理
+ * 
+ * @author IS1907005
+ * @date 2019/11/21
+ * @class PendingService.java
+ */
+@Service
+public class PendingService {
+
+	@Autowired
+	private OutBusinessRepository outBusinessRepository;
+	@Autowired
+	private UnusualAttendanceRepository unusualAttendanceRepository;
+	@Autowired
+	private VacationRepository vacationRepository;
+	@Autowired
+	private WorkOvertimeRepository workOvertimeRepository;
+
+	/**
+	 * 。检索所有待审批申请
+	 * 
+	 * @param dealPeople
+	 * @return
+	 */
+	public Map<String, Object> findAllPendingByUser(User dealPeople) {
+		Map<String, Object> map = new HashMap<>();
+
+		List<PendingDto> outBusinessList = outBusinessRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+		map.put("outBusiness", outBusinessList);
+		List<PendingDto> unusualAttendanceList = unusualAttendanceRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+		map.put("unusualAttendance", unusualAttendanceList);
+		List<PendingDto> vacationList = vacationRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+		map.put("holiday", vacationList);
+		List<PendingDto> workOvertimeList = workOvertimeRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+		map.put("workOvertime", workOvertimeList);
+
+		return map;
+	}
+}

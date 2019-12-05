@@ -1,0 +1,5 @@
+package com.isolver.dao.oaFlowStep;
+
+public interface OaFlowStepRepositoryCustom {
+
+}

@@ -1,0 +1,86 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem : {
+			workId : 'IS1907007',
+			user : 'Dong',
+			date : '',
+			status : '无打卡记录',
+			time : '',
+			projectId : '',
+			content : '',
+			org : '3',
+			depart : '2',
+			assigner : ''
+		},
+		formValidate : {
+			date : [ {
+				required : true,
+				type : 'date',
+				message : '请选择加班日期',
+				trigger : 'change'
+			} ],
+			time : [ {
+				required : true,
+				type : 'array',
+				message : '请选择加班时间',
+				trigger : 'change',
+				fields : {
+					0 : {
+						type : "string",
+						message : "请选择加班时间",
+						required : true
+					},
+					1 : {
+						type : "string",
+						message : "请选择加班时间",
+						required : true
+					}
+				}
+			} ],
+			projectId : [ {
+				required : true,
+				message : '请输入项目编号',
+				trigger : 'blur'
+			} ],
+			content : [ {
+				required : true,
+				message : '请输入主要工作内容',
+				trigger : 'blur'
+			} ],
+		},
+		orgList : [ {
+			value : '1',
+			label : 'ISOLVER集团'
+		}, {
+			value : '2',
+			label : '对日外包模块'
+		}, {
+			value : '3',
+			label : 'ISOLVER上海'
+		} ],
+		departList : [ {
+			value : '1',
+			label : '综合管理部'
+		}, {
+			value : '2',
+			label : '丰通开发室'
+		}, {
+			value : '3',
+			label : 'NDS开发室'
+		} ],
+		assignerList : [ {
+			value : '1',
+			label : 'AAA'
+		}, {
+			value : '2',
+			label : 'BBB'
+		}, {
+			value : '3',
+			label : 'CCC'
+		} ]
+	},
+	methods : {},
+	created : function() {
+	}
+});

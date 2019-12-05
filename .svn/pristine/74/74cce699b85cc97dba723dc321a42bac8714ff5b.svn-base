@@ -1,0 +1,115 @@
+package com.isolver.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.util.PinYinUtil;
+import com.isolver.dao.department.DepartmentRepository;
+import com.isolver.dao.role.RoleRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dto.UserDto;
+import com.isolver.entity.Department;
+import com.isolver.entity.Role;
+import com.isolver.entity.User;
+
+/**
+ * 用户管理
+ * 
+ * @author IS1907006
+ * @date 2019/08/20
+ * @class UserService.java
+ */
+@Service
+public class UserService {
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
+	@Autowired
+	private DepartmentRepository departmentRepository;
+
+//	/**	
+//	 * 根据角色id检索用户
+//	 * @param roleId 角色id
+//	 * @return
+//	 */
+//	public List<UserDto> searchUserWithRole(Long roleId){
+//		Role role = new Role(roleId);
+//		return sysUserRepository.findByRole(role, SysStaticConst.NOTDELE);
+//	}
+	/**
+	 * 根据登录id检索用户
+	 * 
+	 * @param loginId 登录id
+	 * @return
+	 */
+	public User getUserById(Long id) {
+		return userRepository.findOne(id);
+	}
+
+	public List<UserDto> findUserByDepartAndRole(Long departId, Integer userLevel) {
+
+		Department d = departmentRepository.findOne(departId);
+		Role r = roleRepository.findByLevel(userLevel + 1);
+
+		return userRepository.findByRoleAndDepartAndDeleteFlag(r, d, SysStaticConst.NOTDELE);
+
+	}
+
+	/**
+	 * 检索所有用户
+	 * 
+	 * @return
+	 */
+	public Map<String, List<UserDto>> findAll() {
+		List<UserDto> resultList = new ArrayList<>();
+		List<User> userList = userRepository.findAll();
+		for (User user : userList) {
+			UserDto model = new UserDto(user);
+			model.setFirstChart(PinYinUtil.getFirstLetter(user.getUsername()));
+			resultList.add(model);
+		}
+
+		Map<String, List<UserDto>> resultMap = resultList.stream().collect(Collectors.groupingBy(UserDto::getFirstChart));
+		return resultMap;
+	}
+
+	/**
+	 * 模糊检索用户
+	 * 
+	 * @return
+	 */
+	public Map<String, List<UserDto>> findUserLike(String username) {
+		List<UserDto> resultList = new ArrayList<>();
+		List<User> userList = userRepository.findByUsernameLike(username);
+		for (User user : userList) {
+			UserDto model = new UserDto(user);
+			model.setFirstChart(PinYinUtil.getFirstLetter(user.getUsername()));
+			resultList.add(model);
+		}
+
+		Map<String, List<UserDto>> resultMap = resultList.stream().collect(Collectors.groupingBy(UserDto::getFirstChart));
+		return resultMap;
+	}
+
+	/**
+	 * 检索一条用户
+	 * 
+	 * @param userId 用户ID
+	 * @return
+	 */
+	public UserDto findAllById(Long userId) {
+		User user = userRepository.findByIdAndDeleteFlag(userId, SysStaticConst.NOTDELE);
+
+		UserDto userDto = new UserDto(user);
+		return userDto;
+	}
+}

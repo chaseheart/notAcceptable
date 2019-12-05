@@ -1,0 +1,50 @@
+package com.isolver.common.constant;
+/**
+ * 菜单常量
+ * @author 陈昶宇
+ * @createDate 2018/12/03 14:24:02 
+ * 
+ */
+public class MenuConst {
+
+	/**
+	 * 一级菜单层级：1
+	 */
+	public static int MAINMENULEVEL = 1;
+
+	/**
+	 * 次级菜单层级：2
+	 */
+	public static int SUBMENULEVEL = 2;
+	
+	/**
+	 * 模块Flag(是):Y
+	 */
+	public static String MENUFLAG = "Y";
+
+	/**
+	 * 模块Flag(否):N
+	 */
+	public static String NOTMENUFLAG = "N";
+	
+	/**
+	 * 初始菜单编号：m-
+	 */
+	public static String ORIGINMENUNO = "m-";
+	
+	/**
+	 * 菜單排序：1
+	 */
+	public static int ORIGINMENUSORT = 1;
+	
+	/**
+	 * 一级菜单父级菜单编号：0
+	 */
+	public static String MAINMENUPARENTID = "0";
+	
+	/**
+	 * 无跳转url
+	 */
+	public static String EMPTYURL = "#";
+
+}

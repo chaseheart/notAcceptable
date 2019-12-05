@@ -1,0 +1,38 @@
+var vm = new Vue({
+	el : '#app',
+
+	methods : {
+		menuSelect : function(name) {
+			/* this.$router.push(name); */
+			$("#main").prop('src', name);
+		},
+		init : function() {
+			ajaxStatus = true;
+			var dataList = [];
+			dataList.push({
+				id : '1',
+				version : '0'
+			});
+			dataList.push({
+				id : '2',
+				version : '0'
+			});
+			var data = {
+				"formData" : dataList
+			}
+			var url = "/test/json";
+			var success = function(data) {
+				ajaxStatus = true;
+				console.log("success")
+			};
+			var cache = false;
+			var alone = true;
+			var contentType = 'application/json;charset=utf-8';
+			data = JSON.stringify(data);
+			post(url, data, success, cache, alone, contentType);
+		}
+	},
+	created : function() {
+		this.init();
+	},
+});

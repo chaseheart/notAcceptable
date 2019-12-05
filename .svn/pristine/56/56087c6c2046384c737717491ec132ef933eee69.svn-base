@@ -1,0 +1,16 @@
+package com.isolver.dao.hiFlow;
+
+import java.util.List;
+
+import com.isolver.dto.wechat.ApproveHistoryDto;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class ServicePerformanceRepositoryCustom.java
+ */
+public interface HiFlowRepositoryCustom {
+	
+	public List<ApproveHistoryDto> approveHistory(Long dealPerson, Boolean deleteFlag);
+	
+}

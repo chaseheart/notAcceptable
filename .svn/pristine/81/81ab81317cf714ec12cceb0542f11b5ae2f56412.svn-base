@@ -1,0 +1,137 @@
+$(function(){
+	$(".result-table table tbody td").click(function(){
+		if($(this).hasClass("selected")){
+			$(this).removeClass("selected");
+		}else if(!$(this).hasClass("last-month")){
+			$(this).addClass("selected");
+		}
+	})
+})
+
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem : {
+			org : '',
+			depart : '',
+			date : '2019-11'
+		},
+		orgList : [ {
+			value : '1',
+			label : 'ISOLVER集团'
+		}, {
+			value : '2',
+			label : '对日外包模块'
+		}, {
+			value : '3',
+			label : 'ISOLVER上海'
+		} ],
+		departList : [ {
+			value : '1',
+			label : '综合管理部'
+		}, {
+			value : '2',
+			label : '丰通开发室'
+		}, {
+			value : '3',
+			label : 'NDS开发室'
+		} ],
+		calendarHeader : [ {
+			title : '周日',
+			key : 'sun',
+			align : 'center'
+		}, {
+			title : '周一',
+			key : 'mon',
+			align : 'center',
+		}, {
+			title : '周二',
+			key : 'tue',
+			align : 'center',
+		}, {
+			title : '周三',
+			key : 'wed',
+			align : 'center',
+		}, {
+			title : '周四',
+			key : 'thu',
+			align : 'center',
+		}, {
+			title : '周五',
+			key : 'fri',
+			align : 'center',
+		}, {
+			title : '周六',
+			key : 'sat',
+			align : 'center',
+		} ],
+		calendarData : [ {
+			sun : '27',
+			mon : '28',
+			tue : '29',
+			wed : '30',
+			thu : '31',
+			fri : '01',
+			sat : '02',
+			cellClassName : {
+				sun : 'last-month',
+				mon : 'last-month',
+				tue : 'last-month',
+				wed : 'last-month',
+				thu : 'last-month',
+				sat : 'selected'
+			}
+		}, {
+			sun : '03',
+			mon : '04',
+			tue : '05',
+			wed : '06',
+			thu : '07',
+			fri : '08',
+			sat : '09',
+			cellClassName : {
+				sun : 'selected',
+				sat : 'selected'
+			}
+		}, {
+			sun : '10',
+			mon : '11',
+			tue : '12',
+			wed : '13',
+			thu : '14',
+			fri : '15',
+			sat : '16',
+			cellClassName : {
+				sun : 'selected',
+				sat : 'selected'
+			}
+		}, {
+			sun : '17',
+			mon : '18',
+			tue : '19',
+			wed : '20',
+			thu : '21',
+			fri : '22',
+			sat : '23',
+			cellClassName : {
+				sun : 'selected',
+				sat : 'selected'
+			}
+		}, {
+			sun : '24',
+			mon : '25',
+			tue : '26',
+			wed : '27',
+			thu : '28',
+			fri : '29',
+			sat : '30',
+			cellClassName : {
+				sun : 'selected',
+				sat : 'selected'
+			}
+		} ]
+	},
+	methods : {},
+	created : function() {
+	}
+});

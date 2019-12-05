@@ -1,0 +1,347 @@
+package com.isolver.common.util;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+
+public class Dateutil {
+
+	/**
+	 * yyyy-MM-dd HH:mm:ss
+	 */
+	public static final DateTimeFormatter formatter_DateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+	/**
+	 * 获取当前日期
+	 * 
+	 * @return
+	 */
+	public static LocalDate getLocalDate() {
+		return LocalDate.now();
+	}
+
+	/**
+	 * 当前时间LocalDate转Date
+	 * 
+	 * @return
+	 */
+	public static Date nowLocalDateToDate() {
+		LocalDate localDate = LocalDate.now();
+		return Date.from(localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant());
+	}
+
+	/**
+	 * 当前时间String转Date
+	 * 
+	 * @return
+	 */
+	public static Date stringToDate(String date) {
+		String[] dateArr = date.split("-");
+		LocalDate localDate = LocalDate.of(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[2]));
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+	
+	/**
+	 * ·时间转当天的23:59:59
+	 * @param day
+	 * @return
+	 */
+	public static Date getEndTimeOfDate(Date day) {
+		Calendar rightNow = Calendar.getInstance();
+		rightNow.setTime(day);
+		rightNow.add(Calendar.HOUR,23);
+		rightNow.add(Calendar.MINUTE,59);
+		rightNow.add(Calendar.SECOND,59);
+		return rightNow.getTime();
+	}
+	/**
+	 * 将yyyy-MM-dd HH:mm:ss转为 Date
+	 */
+	public static Date parseLocalDateTime(String dateTime) {
+		LocalDateTime time = LocalDateTime.parse(dateTime, formatter_DateTime);
+		return Date.from(time.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	/**
+	 * 任意时间LocalDate转Date
+	 * 
+	 * @return
+	 */
+	public static Date localDateToDate(Integer year, Integer month, Integer day) {
+		LocalDate localDate = LocalDate.of(year, month, day);
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+
+	/**
+	 * 任意时间LocalDate转long
+	 * 
+	 * @return
+	 */
+	public static Long localDateToTimestamp(Integer year, Integer month, Integer day) {
+		LocalDate localDate = LocalDate.of(year, month, day);
+		return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+	}
+
+	/**
+	 * Date转LocalDate
+	 * 
+	 * @return
+	 */
+	public static LocalDate dateToLocalDate(Date date) {
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	}
+
+	/**
+	 * Date转LocalDate
+	 * 
+	 * @return
+	 */
+	public static LocalDateTime dateToLocalDateTime(Date date) {
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	}
+
+	/**
+	 * 获取当前Long型毫秒级时间
+	 * 
+	 * @return
+	 */
+	public static Long getMilliSecond() {
+		Long milliSecond = Instant.now().toEpochMilli();
+		return milliSecond;
+	}
+
+	/**
+	 * 返回当前时间yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getDate(Date date) {
+		return dateToLocalDate(date).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	/**
+	 * 返回当前系统时间 yyyy-MM-dd HH:mm:ss
+	 * 
+	 * @return 返回当前系统时间
+	 */
+	public static String getDateTime(Date date) {
+		return dateToLocalDateTime(date).format(formatter_DateTime);
+	}
+
+	/**
+	 * 获取当前Timestamp型毫秒级时间
+	 * 
+	 * @return
+	 */
+	public static Timestamp getTimestamp() {
+		Timestamp milliSecond = new Timestamp(getMilliSecond());
+		return milliSecond;
+	}
+
+	/**
+	 * 获取当月第一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getFirstDayOfMonth() {
+		return getLocalDate().withDayOfMonth(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	/**
+	 * 获取本月最后一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getLastDayOfMonth() {
+		LocalDate localDate = getLocalDate();
+		return localDate.withDayOfMonth(localDate.lengthOfMonth()).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	/**
+	 * 获取指定月第一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getTheFirstDayOfMonthStr(Integer year, Integer month) {
+		LocalDate localDate = LocalDate.of(year, month, 1);
+		return localDate.withDayOfMonth(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	/**
+	 * 获取指定月最后一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static String getTheLastDayOfMonthStr(Integer year, Integer month) {
+		LocalDate localDate = LocalDate.of(year, month, 1);
+		return localDate.withDayOfMonth(localDate.lengthOfMonth()).format(DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	/**
+	 * 获取指定月第一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static Date getTheFirstDayOfMonth(Integer year, Integer month) {
+		return stringToDate(getTheFirstDayOfMonthStr(year, month));
+	}
+
+	/**
+	 * 获取指定月最后一天 yyyy-MM-dd
+	 * 
+	 * @return
+	 */
+	public static Date getTheLastDayOfMonth(Integer year, Integer month) {
+		return stringToDate(getTheLastDayOfMonthStr(year, month));
+	}
+
+	/**
+	 * 计算两个日期之间相差的天数
+	 * 
+	 * @param startDate 较小的时间 yyyy-MM-dd
+	 * @param endDate   较大的时间 yyyy-MM-dd
+	 * @return 相差天数
+	 */
+	public static int dateCompareTo(String startDate, String endDate) {
+		LocalDate startLocalDate = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
+		LocalDate endLocalDate = LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE);
+		Period period = Period.between(startLocalDate, endLocalDate);
+		return period.getDays();
+	}
+
+//	public static void main(String[] args) {
+//		System.err.println(getDate(nowLocalDateToDate()));
+//	}
+	/**
+	 * 。年月日+时间，转Date
+	 * 
+	 * @param year
+	 * @param time
+	 * @return
+	 */
+	public static Date getDateByYearAndTime(String year, String time) {
+		return parseLocalDateTime(year.replaceAll("/", "-") + " " + time + ":00");
+	}
+
+	/**
+	 * 计算当天到达时间
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getStartTime(Date date) {
+
+		Calendar t = Calendar.getInstance();
+		t.setTime(date);
+		t.set(Calendar.MINUTE, 0);
+		t.set(Calendar.SECOND, 0);
+		// 9点
+		t.set(Calendar.HOUR_OF_DAY, 9);
+		Date nineClock = t.getTime();
+		// 10点
+//		t.set(Calendar.HOUR_OF_DAY, 10);
+//		Date tenClock = t.getTime();
+		// 12点
+		t.set(Calendar.HOUR_OF_DAY, 12);
+		Date twelveClock = t.getTime();
+		// 13点
+		t.set(Calendar.HOUR_OF_DAY, 13);
+		Date thirteenClock = t.getTime();
+
+		// 9点
+		t.set(Calendar.HOUR_OF_DAY, 9);
+		t.set(Calendar.MINUTE, 30);
+		Date nineHalfClock = t.getTime();
+
+		if (date.after(twelveClock) && date.before(thirteenClock)) {
+			return thirteenClock;
+		}
+		if (date.after(nineClock) && date.before(nineHalfClock)) {
+			return date;
+		}
+		if (date.before(nineClock)) {
+			return nineClock;
+		}
+		Calendar d = Calendar.getInstance();
+		d.setTime(date);
+		d.set(Calendar.HOUR, d.get(Calendar.HOUR) + 1);
+		d.set(Calendar.MINUTE, 0);
+		d.set(Calendar.SECOND, 0);
+		return d.getTime();
+	}
+
+	/**
+	 * 计算当天到达时间
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getEndTime(Date date) {
+
+		Calendar t = Calendar.getInstance();
+		t.setTime(date);
+		t.set(Calendar.MINUTE, 0);
+		t.set(Calendar.SECOND, 0);
+
+		// 12点
+		t.set(Calendar.HOUR_OF_DAY, 12);
+		Date twelveClock = t.getTime();
+		// 13点
+		t.set(Calendar.HOUR_OF_DAY, 13);
+		Date thirteenClock = t.getTime();
+
+		// 19点
+//		t.set(Calendar.HOUR_OF_DAY, 19);
+//		Date nineteenClock = t.getTime();
+		// 20点
+		t.set(Calendar.HOUR_OF_DAY, 20);
+		Date twentyClock = t.getTime();
+
+		// 18.30
+		t.set(Calendar.HOUR_OF_DAY, 18);
+//		Date sixClock = t.getTime();
+		t.set(Calendar.MINUTE, 30);
+		// 18.00
+		Date sixHalfClock = t.getTime();
+
+		// 12.00~13.00算13.00
+		if (date.after(twelveClock) && date.before(thirteenClock)) {
+			return twelveClock;
+		}
+		// 6.30~20.00算6.30
+		if (date.after(sixHalfClock) && date.before(twentyClock)) {
+			return sixHalfClock;
+		}
+		// 20.00之后，每半小时算半小时
+		if (date.after(twentyClock)) {
+			Calendar d = Calendar.getInstance();
+			d.setTime(date);
+			int minute = d.get(Calendar.MINUTE);
+			if (minute >= 30) {
+				d.set(Calendar.MINUTE, 30);
+			} else {
+				d.set(Calendar.HOUR, d.get(Calendar.HOUR));
+				d.set(Calendar.MINUTE, 0);
+			}
+			return d.getTime();
+		}
+
+		Calendar d = Calendar.getInstance();
+		d.setTime(date);
+		d.set(Calendar.HOUR, d.get(Calendar.HOUR));
+		d.set(Calendar.MINUTE, 0);
+		d.set(Calendar.SECOND, 0);
+		return d.getTime();
+	}
+
+	public static void main(String[] args) {
+		System.err.println(getLocalDate());
+	}
+}

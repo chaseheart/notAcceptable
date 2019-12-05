@@ -1,0 +1,82 @@
+package com.isolver.controller.wechat;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.entity.News;
+import com.isolver.service.wechat.NewsService;
+
+@RestController
+@RequestMapping(value = "/weixin")
+public class NewsController {
+
+	@Autowired
+	private NewsService newsService;
+
+	private static final Logger logger = LoggerFactory.getLogger(NewsController.class);
+
+	/**
+	 * 新闻/通知/贴士
+	 * 
+	 * @param
+	 * @return
+	 */
+	@RequestMapping(value = "/news", method = RequestMethod.POST)
+	public Result<Object> getNewsList(Integer type) {
+		try {
+			List<News> newsList = newsService.getNewsList(type);
+			return new Result<>(SysStatusCodeConst.SUCCESS, newsList);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("获得新闻失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 新闻/通知/贴士
+	 * 
+	 * @param
+	 * @return
+	 */
+	@RequestMapping(value = "/news/detail", method = RequestMethod.POST)
+	public Result<Object> getNewsDetail(Long id) {
+		try {
+			News news = newsService.getNewsDetail(id);
+			return new Result<>(SysStatusCodeConst.SUCCESS, news);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("获得详细内容失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 检索 新闻/通知/贴士
+	 * 
+	 * @param
+	 * @return
+	 */
+	@RequestMapping(value = "/news/search", method = RequestMethod.POST)
+	public Result<Object> getNewsList(Integer type, String content) {
+		try {
+			List<News> newsList = newsService.searchNews(content, type);
+			return new Result<>(SysStatusCodeConst.SUCCESS, newsList);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("检索失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+}

@@ -1,0 +1,54 @@
+package com.isolver.controller.wechat;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.dto.wechat.WechatVacationRecordDto;
+import com.isolver.entity.User;
+import com.isolver.service.UserService;
+import com.isolver.service.wechat.VacationRecordService;
+
+@RestController
+@RequestMapping(value = "/weixin")
+public class VacationRecordController {
+
+	private static final Logger logger = LoggerFactory.getLogger(VacationRecordController.class);
+
+	@Autowired
+	private VacationRecordService vacationRecordService;
+
+	@Autowired
+	private UserService userService;
+
+	/**
+	 * 休假查看
+	 * 
+	 * @param userId
+	 * @param date
+	 * 
+	 * @return resultList
+	 */
+	@RequestMapping(value = "/vacationRecord", method = RequestMethod.POST)
+	public Result<Object> getVacationRecord(Long userId, String date) {
+		try {
+			User user = userService.getUserById(userId);
+
+			List<WechatVacationRecordDto> resultList = vacationRecordService.getRecord(user, date);
+			return new Result<Object>(SysStatusCodeConst.SUCCESS, resultList);
+		} catch (NullPointerException e) {
+			return new Result<>(SysStatusCodeConst.SYSERROR);
+		} catch (Exception e) {
+			logger.error("获得列表失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+}

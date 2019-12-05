@@ -1,0 +1,50 @@
+package com.isolver.interfaces;
+
+import java.io.FileNotFoundException;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.isolver.common.util.Result;
+
+@RequestMapping("/weixin")
+public interface FileApi {
+
+	/**
+	 * 文件上传
+	 * 
+	 * @param file      文件内容
+	 * @param fieldId   字段id
+	 * @param fieldType 文件类型
+	 * @param userId    登录者id
+	 * @return
+	 * @throws FileNotFoundException m("runProcessId") Long
+	 *                               userId, @RequestParam("runProcessId") int
+	 *                               fieldFuncti
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/saveOneFiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@ResponseBody
+	public Result<Object> saveOneFiles(@RequestPart("file") MultipartFile[] file, Long userId)
+			throws FileNotFoundException;
+
+	/**
+	 * 文件上传2
+	 * 
+	 * @param file      文件内容
+	 * @param fieldId   字段id
+	 * @param fieldType 文件类型
+	 * @param userId    登录者id
+	 * @return
+	 * @throws FileNotFoundException m("runProcessId") Long
+	 *                               userId, @RequestParam("runProcessId") int
+	 *                               fieldFuncti
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/saveFiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@ResponseBody
+	public Result<Object> saveFiles(@RequestPart("file") MultipartFile[] file, Long userId, String ruFlowId)
+			throws FileNotFoundException;
+}

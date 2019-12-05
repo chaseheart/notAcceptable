@@ -1,0 +1,16 @@
+package com.isolver.dao.fileInfo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.FileInfo;
+
+/**
+ * @author IS1907005
+ * @date 2019/08/20
+ * @class FileInfoRepository.java
+ */
+@Repository
+public interface FileInfoRepository extends JpaRepository<FileInfo, Long> {
+	
+}

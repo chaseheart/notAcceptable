@@ -1,0 +1,13 @@
+var vm = new Vue({
+	el : '#app',
+
+	methods : {
+		menuSelect : function(name) {
+			/* this.$router.push(name); */
+			$("#main").prop('src', name);
+		}
+	},
+	created : function() {
+
+	}
+});

@@ -1,0 +1,259 @@
+package com.isolver.entity;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/06
+ * @class UnusualAttendence.java
+ */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "unusualAttendance")
+@NamedQuery(name = "UnusualAttendance.findAll", query = "SELECT u FROM UnusualAttendance u")
+@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+public class UnusualAttendance implements Serializable {
+
+	/** ID **/
+	private Long id;
+	/** 。申请者 **/
+	private User user;
+	/** 。非正常考勤时间 **/
+	private Date unusualAttendanceDate;
+	/** 。非正常考勤类型 **/
+	private Integer unusualAttendanceType;
+	/** 。实体单据有无 **/
+	private Boolean hasDocument;
+	/** 。非正常考勤原因 **/
+	private String reason;
+	/** 。ru外联表 **/
+	private RuFlow ruFlow;
+
+	/**
+	 * @return the id
+	 */
+	@Id
+	@Column(name = "id")
+	@GeneratedValue
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the user
+	 */
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user", nullable = false)
+	public User getUser() {
+		return user;
+	}
+
+	/**
+	 * @param user the user to set
+	 */
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	/**
+	 * @return the unusualAttendanceDate
+	 */
+	@Column(name = "unusualAttendanceDate", nullable = false)
+	public Date getUnusualAttendanceDate() {
+		return unusualAttendanceDate;
+	}
+
+	/**
+	 * @param unusualAttendanceDate the unusualAttendanceDate to set
+	 */
+	public void setUnusualAttendanceDate(Date unusualAttendanceDate) {
+		this.unusualAttendanceDate = unusualAttendanceDate;
+	}
+
+	/**
+	 * @return the unusualAttendanceType
+	 */
+	@Column(name = "unusualAttendanceType", nullable = false)
+	public Integer getUnusualAttendanceType() {
+		return unusualAttendanceType;
+	}
+
+	/**
+	 * @param unusualAttendanceType the unusualAttendanceType to set
+	 */
+	public void setUnusualAttendanceType(Integer unusualAttendanceType) {
+		this.unusualAttendanceType = unusualAttendanceType;
+	}
+
+	/**
+	 * @return the hasDocument
+	 */
+	@Column(name = "hasDocument", nullable = false)
+	public Boolean getHasDocument() {
+		return hasDocument;
+	}
+
+	/**
+	 * @param hasDocument the hasDocument to set
+	 */
+	public void setHasDocument(Boolean hasDocument) {
+		this.hasDocument = hasDocument;
+	}
+
+	/**
+	 * @return the reason
+	 */
+	@Column(name = "reason", nullable = false)
+	public String getReason() {
+		return reason;
+	}
+
+	/**
+	 * @param reason the reason to set
+	 */
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	/**
+	 * @return the ruFlow
+	 */
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ruFlowId", nullable = false)
+	public RuFlow getRuFlow() {
+		return ruFlow;
+	}
+
+	/**
+	 * @param ruFlow the ruFlow to set
+	 */
+	public void setRuFlow(RuFlow ruFlow) {
+		this.ruFlow = ruFlow;
+	}
+
+	/** 。插入者 **/
+	private Long insertUserId;
+	/** 。插入时间 **/
+	private Timestamp insertTime;
+	/** 。更新者 **/
+	private Long updateUserId;
+	/** 。更新时间 **/
+	private Timestamp updateTime;
+	/** deleteFlag **/
+	private Boolean deleteFlag;
+	/** 。版本 **/
+	private Integer version;
+
+	/**
+	 * @return the insertUserId
+	 */
+	@Column(name = "insertUserId")
+	public Long getInsertUserId() {
+		return insertUserId;
+	}
+
+	/**
+	 * @param insertUserId the insertUserId to set
+	 */
+	public void setInsertUserId(Long insertUserId) {
+		this.insertUserId = insertUserId;
+	}
+
+	/**
+	 * @return the insertTime
+	 */
+	@Column(name = "insertTime")
+	public Timestamp getInsertTime() {
+		return insertTime;
+	}
+
+	/**
+	 * @param insertTime the insertTime to set
+	 */
+	public void setInsertTime(Timestamp insertTime) {
+		this.insertTime = insertTime;
+	}
+
+	/**
+	 * @return the updateUserId
+	 */
+	@Column(name = "updateUserId")
+	public Long getUpdateUserId() {
+		return updateUserId;
+	}
+
+	/**
+	 * @param updateUserId the updateUserId to set
+	 */
+	public void setUpdateUserId(Long updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+
+	/**
+	 * @return the updateTime
+	 */
+	@Column(name = "updateTime")
+	public Timestamp getUpdateTime() {
+		return updateTime;
+	}
+
+	/**
+	 * @param updateTime the updateTime to set
+	 */
+	public void setUpdateTime(Timestamp updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	/**
+	 * @return the deleteFlag
+	 */
+	@Column(name = "deleteFlag")
+	public Boolean getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	/**
+	 * @param deleteFlag the deleteFlag to set
+	 */
+	public void setDeleteFlag(Boolean deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+
+	/**
+	 * @return the version
+	 */
+	@Version
+	@Column(name = "version")
+	public Integer getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version the version to set
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+}

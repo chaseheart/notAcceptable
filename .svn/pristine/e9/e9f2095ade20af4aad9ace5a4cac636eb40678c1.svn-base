@@ -1,0 +1,70 @@
+package com.isolver.dto.wechat;
+
+public class ApproveHistoryDto {
+
+	/** 运行流程id **/
+	private String ruFlowId;
+	
+	/** 流程名 **/
+	private String name;
+	
+	/** 处理人 **/
+	private String dealPerson;
+	
+	/** 操作 **/
+	private String operate;
+
+	public String getRuFlowId() {
+		return ruFlowId;
+	}
+
+	public void setRuFlowId(String ruFlowId) {
+		this.ruFlowId = ruFlowId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDealPerson() {
+		return dealPerson;
+	}
+
+	public void setDealPerson(String dealPerson) {
+		this.dealPerson = dealPerson;
+	}
+
+	public String getOperate() {
+		return operate;
+	}
+
+	public void setOperate(String operate) {
+		this.operate = operate;
+	}
+
+	public ApproveHistoryDto() {
+		
+	}
+	
+	public ApproveHistoryDto(String ruFlowId, String name, String dealPerson, String operate) {
+		super();
+		this.ruFlowId = ruFlowId;
+		this.name = name;
+		this.dealPerson = dealPerson;
+		this.operate = operate;
+	}
+
+	public ApproveHistoryDto(String ruFlowId, String name) {
+		super();
+		this.ruFlowId = ruFlowId;
+		this.name = name;
+	}
+	
+	
+	
+	
+}

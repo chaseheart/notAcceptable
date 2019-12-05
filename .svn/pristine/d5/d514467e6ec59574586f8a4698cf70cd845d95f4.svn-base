@@ -1,0 +1,27 @@
+package com.isolver.dao.fileInfo;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.FileInfo;
+
+/**
+ * @author IS1907005
+ * @date 2019/08/20
+ * @class FileInfoRepository.java
+ */
+@Repository
+public interface FileInfoRepository extends JpaRepository<FileInfo, Long> {
+	
+	/**
+	 * 根据表名和表id查找附件
+	 * @param tableName
+	 * @param tableId
+	 * @return
+	 */
+	public List<FileInfo> findByTableNameAndTableIdAndDeleteFlag(String tableName, String tableId, Boolean deleteFlag);
+	
+	
+}

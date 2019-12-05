@@ -1,0 +1,122 @@
+package com.isolver.form;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/18
+ * @class OverTimeForm.java
+ */
+public class OverTimeForm {
+	/** 。加班日期 **/
+	private String workOvertimeDate;
+	/** 。加班开始时间 **/
+	private String timeStart;
+	/** 。加班加速时间 **/
+	private String timeEnd;
+	/** 。项目编号 **/
+	private String projectId;
+	/** 。工作内容 **/
+	private String workContent;
+	/** 。考勤务实ID **/
+	private String servicePerformance;
+	/** 。审批者 **/
+	private String assigner;
+
+	/**
+	 * @return the workOvertimeDate
+	 */
+	public String getWorkOvertimeDate() {
+		return workOvertimeDate;
+	}
+
+	/**
+	 * @param workOvertimeDate the workOvertimeDate to set
+	 */
+	public void setWorkOvertimeDate(String workOvertimeDate) {
+		this.workOvertimeDate = workOvertimeDate;
+	}
+
+	/**
+	 * @return the timeStart
+	 */
+	public String getTimeStart() {
+		return timeStart;
+	}
+
+	/**
+	 * @param timeStart the timeStart to set
+	 */
+	public void setTimeStart(String timeStart) {
+		this.timeStart = timeStart;
+	}
+
+	/**
+	 * @return the timeEnd
+	 */
+	public String getTimeEnd() {
+		return timeEnd;
+	}
+
+	/**
+	 * @param timeEnd the timeEnd to set
+	 */
+	public void setTimeEnd(String timeEnd) {
+		this.timeEnd = timeEnd;
+	}
+
+	/**
+	 * @return the projectId
+	 */
+	public String getProjectId() {
+		return projectId;
+	}
+
+	/**
+	 * @param projectId the projectId to set
+	 */
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
+	/**
+	 * @return the workContent
+	 */
+	public String getWorkContent() {
+		return workContent;
+	}
+
+	/**
+	 * @param workContent the workContent to set
+	 */
+	public void setWorkContent(String workContent) {
+		this.workContent = workContent;
+	}
+
+	/**
+	 * @return the servicePerformance
+	 */
+	public String getServicePerformance() {
+		return servicePerformance;
+	}
+
+	/**
+	 * @param servicePerformance the servicePerformance to set
+	 */
+	public void setServicePerformance(String servicePerformance) {
+		this.servicePerformance = servicePerformance;
+	}
+
+	/**
+	 * @return the assigner
+	 */
+	public String getAssigner() {
+		return assigner;
+	}
+
+	/**
+	 * @param assigner the assigner to set
+	 */
+	public void setAssigner(String assigner) {
+		this.assigner = assigner;
+	}
+
+}

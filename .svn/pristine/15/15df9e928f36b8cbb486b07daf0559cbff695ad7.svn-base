@@ -1,0 +1,81 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem : {
+			workId : 'IS1907007',
+			user : 'Dong',
+			type : '',
+			status : '09:30 - 无记录',
+			date : '',
+			bill : '',
+			reason : '',
+			content : '事假（非带薪休假）：事假x小时　',
+			org : '3',
+			depart : '2',
+			assigner : ''
+		},
+		formValidate : {
+			type : [ {
+				required : true,
+				message : '请选择请假类型',
+				trigger : 'change'
+			} ],
+			date : [ {
+				required : true,
+				type : 'array',
+				message : '请选择请假时间',
+				trigger : 'change',
+				fields : {
+					0 : {
+						type : "date",
+						message : "请选择请假时间",
+						required : true
+					},
+					1 : {
+						type : "date",
+						message : "请选择请假时间",
+						required : true
+					}
+				}
+			} ],
+			reason : [ {
+				required : true,
+				message : '请输入请假事由',
+				trigger : 'blur'
+			} ],
+		},
+		orgList : [ {
+			value : '1',
+			label : 'ISOLVER集团'
+		}, {
+			value : '2',
+			label : '对日外包模块'
+		}, {
+			value : '3',
+			label : 'ISOLVER上海'
+		} ],
+		departList : [ {
+			value : '1',
+			label : '综合管理部'
+		}, {
+			value : '2',
+			label : '丰通开发室'
+		}, {
+			value : '3',
+			label : 'NDS开发室'
+		} ],
+		assignerList : [ {
+			value : '1',
+			label : 'AAA'
+		}, {
+			value : '2',
+			label : 'BBB'
+		}, {
+			value : '3',
+			label : 'CCC'
+		} ]
+	},
+	methods : {},
+	created : function() {
+	}
+});

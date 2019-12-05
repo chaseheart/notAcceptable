@@ -1,0 +1,20 @@
+package com.isolver.interfaces;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.isolver.common.util.Result;
+
+@RequestMapping("/weixin")
+public interface ServicePerformanceApi {
+	
+	/**
+	 * 考勤一览初期化
+	 * @param id
+	 * @param oaYear
+	 * @param oaMonth
+	 * @return
+	 */
+	@RequestMapping(value = "/servicePerformance", method = RequestMethod.POST)
+	public Result<Object> searchSP(Long id, Integer oaYear, Integer oaMonth);
+}

@@ -1,0 +1,151 @@
+package com.isolver.common.config;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StreamUtils;
+
+import com.alibaba.fastjson.JSONObject;
+
+/**
+ * @Auther: Lee
+ * @Date: 2018-08-14
+ * @Description: request的包装类
+ */
+public class XSSRequestWrapper extends HttpServletRequestWrapper {
+
+	private byte[] requestBody;
+	private Charset charSet;
+	
+	public XSSRequestWrapper(HttpServletRequest servletRequest) throws IOException {
+		super(servletRequest);
+//		String contentType = servletRequest.getContentType();
+//		if(contentType != null) {
+//			if(contentType.equals("application/json")) {
+//				// 缓存请求body
+//					String requestBodyStr = getRequestPostStr(servletRequest);
+//					requestBodyStr = StringEscapeUtils.unescapeHtml3(cleanXSS(requestBodyStr));
+//					if (StringUtils.isNotBlank(requestBodyStr)) {
+//						JSONObject resultJson = JSONObject.parseObject(requestBodyStr);
+//
+//						Object[] obj = resultJson.keySet().toArray();
+//						for (Object o : obj) {
+//							resultJson.put(StringUtils.trimToNull(resultJson.get(o).toString()) , o);
+//						}
+//
+//						requestBody = resultJson.toString().getBytes(charSet);
+//					} else {
+//						requestBody = new byte[0];
+//					}
+//			}
+//		}
+		
+	}
+
+	public String[] getParameterValues(String parameter) {
+		String[] values = super.getParameterValues(parameter);
+		if (values == null) {
+			return null;
+		}
+		int count = values.length;
+		String[] encodedValues = new String[count];
+		for (int i = 0; i < count; i++) {
+			encodedValues[i] = cleanXSS(values[i]);
+		}
+		return encodedValues;
+	}
+
+	public String getParameter(String parameter) {
+		String value = super.getParameter(parameter);
+		if (value == null) {
+			return null;
+		}
+		return cleanXSS(value);
+	}
+
+	public String getHeader(String name) {
+		String value = super.getHeader(name);
+		if (value == null)
+			return null;
+		return cleanXSS(value);
+	}
+
+	private String cleanXSS(String value) {
+		// 这里特意 加多个空格.... 方便 csdn显示 ,如 < ==> & lt;
+		value = value.replaceAll("<", "&lt;");
+		value = value.replaceAll(">", "&gt;");
+		value = value.replaceAll("\\(", "&#40;");
+		value = value.replaceAll("\\)", "&#41;");
+		value = value.replaceAll("'", "&#39;");
+		value = value.replaceAll("\\\"", "&#34;");
+		value = value.replaceAll("eval\\((.*)\\)", "");
+		value = value.replaceAll("[\\\"\\\'][\\s]*javascript:(.*)[\\\"\\\']", "\"\"");
+		value = value.replaceAll("script", "");
+		return value;
+	}
+	
+	
+	// ***********RequestBody用
+	public String getRequestPostStr(HttpServletRequest request) throws IOException {
+		String charSetStr = request.getCharacterEncoding();
+		if (charSetStr == null) {
+			charSetStr = "UTF-8";
+		}
+		charSet = Charset.forName(charSetStr);
+
+		return StreamUtils.copyToString(request.getInputStream(), charSet);
+	}
+
+//	/**
+//	 * 重写 getInputStream()
+//	 */
+//	@Override
+//	public ServletInputStream getInputStream() {
+//		if (requestBody == null) {
+//			requestBody = new byte[0];
+//		}
+//
+//		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(requestBody);
+//
+//		return new ServletInputStream() {
+//			@Override
+//			public boolean isFinished() {
+//				return false;
+//			}
+//
+//			@Override
+//			public boolean isReady() {
+//				return false;
+//			}
+//
+//			@Override
+//			public void setReadListener(ReadListener readListener) {
+//
+//			}
+//
+//			@Override
+//			public int read() {
+//				return byteArrayInputStream.read();
+//			}
+//		};
+//	}
+//
+//	/**
+//	 * 重写 getReader()
+//	 */
+//	@Override
+//	public BufferedReader getReader() {
+//		return new BufferedReader(new InputStreamReader(getInputStream()));
+//	}
+
+}

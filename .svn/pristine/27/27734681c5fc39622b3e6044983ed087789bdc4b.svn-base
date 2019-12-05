@@ -1,0 +1,24 @@
+package com.isolver.dao.servicePerformance;
+
+import java.util.Date;
+import java.util.List;
+
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class ServicePerformanceRepositoryCustom.java
+ */
+public interface ServicePerformanceRepositoryCustom {
+	/**
+	 * 
+	 * @param user
+	 * @param monthStart
+	 * @param monthEnd
+	 * @param deleteFlag
+	 * @return
+	 */
+	public List<ServicePerformanceDto> findServicePerformanceByUserAndDeleteFlag(User user, Date monthStart, Date monthEnd, Boolean deleteFlag);
+}

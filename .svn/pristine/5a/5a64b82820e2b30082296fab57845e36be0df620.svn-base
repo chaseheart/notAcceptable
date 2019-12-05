@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+#app {
+	width: 1500px;
+	margin: 20px auto;
+}
+
+.form-box {
+	margin: 10px auto;
+}
+
+.form-info {
+	margin-left: 5px;
+}
+
+.ivu-form .ivu-form-item-label {
+	font-weight: bolder;
+	font-size: 14px;
+}
+
+.ivu-divider-inner-text {
+	font-size: 20px;
+}
+
+.ivu-date-picker {
+	width: 100%;
+}
+
+.pageable {
+	text-align: right;
+	margin: 15px 0px;
+}
+
+.result-table table {
+	width: auto !important;
+}
+
+.result-table table .ivu-table-cell {
+	padding-left: 8px;
+	padding-right: 8px;
+}
+
+.table-col-1 {
+	width: 4%;
+}
+
+.table-col-3 {
+	width: 5%;
+}

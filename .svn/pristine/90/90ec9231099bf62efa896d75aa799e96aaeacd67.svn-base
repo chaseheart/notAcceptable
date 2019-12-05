@@ -1,0 +1,160 @@
+/**
+ * 
+ */
+package com.isolver.common.constant;
+
+/**
+ * 机能名常量
+ * @author 陈昶宇
+ * @createDate 2018/12/07 17:55:10 
+ * 
+ */
+public class FunctionNumConst {
+
+	/**
+	 * 任务一览
+	 */
+	public static String AT000011 = "AT000011";
+	
+	/**
+	 * 待办任务
+	 */
+	public static String AT000012 = "AT000012";
+	
+	/**
+	 * 处理问题
+	 */
+	public static String AT000013 = "AT000013";
+	
+	/**
+	 * 已办任务
+	 */
+	public static String AT000014 = "AT000014";
+	
+	/**
+	 * 我的草稿
+	 */
+	public static String AT000015 = "AT000015";
+	
+	/**
+	 * 与我相关
+	 */
+	public static String AT000016 = "AT000016";
+	
+	/**
+	 * 查询(查询结果显示)
+	 */
+	public static String AT010011 = "AT010011";
+	
+	/**
+	 * 问题详情显示（问题详情）
+	 */
+	public static String AT010012 = "AT010012";
+	
+	/**
+	 * 录入
+	 */
+	public static String AT010013 = "AT010013";
+	
+	/**
+	 * 新建(使用模板)
+	 */
+	public static String AT010014 = "AT010014";
+	
+	/**
+	 * 读取模板
+	 */
+	public static String AT010015 = "AT010015";
+	
+
+	/**
+	 * 问题模块定制(新增模块、主/子模块、编辑主/子模块)
+	 */
+	public static String AT020011 = "AT020011";
+	
+	/**
+	 * 问题流程定制
+	 */
+	public static String AT020012 = "AT020012";
+	
+	/**
+	 * 流程设置
+	 */
+	public static String AT020013 = "AT020013";
+	
+	/**
+	 * 流程功能定制
+	 */
+	public static String AT020014 = "AT020014";
+	
+	/**
+	 * 表单定制（复制表单）
+	 */
+	public static String AT020015 = "AT020015";
+	
+	/**
+	 * 表单设置
+	 */
+	public static String AT020016 = "AT020016";
+
+	/**
+	 * 角色设置
+	 */
+	public static String AT030011 = "AT030011";
+	
+	/**
+	 * 新增角色
+	 */
+	public static String AT030012 = "AT030012";
+	
+	/**
+	 * 用户信息
+	 */
+	public static String AT030013 = "AT030013";
+	
+	/**
+	 * 新建用户
+	 */
+	public static String AT030014 = "AT030014";
+	
+	/**
+	 * 修改用户
+	 */
+	public static String AT030015 = "AT030015";
+	
+	/**
+	 * 组织架构
+	 */
+	public static String AT030016 = "AT030016";
+	
+	/**
+	 * 表单字段维护
+	 */
+	public static String AT030017 = "AT030017";
+	
+	/**
+	 * 流程状态维护
+	 */
+	public static String AT030018 = "AT030018";
+	
+	/**
+	 * 规则定义
+	 */
+	public static String AT030019 = "AT030019";
+	
+	/**
+	 * 查询设置
+	 */
+	public static String AT030020 = "AT030020";
+	
+	/**
+	 * 列表设置
+	 */
+	public static String AT030021 = "AT030021";
+
+
+	/**
+	 * 用户信息（查询权限、首页设置、提醒设置）
+	 */
+	public static String AT040011 = "AT040011";
+}

@@ -1,0 +1,166 @@
+package com.isolver.common.constant;
+
+/**
+ * 系统常量
+ * 
+ * @author 陈昶宇
+ * @createDate 2018/12/03 14:24:02
+ * 
+ */
+public class SysStaticConst {
+
+	/**
+	 * 失败：0
+	 */
+	public static String FAILEFLAG = "0";
+
+	/**
+	 * 成功：1
+	 */
+	public static String SUCCESSFLAG = "1";
+
+	/**
+	 * 初始版本号
+	 */
+	public static Integer VERSION = 0;
+
+	/**
+	 * 初始deleFlag(未消除):'N'
+	 */
+	public static Boolean NOTDELE = false;
+
+	/**
+	 * deleFlag(消除):'Y'
+	 */
+	public static Boolean ISDELE = true;
+
+	/**
+	 * 是否必须字段,默认N
+	 */
+	public static String MUSTFLAG = "N";
+
+	/**
+	 * '-'
+	 */
+	public static String DASH = "-";
+
+	/**
+	 * 下划线
+	 */
+	public static String UNDERLINE = "_";
+
+	/**
+	 * 逗号
+	 */
+	public static String COMMA = ",";
+
+	/**
+	 * 点
+	 */
+	public static String DOT = ".";
+
+	/**
+	 * 斜杠
+	 */
+	public static String SLASH = "/";
+
+	/**
+	 * 删除成功
+	 */
+	public static String DELETESUCCESS = "DeleteSuccess";
+
+	/**
+	 * 删除失败
+	 */
+	public static String DELETEFAILURE = "DeleteFailure";
+
+	/**
+	 * 更新成功
+	 */
+	public static String MODIFYSUCCESS = "ModifySuccess";
+
+	/**
+	 * 更新失败
+	 */
+	public static String MODIFYFAILURE = "ModifyFailure";
+
+	/**
+	 * 新建成功
+	 */
+	public static String INSERTSUCCESS = "InsertSuccess";
+
+	/**
+	 * 新建失败
+	 */
+	public static String INSERTFAILURE = "InsertFailure";
+
+	/**
+	 * 流程类型:入职申请
+	 */
+	public static String TYPE = "flowType";
+
+	/**
+	 * 流程类型:入职申请
+	 */
+	public static Long FLOWTYPE = 1L;
+
+	/**
+	 * 入职申请第一步
+	 */
+	public static Long FIRSTSTEPFORAPPLY = 2L;
+
+	/**
+	 * 入职申请第二步
+	 */
+	public static Long SECONDSTEPFORAPPLY = 3L;
+	
+	/**
+	 * 入职申请第三步：业务部审批
+	 */
+	public static Long THIRDSTEPFORAPPLY = 4L;
+	
+	/**
+	 * 入职申请第四步：人事/运营总监审批
+	 */
+	public static Long FOURTHSTEPFORAPPLY = 5L;
+	
+	/**
+	 * 入职申请第五步：总经理审批
+	 */
+	public static Long FIFTHSTEPFORAPPLY = 6L;
+
+	/**
+	 * 流程状态:待审批
+	 */
+	public static String APPROVALPENDING = "approvalPending";
+	
+	/**
+	 * 流程状态:人事部审批完成
+	 */
+	public static String APPROVE1COMPLELET = "approve1Complelet";
+	
+	/**
+	 * 流程状态:业务部审批完成
+	 */
+	public static String APPROVE2COMPLELET = "approve2Complelet";
+	
+	/**
+	 * 流程状态:运营总监审批完成
+	 */
+	public static String APPROVE3COMPLELET = "approve3Complelet";
+	
+	/**
+	 * 流程状态:入职审批完成
+	 */
+	public static String APPROVE4COMPLELET = "approve4Complelet";
+	
+	/**
+	 * 流程状态:驳回
+	 */
+	public static String REJECTSTATE = "reject";
+	
+	/**
+	 * 3:无分页结果
+	 */
+	public static Integer SUMANDRESULT=3;
+}

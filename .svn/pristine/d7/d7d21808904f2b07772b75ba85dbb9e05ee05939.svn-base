@@ -1,0 +1,159 @@
+package com.isolver.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.isolver.common.config.AuthenticationFacade;
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.JsonUtil;
+import com.isolver.common.util.Result;
+import com.isolver.entity.User;
+import com.isolver.form.ConditionForm;
+import com.isolver.service.PendingService;
+import com.isolver.service.UserService;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/13
+ * @class UserController.java
+ */
+@RestController
+@RequestMapping(value = "/pending")
+public class PendingController {
+
+	private static final Logger logger = LoggerFactory.getLogger(PendingController.class);
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private PendingService pendingService;
+
+	/**
+	 * main初始化数据
+	 * 
+	 * @return
+	 * @throws JsonProcessingException
+	 */
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView() throws JsonProcessingException {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("pending");
+		Map<String, Object> map = new HashMap<>();
+		Long id = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(id);
+		map = pendingService.findAllPendingByUser(user,"%%","%%");
+		modelAndView.addObject("map", JsonUtil.objectToJSON(map));
+		return modelAndView;
+	}
+
+	/**
+	 * 报销初始化数据
+	 * 
+	 * @return
+	 * @throws JsonProcessingException
+	 */
+	@RequestMapping(value = "/claimingExpensesIndex", method = RequestMethod.GET)
+	public ModelAndView indexView2() throws JsonProcessingException {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("pendingClaimingExpenses");
+		Map<String, Object> map = new HashMap<>();
+		Long id = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(id);
+		map = pendingService.findAllPendingClaimingExpensesByUser(user, "%%", "%%");
+		modelAndView.addObject("map", JsonUtil.objectToJSON(map));
+		return modelAndView;
+	}
+
+	/**
+	 * 批量审批
+	 * 
+	 * @param assigner            下一步审批人
+	 * @param ruFlowIdArrayString 流程id数组（转字符串，逗号隔开）
+	 * @return
+	 */
+	@RequestMapping(value = "/nextStepbenth", method = RequestMethod.POST)
+	public Result<Object> nextStepbenth(String assigner, String ruFlowIdArrayString) {
+		try {
+			Long id = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(id);
+			String[] ruFlowIdArray = ruFlowIdArrayString.split(SysStaticConst.COMMA);
+			User assignerUser = new User();
+			if (!StringUtils.isBlank(assigner)) {
+				Long assignerId = Long.valueOf(assigner);
+				assignerUser = userService.getUserById(assignerId);
+			}
+			List<String> err = pendingService.nextStepbenth(assignerUser, ruFlowIdArray, user);
+			return new Result<>(err);
+		} catch (Exception e) {
+			logger.error("审批失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * ·拒绝申请
+	 * @param ruFlowId 流程id
+	 * @return
+	 */
+	@RequestMapping(value = "/refuseApply", method = RequestMethod.POST)
+	public Result<Object> refuseApply(String ruFlowId) {
+		try {
+			Long id = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(id);
+			pendingService.refuseApply(Long.valueOf(ruFlowId), user);
+			return new Result<>();
+		} catch (Exception e) {
+			logger.error("审批失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * ·驳回申请
+	 * @param ruFlowId 流程id
+	 * @return
+	 */
+	@RequestMapping(value = "/rejectApply", method = RequestMethod.POST)
+	public Result<Object> rejectApply(String ruFlowId) {
+		try {
+			Long id = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(id);
+			pendingService.rejectApply(Long.valueOf(ruFlowId), user);
+			return new Result<>();
+		} catch (Exception e) {
+			logger.error("审批失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	/**
+	 *· 根据条件检索
+	 * @param conditionForm 检索条件
+	 * @return
+	 */
+	@RequestMapping(value = "/getDataByCondition", method = RequestMethod.POST)
+	public Result<Object> getDataByCondition(@ModelAttribute ConditionForm conditionForm) {
+		try {
+			Long userId = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(userId);
+			Map<String, Object> map = pendingService.findAllPendingByUser(user, conditionForm.getWorkId(), conditionForm.getUsername());
+			return new Result<>(SysStatusCodeConst.SUCCESS, map);
+		} catch (Exception e) {
+			logger.error("检索失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+}

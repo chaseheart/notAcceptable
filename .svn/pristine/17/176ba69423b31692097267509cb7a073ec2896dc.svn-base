@@ -1,0 +1,80 @@
+package com.isolver.common.config;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.FieldError;
+
+/**
+ * @author 陈昶宇
+ * @createDate 2018/12/05 17:28:53
+ * 
+ */
+@Service
+public class MessageSourceHandler {
+
+	@Autowired
+	private MessageSource messageSource;
+
+	/**
+	 * 获取check失败mes
+	 * 
+	 * @param functionNum 机能名
+	 * @param fieldErrors check失败字段
+	 * @return check失败msg
+	 */
+	public List<String> getMessage(String functionNum, List<FieldError> fieldErrors) {
+		List<String> errorMessageList = new ArrayList<>();
+		for (FieldError fieldError : fieldErrors) {
+			Object[] objects = new Object[2];
+			objects[0] = functionNum;
+			objects[1] = fieldError.getDefaultMessage();
+			String errorMessage = messageSource.getMessage(fieldError.getCode(), objects, null);
+			errorMessageList.add(errorMessage);
+		}
+		return errorMessageList;
+	}
+
+	/**
+	 * 获取报错信息
+	 * 
+	 * @param functionNum 机能名
+	 * @param objectName  对象名
+	 * @param fieldName   message的key
+	 * @return 报错信息
+	 */
+	public String getMessage(String functionNum, String objectName, String fieldName) {
+		Object[] objects = new Object[2];
+		objects[0] = functionNum;
+		objects[1] = objectName;
+		String errorMessage = messageSource.getMessage(fieldName, objects, null);
+		return errorMessage;
+	}
+
+	/**
+	 * 获取报错信息
+	 * 
+	 * @param fieldName message的key
+	 * @return objects
+	 */
+	public String getMessage(String keyName) {
+		String errorMessage = messageSource.getMessage(keyName, null, null);
+		return errorMessage;
+	}
+
+	/**
+	 * 获取报错信息
+	 * 
+	 * @param fieldName message的key
+	 * @return objects
+	 */
+	public String getMessage(String keyName, String fieldName) {
+		Object[] objects = new Object[1];
+		objects[0] = fieldName;
+		String errorMessage = messageSource.getMessage(keyName, objects, null);
+		return errorMessage;
+	}
+}

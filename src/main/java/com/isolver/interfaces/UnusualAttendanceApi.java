@@ -1,0 +1,60 @@
+package com.isolver.interfaces;
+
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.isolver.common.util.Result;
+import com.isolver.form.UnusualAttendanceForm;
+
+@RequestMapping("/weixin/unusualAttendance")
+public interface UnusualAttendanceApi {
+
+	/**
+	 * 非正常考勤申请 - 初始化
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/init", method = RequestMethod.POST)
+	public Result<Object> applicationInit(Long ruFlowId);
+	
+	/**
+	 * 非正常提交申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/application", method = RequestMethod.POST)
+	public Result<Object> application(@ModelAttribute UnusualAttendanceForm unusualAttendanceForm, Long userId);
+
+	/**
+	 * 非正常提交再申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/reApplication", method = RequestMethod.POST)
+	public Result<Object> reApplication(@ModelAttribute UnusualAttendanceForm unusualAttendanceForm, Long userId, Long id);
+	
+	/**
+	 * 非正常审批
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/dealApplication", method = RequestMethod.POST)
+	public Result<Object> dealApplication(String assigner, String ruFlow, Long userId);
+
+	/**
+	 * 非正常驳回
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/rejectFlow", method = RequestMethod.POST)
+	public Result<Object> rejectFlow(Long ruFlow, Long userId);
+	
+	/**
+	 * 非正常审批拒絕
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/refuseApply", method = RequestMethod.POST)
+	public Result<Object> refuseApply(Long ruFlow, Long userId);
+}

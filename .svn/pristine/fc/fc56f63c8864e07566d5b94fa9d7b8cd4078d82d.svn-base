@@ -1,0 +1,41 @@
+package com.isolver.common.constant;
+
+import java.sql.Time;
+import java.util.Date;
+
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/07
+ * @class WorkTime.java
+ */
+public class WorkTime {
+	// 。上班打卡最早时间
+	@Temporal(TemporalType.TIME)
+	public final static Date ONEARLYWORK = new Time(9, 0, 0);
+	// 。上班打卡最晚时间
+	@Temporal(TemporalType.TIME)
+	public final static Date ONWORK = new Time(9, 30, 0);
+	// 。下班打卡最早时间
+	@Temporal(TemporalType.TIME)
+	public final static Date OFFWORK = new Time(18, 0, 0);
+	// 。下班打卡最晚时间
+	@Temporal(TemporalType.TIME)
+	public final static Date OFFLATEWORK = new Time(18, 30, 0);
+
+	// 。工作8小时
+	@Temporal(TemporalType.TIME)
+	public final static Date WORKTIME = new Time(18, 0, 0);
+
+	// 。休息开始时间
+	@Temporal(TemporalType.TIME)
+	public final static Date ON11REST = new Time(11, 0, 0);
+	// 。休息开始时间
+	@Temporal(TemporalType.TIME)
+	public final static Date ONREST = new Time(12, 0, 0);
+	// 。休息结束时间
+	@Temporal(TemporalType.TIME)
+	public final static Date OFFREST = new Time(13, 0, 0);
+}

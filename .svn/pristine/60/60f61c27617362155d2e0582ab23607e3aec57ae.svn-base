@@ -1,0 +1,75 @@
+package com.isolver.dao.servicePerformance;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.entity.ServicePerformance;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/07
+ * @class servicePerformanceRepository.java
+ */
+@Repository
+public interface ServicePerformanceRepository extends JpaRepository<ServicePerformance, Long>, ServicePerformanceRepositoryCustom {
+	/**
+	 * 根据用户检索考勤
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public List<ServicePerformance> findByUser(User user);
+
+	/**
+	 * 根据用户和日期范围检索考勤
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public List<ServicePerformance> findByUserAndDayBetween(User user, Date day1, Date day2);
+
+	/**
+	 * 根据ID检索一条考勤信息
+	 * 
+	 * @param user
+	 * @param monthStart
+	 * @param monthEnd
+	 * @param deleteFlag
+	 * @return
+	 */
+	@Query("select new com.isolver.dto.ServicePerformanceDto(CONCAT(a.id,'' )as id, CONCAT(a.day,'' ) as day,"
+			+ " CONCAT(a.oaStart,'' ) as oaStart, CONCAT(a.oaEnd,'' ) as oaEnd, CONCAT(a.oaFinalStart,'' ) as oaFinalStart,"
+			+ "CONCAT(a.oaFinalEnd,'' ) as oaFinalEnd, CONCAT(a.version,'' ) as version) " + "from ServicePerformance a where a.id = :id")
+	public ServicePerformanceDto findservicePerformanceById(@Param("id") Long id);
+
+	/**
+	 * 根据ID检索一条考勤信息
+	 * 
+	 * @param user
+	 * @param monthStart
+	 * @param monthEnd
+	 * @param deleteFlag
+	 * @return
+	 */
+	@Query("select new com.isolver.dto.ServicePerformanceDto(CONCAT(a.id,'' )as id, CONCAT(a.day,'' ) as day,"
+			+ " CONCAT(a.oaStart,'' ) as oaStart, CONCAT(a.oaEnd,'' ) as oaEnd, CONCAT(a.oaFinalStart,'' ) as oaFinalStart,"
+			+ "CONCAT(a.oaFinalEnd,'' ) as oaFinalEnd, CONCAT(a.version,'' ) as version) " + "from ServicePerformance a where a.user = :user and a.day = :date and a.deleteFlag = :deleteFlag")
+	public ServicePerformanceDto findServicePerformanceByDate(@Param("user") User user, @Param("date") Date date, @Param("deleteFlag") Boolean deleteFlag);
+
+	/**
+	 * 检索用户在某天的考勤记录
+	 * 
+	 * @param user
+	 * @param day
+	 * @return
+	 */
+	public ServicePerformance findByUserAndDay(User user, Date day);
+
+}

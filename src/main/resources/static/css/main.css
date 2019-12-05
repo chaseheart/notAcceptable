@@ -1,0 +1,427 @@
+@charset "UTF-8";
+
+* {
+	padding: 0px;
+}
+
+.header {
+	height: 60px;
+	background: #fff;
+	width: 100%;
+	box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+}
+
+.header .icons-bar .fa {
+	line-height: 57px;
+	margin: 0px 15px;
+	font-size: 15px;
+}
+
+.header-logo {
+	width: 15%;
+	margin-right: 1%;
+	display: inline-block;
+}
+
+.icons-bar {
+	float: right;
+}
+
+.icon-group {
+	display: inline-block;
+	position: relative;
+}
+
+.icon-number {
+	position: absolute;
+	color: #ffffff;
+	font-size: 12px;
+	right: 5px;
+	top: 10px;
+	padding: 0px 3px;
+	border-radius: 3px;
+}
+
+.icon-number.success {
+	background: #499f5d;
+}
+
+.icon-number.warning {
+	background: #ff9a42;
+}
+
+.icon-number.danger {
+	background: #bd595a;
+}
+
+.user-status {
+	background: #fff;
+	display: inline-block;
+	min-width: 150px;
+	height: 60px;
+	line-height: 60px;
+}
+
+.user-status img {
+	background: #ffffff;
+	width: 25px;
+	height: 25px;
+	margin: 0px 2px 0px 15px;
+}
+
+.user-status span {
+	color: rgba(0, 0, 0, .65);
+	margin: 0px 15px 0px 0px;
+}
+
+.menu {
+	position: absolute;
+	height: 100%;
+	background: #001529;
+}
+
+.menu-user-bar {
+	padding: 3%;
+	margin-bottom: 3%;
+}
+
+.menu-user-bar img {
+	background: #ffffff;
+	height: 50px;
+	width: 50px;
+}
+
+.menu-user-status {
+	color: #ffffff;
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 5%;
+}
+
+.online {
+	color: #477540;
+}
+
+.menu-search-bar {
+	padding: 5px;
+	position: relative;
+}
+
+.menu-search-bar input {
+	padding-right: 27px;
+	border-radius: 2px;
+	background: #39484f !important;
+	border-color: #39484f !important;
+	color: #939c9f !important;
+}
+
+.menu-search-bar input::-webkit-input-placeholder {
+	color: #939c9f;
+}
+
+.menu-search-bar input::-moz-input-placeholder {
+	color: #939c9f;
+}
+
+.menu-search-bar input::-ms-input-placeholder {
+	color: #939c9f;
+}
+
+.menu-search-bar .input-icon {
+	color: #939c9f;
+	z-index: 2;
+	position: absolute;
+	line-height: 45px;
+	display: inline-block;
+	right: 13px;
+	top: 0px;
+}
+
+.menu-title {
+	padding: 3%;
+	color: #39484f;
+	background: #1a2225;
+	line-height: 40px;
+	margin-top: 2%;
+}
+
+.menu-li {
+	display: block;
+	width: 100%;
+	line-height: 35px;
+	position: relative;
+}
+
+.menu-li a {
+	color: hsla(0, 0%, 100%, .65);
+	font-size: 14px;
+	text-decoration: none;
+}
+
+.menu-li a:hover {
+	color: #fff !important;
+}
+
+.menu-icon {
+	margin-right: 5px;
+}
+
+.arrow {
+	float: right;
+	clear: both;
+	line-height: 40px;
+}
+
+.submenu {
+	background: #000c17;
+	box-shadow: inset 0 2px 8px rgba(0, 0, 0, .45);
+}
+
+.submenu a {
+	padding: 7px 0 9px 37px;
+}
+
+.nav-list ul {
+	display: none;
+}
+
+.nav>li>a {
+	padding: 10px 15px;
+}
+
+.nav-list>li .submenu>li>a {
+	display: block;
+	position: relative;
+	padding: 7px 0 9px 37px;
+	margin: 0;
+	border-top-width: 1px;
+}
+
+.nav-list>li>a {
+	display: block;
+	height: 51px;
+	line-height: 29px;
+	padding-left: 24px;
+	text-shadow: none !important;
+	font-size: 17px;
+}
+
+.nav-list>li a>.arrow {
+	display: block;
+	width: 14px !important;
+	height: 14px;
+	line-height: 20px;
+	text-shadow: none;
+	font-size: 18px;
+	padding: 0;
+	text-align: center;
+}
+
+.iframe {
+	height: calc(100% - 60px);
+	border: 0px;
+	margin-top: 5px;
+	color: black;
+}
+
+.sider-menu-logo {
+	position: relative;
+	height: 64px;
+	padding-left: 15px;
+	overflow: hidden;
+	line-height: 64px;
+	background: #001529;
+	cursor: pointer;
+	transition: all .3s;
+}
+
+.sider-menu-logo img {
+	display: inline-block;
+	height: 45px;
+	vertical-align: middle;
+	line-height: 45px;
+	backgroud: transparent;
+}
+
+.sider-menu-logo h1 {
+	display: inline-block;
+	margin: 0 0 0 12px;
+	color: #fff;
+	font-weight: 600;
+	font-size: 30px;
+	font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+	vertical-align: middle;
+}
+
+.sider-menu-logo a {
+	text-decoration: none;
+}
+
+.basicLayout {
+	transition: all .2s;
+}
+
+.sidebar {
+	padding: 16px 0;
+}
+
+.basicLayout .main-layout {
+	flex-direction: row;
+}
+
+.layout {
+	box-sizing: border-box;
+	display: flex;
+	flex: auto;
+	flex-direction: column;
+	min-height: 0;
+	background: #f0f2f5;
+}
+
+.sider-menu-sider {
+	position: relative;
+	z-index: 10;
+	min-height: 100vh;
+	box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
+	/* flex: 0 0 256px;
+	max-width: 256px;
+	min-width: 256px; */
+	width: 256px;
+	background: #001529;
+}
+
+.header .pro-global-header-trigger {
+	/* height: 64px; */
+	padding: 19px 24px;
+	font-size: 20px;
+	cursor: pointer;
+	transition: all .3s, padding 0s;
+}
+
+.icons-bar div {
+	cursor: pointer;
+}
+
+li.active {
+	background: #1890ff;
+}
+
+li.active a {
+	color: #ffffff;
+}
+
+.user-dropdown {
+	position: relative;
+	margin-right: 5px;
+}
+
+.user-dropdown .dropdown-menu {
+	border: 0px;
+	box-shadow: 0 0 4px 1px #cecece;
+}
+
+.user-dropdown .dropdown-menu a {
+	line-height: 30px;
+	padding: 5px 15px;
+}
+
+.user-dropdown .dropdown-menu a i.fa {
+	line-height: normal;
+	margin: 0px 5px;
+	font-size: 14px;
+}
+
+.user-dropdown .dropdown-menu a:hover {
+	background: #E6F7FF;
+}
+
+.dropdown-btn {
+	background: #fff;
+	border: 0px;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+}
+
+.dropdown-btn:hover {
+	background: #f4f9fd;
+}
+
+.dropdown-btn:active {
+	background: #f4f9fd;
+}
+
+.dropdown-btn:focus {
+	outline: 0;
+}
+
+/* header */
+.layout {
+	border: 1px solid #d7dde4;
+	background: #f5f7f9;
+	position: relative;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.layout-header-bar {
+	background: #fff;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+	padding: 12px;
+	margin-bottom: 10px;
+}
+
+.layout-logo-left {
+	width: 90%;
+	height: 30px;
+	background: #5b6270;
+	border-radius: 3px;
+	margin: 15px auto;
+}
+
+.menu-icon {
+	transition: all .3s;
+}
+
+.rotate-icon {
+	transform: rotate(-90deg);
+}
+
+.menu-item span {
+	display: inline-block;
+	overflow: hidden;
+	width: 69px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: bottom;
+	transition: width .2s ease .2s;
+}
+
+.menu-item i {
+	transform: translateX(0px);
+	transition: font-size .2s ease, transform .2s ease;
+	vertical-align: middle;
+	font-size: 16px;
+}
+
+.collapsed-menu span {
+	width: 0px;
+	transition: width .2s ease;
+}
+
+.collapsed-menu i {
+	transform: translateX(5px);
+	transition: font-size .2s ease .2s, transform .2s ease .2s;
+	vertical-align: middle;
+	font-size: 22px;
+}
+
+.logout {
+	float: right;
+	margin-right: 10px;
+}
+
+.logo {
+	margin-left: 10px;
+	margin-top: 5px;
+}

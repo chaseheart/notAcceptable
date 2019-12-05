@@ -1,0 +1,149 @@
+package com.isolver.dto;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/21
+ * @class PendingDto.java
+ */
+public class PendingDto {
+
+	/** 。申请编号 **/
+	private String appId;
+	/** 。申请者 **/
+	private String appUsername;
+	/** 。申请开始日期 **/
+	private String appStartTime;
+	/** 最后处理人 **/
+	private String dealPeople;
+	/** 最后处理日期 **/
+	private String appEndtTime;
+	/** 状态 **/
+	private String state;
+	
+
+	/**
+	 * @return the appId
+	 */
+	public String getAppId() {
+		return appId;
+	}
+
+	/**
+	 * @param appId the appId to set
+	 */
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	/**
+	 * @return the appUsername
+	 */
+	public String getAppUsername() {
+		return appUsername;
+	}
+
+	/**
+	 * @param appUsername the appUsername to set
+	 */
+	public void setAppUsername(String appUsername) {
+		this.appUsername = appUsername;
+	}
+
+	/**
+	 * @return the appStartTime
+	 */
+	public String getAppStartTime() {
+		return appStartTime;
+	}
+
+	/**
+	 * @param appStartTime the appStartTime to set
+	 */
+	public void setAppStartTime(String appStartTime) {
+		this.appStartTime = appStartTime;
+	}
+
+	/**
+	 * @return the dealPeople
+	 */
+	public String getDealPeople() {
+		return dealPeople;
+	}
+
+	/**
+	 * @param dealPeople the dealPeople to set
+	 */
+	public void setDealPeople(String dealPeople) {
+		this.dealPeople = dealPeople;
+	}
+
+	/**
+	 * @return the appEndtTime
+	 */
+	public String getAppEndtTime() {
+		return appEndtTime;
+	}
+
+	/**
+	 * @param appEndtTime the appEndtTime to set
+	 */
+	public void setAppEndtTime(String appEndtTime) {
+		this.appEndtTime = appEndtTime;
+	}
+
+	/**
+	 * @return the state
+	 */
+	public String getState() {
+		return state;
+	}
+
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	/**
+	 * PendingDto.java
+	 * 
+	 * @param appId
+	 * @param type
+	 * @param appUsername
+	 * @param appStartTime
+	 * @param dealPeople
+	 * @param appEndtTime  2019/11/21
+	 */
+	public PendingDto(String appId, String appUsername, String appStartTime, String dealPeople, String appEndtTime,String state) {
+		super();
+		this.appId = appId;
+		this.appUsername = appUsername;
+		this.appStartTime = appStartTime;
+		this.dealPeople = dealPeople;
+		this.appEndtTime = appEndtTime;
+		this.state = state;
+	}
+	/**
+	 * PendingDto.java
+	 * 
+	 * @param appId
+	 * @param type
+	 * @param appUsername
+	 * @param appStartTime
+	 * @param dealPeople
+	 * @param appEndtTime  2019/11/21
+	 */
+	public PendingDto(String appId, String appUsername, String appStartTime, String dealPeople, String appEndtTime) {
+		super();
+		this.appId = appId;
+		this.appUsername = appUsername;
+		this.appStartTime = appStartTime;
+		this.dealPeople = dealPeople;
+		this.appEndtTime = appEndtTime;
+	}
+	
+	public PendingDto() {
+		super();
+	}
+}

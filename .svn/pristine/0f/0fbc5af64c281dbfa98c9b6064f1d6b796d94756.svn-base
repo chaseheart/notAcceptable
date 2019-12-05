@@ -1,0 +1,141 @@
+package com.isolver.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.isolver.common.config.AuthenticationFacade;
+import com.isolver.common.constant.HtmlConst;
+import com.isolver.common.util.JsonUtil;
+import com.isolver.common.util.Result;
+import com.isolver.dto.OrgDto;
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.dto.UserDto;
+import com.isolver.entity.User;
+import com.isolver.form.OverTimeForm;
+import com.isolver.service.OrganizationService;
+import com.isolver.service.OverTimeService;
+import com.isolver.service.ServicePerformanceService;
+import com.isolver.service.UserService;
+
+@RestController
+@RequestMapping(value = "/workOvertime")
+public class OverTimeController {
+
+	private static final Logger logger = LoggerFactory.getLogger(OverTimeController.class);
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private ServicePerformanceService servicePerformanceService;
+
+	@Autowired
+	private OrganizationService organizationService;
+	@Autowired
+	private OverTimeService overTimeService;
+
+	/**
+	 * main初始化数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView(String id) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("overtime");
+		Long userId = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(userId);
+		modelAndView.addObject("username", JsonUtil.getJsonArray(new UserDto(user)));
+		List<OrgDto> orgdto = organizationService.findAllOrg();
+		if (!"undefined".equals(id) && null != id) {
+			Long ids = Long.parseLong(id);
+			ServicePerformanceDto servicePerformanceDto = servicePerformanceService.findOneServicePerformance(ids);
+			modelAndView.addObject("servicePerformance", JsonUtil.getJsonArray(servicePerformanceDto));
+		}
+		modelAndView.addObject("orgdto", JsonUtil.getJsonArray(orgdto));
+		modelAndView.addObject("html", HtmlConst.SUBMMITBUTTON);
+		modelAndView.addObject("type", HtmlConst.APPLICATION);
+		return modelAndView;
+
+	}
+
+	/**
+	 * 加班初始化数据（审批页面）
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pending", method = RequestMethod.GET)
+	public ModelAndView indexView2(String ruFlowId) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("overtime");
+		Long userId = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(userId);
+		modelAndView.addObject("username", JsonUtil.getJsonArray(new UserDto(user)));
+		List<OrgDto> orgdto = organizationService.findAllOrg();
+		modelAndView.addObject("orgdto", JsonUtil.getJsonArray(orgdto));
+		if (!"undefined".equals(ruFlowId) && null != ruFlowId) {
+			Long ids = Long.parseLong(ruFlowId);
+			Map<String, Object> map = servicePerformanceService.getServicePerformaneAndOverTimeForm(ids);
+			modelAndView.addObject("overTime", JsonUtil.getJsonArray(map.get("overTime")));
+			modelAndView.addObject("servicePerformance", JsonUtil.getJsonArray(map.get("servicePerformanceDto")));
+			modelAndView.addObject("ruFlowId", ruFlowId);
+		}
+		modelAndView.addObject("html", HtmlConst.PENDINGBUTTON);
+		modelAndView.addObject("type", HtmlConst.APPLICATION);
+		return modelAndView;
+
+	}
+
+	/**
+	 * 加班提交申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/application", method = RequestMethod.POST)
+	public Result<Object> Application(@ModelAttribute OverTimeForm overTimeForm) {
+		try {
+			Long id = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(id);
+			overTimeService.startFlow(overTimeForm, user);
+			return new Result<>();
+		} catch (Exception e) {
+			logger.error("提交申请失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 加班审批
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/dealApplication", method = RequestMethod.POST)
+	public Result<Object> dealApplication(String assigner, String ruFlow) {
+		try {
+			Long id = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(id);
+			Long ruFlowId = Long.valueOf(ruFlow);
+			if (user.getRole().getLevel() != 3) {
+				Long assignerId = Long.valueOf(assigner);
+				User assignerUser = userService.getUserById(assignerId);
+
+				overTimeService.nextStep(assignerUser, ruFlowId, user);
+			} else {
+				overTimeService.nextStep(user, ruFlowId, user);
+			}
+
+			return new Result<>();
+		} catch (Exception e) {
+			logger.error("提交申请失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+}

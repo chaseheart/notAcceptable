@@ -1,0 +1,254 @@
+package com.isolver.service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.ProcessEngineUtil;
+import com.isolver.common.util.Timeutil;
+import com.isolver.dao.hiFlow.HiFlowRepository;
+import com.isolver.dao.oaFlow.OaFlowRepository;
+import com.isolver.dao.outBusiness.OutBusinessRepository;
+import com.isolver.dao.ruFlow.RuFlowRepository;
+import com.isolver.dao.servicePerformance.ServicePerformanceRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.entity.HiFlow;
+import com.isolver.entity.OaFlow;
+import com.isolver.entity.OutBusiness;
+import com.isolver.entity.RuFlow;
+import com.isolver.entity.ServicePerformance;
+import com.isolver.entity.User;
+import com.isolver.form.OutBusinessForm;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/19
+ * @class OutBusinessService.java
+ */
+@Service
+public class OutBusinessService {
+	@Autowired
+	private ActivityService activityService;
+	@Autowired
+	private OaFlowRepository oaFlowRepository;
+	@Autowired
+	private ServicePerformanceRepository servicePerformanceRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private RuFlowRepository ruFlowRepository;
+	@Autowired
+	private HiFlowRepository hiFlowRepository;
+	@Autowired
+	private OutBusinessRepository outBusinessRepository;
+
+	/**
+	 * 录入并启动新流程
+	 * 
+	 * @param formInputList
+	 * @param prevAssignJson 预处理人组
+	 * @param assignId
+	 * @param userId
+	 */
+
+	public void startFlow(OutBusinessForm outBusinessForm, User user) {
+
+		OaFlow oaFlow = oaFlowRepository.findOne(1l);
+		User assigner = userRepository.findOne(Long.valueOf(outBusinessForm.getAssigner()));
+		RuFlow ruFlow = new RuFlow();
+		// 。存进ru的act id
+		String runFlowId = activityService.startActivity(oaFlow);
+		ruFlow.setActRunFlowId(runFlowId);
+		ruFlow.setFlowId(oaFlow);
+		ruFlow.setState(2);
+		ruFlow.setDealPeople(assigner);
+		ruFlow.setDealPeopleNow(user);
+		ruFlow.setInsertUserId(user.getId());
+		ruFlow.setInsertTime(Timeutil.getTimestamp());
+		ruFlow.setUpdateUserId(user.getId());
+		ruFlow.setUpdateTime(Timeutil.getTimestamp());
+		ruFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+
+		HiFlow hiFlow = new HiFlow();
+		hiFlow.setActId(runFlowId);
+		hiFlow.setState(1);
+		hiFlow.setApplication(user);
+		// 20191128 ccy add 当前处理人和fix 申请人 start
+		hiFlow.setDealPeopleNow(user);
+		hiFlow.setDealPeople(user);
+		// 20191128 ccy add 当前处理人和fix 申请人 end
+		hiFlow.setRuFlowId(ruFlow);
+		hiFlow.setInsertUserId(user.getId());
+		hiFlow.setInsertTime(Timeutil.getTimestamp());
+		hiFlow.setUpdateUserId(user.getId());
+		hiFlow.setUpdateTime(Timeutil.getTimestamp());
+		hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		hiFlowRepository.saveAndFlush(hiFlow);
+
+		// 外出公务开始日期
+		Integer startYear = Integer.parseInt(outBusinessForm.getOutBusinessStart().split("/")[0]);
+		Integer startMonth = Integer.parseInt(outBusinessForm.getOutBusinessStart().split("/")[1]);
+		Integer startDay = Integer.parseInt(outBusinessForm.getOutBusinessStart().split("/")[2]);
+		Date dateStart = Dateutil.LocalDateToDate(startYear, startMonth, startDay);
+		// 外出公务结束日期
+		Integer endYear = Integer.parseInt(outBusinessForm.getOutBusinessEnd().split("/")[0]);
+		Integer endMonth = Integer.parseInt(outBusinessForm.getOutBusinessEnd().split("/")[1]);
+		Integer endDay = Integer.parseInt(outBusinessForm.getOutBusinessEnd().split("/")[2]);
+		Date dateEnd = Dateutil.LocalDateToDate(endYear, endMonth, endDay);
+
+		List<ServicePerformance> splist = servicePerformanceRepository.findByUserAndDayBetween(user, dateStart, dateEnd);
+		List<OutBusiness> oblist = new ArrayList<>();
+		for (ServicePerformance sp : splist) {
+			OutBusiness outBusiness = new OutBusiness();
+			outBusiness.setUser(user);
+			outBusiness.setBusinessReason(outBusinessForm.getBusinessReason());
+			outBusiness.setBusinessPlace(outBusinessForm.getBusinessPlace());
+			outBusiness.setPlaceDetail(outBusinessForm.getPlaceDetail());
+			outBusiness.setContactName(outBusinessForm.getContactName());
+			outBusiness.setContactPhone(outBusinessForm.getContactPhone());
+			outBusiness.setOutType(outBusinessForm.getOutType());
+			outBusiness.setOutBusinessStart(dateStart);
+			outBusiness.setOutBusinessEnd(dateEnd);
+			outBusiness.setContent(outBusinessForm.getContent());
+			outBusiness.setRuFlow(ruFlow);
+			outBusiness.setServicePerformance(sp);
+			oblist.add(outBusiness);
+		}
+		outBusinessRepository.save(oblist);
+		outBusinessRepository.flush();
+	}
+
+	/**
+	 * 下一步骤
+	 * 
+	 * @param assign   审批人
+	 * @param ruFlowId
+	 * @param user     提交用户
+	 */
+	public void nextStep(User assign, Long ruFlowId, User user) {
+		RuFlow ruFlow = ruFlowRepository.findOne(ruFlowId);
+		List<OutBusiness> OutBusinessList = outBusinessRepository.findByRuFlow(ruFlow);
+		ProcessEngineUtil.getProcessEngine().getTaskService()
+				.complete(ProcessEngineUtil.getProcessEngine().getTaskService().createTaskQuery().processInstanceId(ruFlow.getActRunFlowId()).singleResult().getId());
+		HiFlow hiFlow = new HiFlow();
+		hiFlow.setActId(ruFlow.getActRunFlowId());
+		hiFlow.setState(ruFlow.getState());
+		hiFlow.setApplication(OutBusinessList.get(0).getUser());
+		hiFlow.setDealPeople(ruFlow.getDealPeople());
+		hiFlow.setDealPeopleNow(ruFlow.getDealPeopleNow());
+		hiFlow.setRuFlowId(ruFlow);
+		hiFlow.setInsertUserId(user.getId());
+		hiFlow.setInsertTime(Timeutil.getTimestamp());
+		hiFlow.setUpdateUserId(user.getId());
+		hiFlow.setUpdateTime(Timeutil.getTimestamp());
+		hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		hiFlowRepository.saveAndFlush(hiFlow);
+
+		if (ruFlow.getState() == 2) {
+			ruFlow.setState(3);
+			ruFlow.setDealPeople(assign);
+			ruFlow.setDealPeopleNow(user);
+			ruFlow.setUpdateUserId(user.getId());
+			ruFlow.setUpdateTime(Timeutil.getTimestamp());
+			ruFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+			ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+		} else {
+			ruFlow.setState(4);
+			ruFlow.setDealPeopleNow(user);
+			ruFlow.setUpdateUserId(user.getId());
+			ruFlow.setUpdateTime(Timeutil.getTimestamp());
+			ruFlow.setDeleteFlag(SysStaticConst.ISDELE);
+			ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+		}
+	}
+
+	/**
+	 * 外出公务 - 再申请
+	 * 
+	 * @param outBusinessForm
+	 * @param user
+	 * @param outBusinessId
+	 * 
+	 */
+	public void restartFlow(OutBusinessForm outBusinessForm, User user, Long ruFlowId) {
+
+		OaFlow oaFlow = oaFlowRepository.findOne(1l);
+		User assigner = userRepository.findOne(Long.valueOf(outBusinessForm.getAssigner()));
+		RuFlow ruFlowModel = ruFlowRepository.findOne(ruFlowId);
+		RuFlow ruFlowEntity = new RuFlow();
+		BeanUtils.copyProperties(ruFlowModel, ruFlowEntity);
+
+		// 。存进ru的act id
+		String runFlowId = activityService.startActivity(oaFlow);
+		ruFlowEntity.setActRunFlowId(runFlowId);
+		ruFlowEntity.setFlowId(oaFlow);
+		ruFlowEntity.setState(2);
+		ruFlowEntity.setDealPeople(assigner);
+//		ruFlow.setDealPeopleNow(user);
+//		ruFlow.setInsertUserId(user.getId());
+//		ruFlow.setInsertTime(Timeutil.getTimestamp());
+		ruFlowEntity.setUpdateUserId(user.getId());
+		ruFlowEntity.setUpdateTime(Timeutil.getTimestamp());
+//		ruFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		ruFlowEntity = ruFlowRepository.saveAndFlush(ruFlowEntity);
+
+		HiFlow hiFlow = new HiFlow();
+		hiFlow.setActId(oaFlow.getActId());
+		hiFlow.setState(1);
+		hiFlow.setApplication(user);
+		hiFlow.setDealPeople(assigner);
+		hiFlow.setRuFlowId(ruFlowEntity);
+		hiFlow.setInsertUserId(user.getId());
+		hiFlow.setInsertTime(Timeutil.getTimestamp());
+		hiFlow.setUpdateUserId(user.getId());
+		hiFlow.setUpdateTime(Timeutil.getTimestamp());
+		hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		hiFlowRepository.saveAndFlush(hiFlow);
+
+		// 外出公务开始日期
+		Integer startYear = Integer.parseInt(outBusinessForm.getOutBusinessStart().split("/")[0]);
+		Integer startMonth = Integer.parseInt(outBusinessForm.getOutBusinessStart().split("/")[1]);
+		Integer startDay = Integer.parseInt(outBusinessForm.getOutBusinessStart().split("/")[2]);
+		Date dateStart = Dateutil.LocalDateToDate(startYear, startMonth, startDay);
+		// 外出公务结束日期
+		Integer endYear = Integer.parseInt(outBusinessForm.getOutBusinessEnd().split("/")[0]);
+		Integer endMonth = Integer.parseInt(outBusinessForm.getOutBusinessEnd().split("/")[1]);
+		Integer endDay = Integer.parseInt(outBusinessForm.getOutBusinessEnd().split("/")[2]);
+		Date dateEnd = Dateutil.LocalDateToDate(endYear, endMonth, endDay);
+
+		List<OutBusiness> obFormList = outBusinessRepository.findByRuFlow(ruFlowEntity);
+		outBusinessRepository.delete(obFormList);
+
+		List<ServicePerformance> splist = servicePerformanceRepository.findByUserAndDayBetween(user, dateStart, dateEnd);
+		List<OutBusiness> oblist = new ArrayList<>();
+		for (ServicePerformance sp : splist) {
+			OutBusiness outBusiness = new OutBusiness();
+			outBusiness.setUser(user);
+			outBusiness.setBusinessReason(outBusinessForm.getBusinessReason());
+			outBusiness.setBusinessPlace(outBusinessForm.getBusinessPlace());
+			outBusiness.setPlaceDetail(outBusinessForm.getPlaceDetail());
+			outBusiness.setContactName(outBusinessForm.getContactName());
+			outBusiness.setContactPhone(outBusinessForm.getContactPhone());
+			outBusiness.setOutType(outBusinessForm.getOutType());
+			outBusiness.setOutBusinessStart(dateStart);
+			outBusiness.setOutBusinessEnd(dateEnd);
+			outBusiness.setContent(outBusinessForm.getContent());
+			outBusiness.setRuFlow(ruFlowEntity);
+			outBusiness.setServicePerformance(sp);
+			outBusiness.setInsertTime(Timeutil.getTimestamp());
+			outBusiness.setInsertUserId(user.getId());
+			outBusiness.setUpdateTime(outBusiness.getInsertTime());
+			outBusiness.setUpdateUserId(user.getId());
+			oblist.add(outBusiness);
+		}
+		outBusinessRepository.save(oblist);
+		outBusinessRepository.flush();
+	}
+}

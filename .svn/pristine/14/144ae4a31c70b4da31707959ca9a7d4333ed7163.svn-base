@@ -1,0 +1,438 @@
+//var weekDay = [ "日", "一", "二", "三", "四", "五", "六" ];
+var vm = new Vue({
+	el : '#app',
+	data : {
+		openDrawer : false,
+		formItem : {
+			date : new Date()
+		},
+		approvalTable : [ {
+			title : '申请号',
+			key : 'id'
+		}, {
+			title : '类型',
+			key : 'type'
+		}, {
+			title : '申请开始时间',
+			key : 'startTime'
+		}, {
+			title : '申请中止时间',
+			key : 'endTime'
+		}, {
+			title : '最终审批者',
+			key : 'lastApproval'
+		}, {
+			title : '审批状态',
+			key : 'approvalStatus'
+		}, {
+			title : '备注',
+			key : 'remarks'
+		} ],
+		approvalData : [],
+		resultTable : [ {
+			title : 'id',
+			key : 'id',
+			className : 'table-col-1',
+			render : function(h, params) {
+				var functionList = [];
+				var show = h('span', {
+					props : {
+						type : 'primary',
+					},
+					on : {
+						click : function() {
+						}
+					}
+				}, params.row.id);
+				functionList.push(show);
+				return h('span', {
+
+				}, functionList);
+			}
+		}, {
+			title : '考勤日期',
+			key : 'date',
+			render : function(h, params) {
+				var functionList = [];
+				var show = h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '####',
+					},
+					on : {
+						click : function() {
+						}
+					}
+				}, params.row.date);
+				var content = h("div", {
+					slot : "content"
+				}, [ h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '/holiday?id=' + params.row.id,
+					}
+				}, '休假申请'), h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###' + params.row.id,
+					}
+				}, '加班申请'), h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###' + params.row.id,
+					}
+				}, '非正常考勤申请'), h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###'+ params.row.id,
+					}
+				}, '外出公务申请') ])
+				functionList.push(show);
+				functionList.push(content);
+				return h('Poptip', {
+					props : {
+						transfer : true,
+						title : '考勤',
+						size : 'small',
+					},
+				}, functionList);
+			},
+			className : 'table-col-3'
+		}, {
+			title : '星期',
+			key : 'weeks',
+			className : 'table-col-1'
+		}, {
+			title : '勤务开始时间',
+			key : 'startTime',
+			className : 'table-col-5'
+		}, {
+			title : '勤务结束时间',
+			key : 'endTime',
+			className : 'table-col-5'
+		}, {
+			title : '加班',
+			key : 'overtime',
+			className : 'table-col-1'
+		}, {
+			title : '非正常考勤情况',
+			key : 'status',
+			className : 'table-col-5'
+		}, {
+			title : '旷工',
+			key : 'absenteeism',
+			className : 'table-col-1'
+		}, {
+			title : '缺勤',
+			key : 'absenceFromDuty',
+			className : 'table-col-1'
+		}, {
+			title : '事假',
+			key : 'absence',
+			className : 'table-col-1'
+		}, {
+			title : '病假',
+			key : 'sick',
+			className : 'table-col-1'
+		}, {
+			title : '带薪假',
+			key : 'paid',
+			className : 'table-col-3'
+		}, {
+			title : '外出公务',
+			key : 'out',
+			className : 'table-col-3'
+		}, {
+			title : '打卡时间',
+			key : 'clockIn',
+			className : 'table-col-5'
+		}, {
+			title : '照合结果',
+			key : 'result',
+			className : 'table-col-3',
+			render : function(h, params) {
+				var functionList = [];
+				if (params.row.result == "非") {
+					var show = h('Tag', {
+						props : {
+							type : 'error',
+						},
+						on : {
+							click : function() {
+							}
+						}
+					}, "X");
+					functionList.push(show);
+					return h('span', {
+
+					}, functionList);
+				} else if (params.row.result == "加") {
+					var show = h('Tag', {
+						props : {
+							type : 'primary',
+						},
+						on : {
+							click : function() {
+							}
+						}
+					}, params.row.result);
+					functionList.push(show);
+					return h('span', {
+
+					}, functionList);
+				} else if (params.row.result == "非加") {
+					var t1 = params.row.result.split('加')[0];
+					var t2 = params.row.result.split('非')[1];
+
+					var show1 = h('Tag', {
+						props : {
+							type : 'error',
+						},
+						on : {
+							click : function() {
+							}
+						}
+					}, "X");
+					var show2 = h('Tag', {
+						props : {
+							type : 'primary',
+						},
+						on : {
+							click : function() {
+							}
+						}
+					}, t2);
+					functionList.push(show1);
+					functionList.push(show2);
+					return h('span', {
+
+					}, functionList);
+				}
+			}
+		} ],
+		resultData : []
+	},
+	methods : {
+		getFormItem : function() {
+			var userData = JSON.parse($("#username").val())[0];
+			var date = new Date();
+			var formItem = {
+				workId : userData.workId,
+				user : userData.username,
+				org : userData.org,
+				depart : userData.depart,
+				date : date.getFullYear().toString() + '-' + date.getMonth().toString(),
+			}
+			this.formItem = formItem;
+		},
+		getDateWeek : function(date) {
+			var day = new Date(Date.parse(date));
+			var today = new Array('日', '一', '二', '三', '四', '五', '六');
+			var week = today[day.getDay()];
+			return week;
+		},
+		createTable : function(servicePerformance, holiday, monthDay, month) { // 。生成表格
+			let resultData = [];
+			if (holiday != undefined) {
+				let restDay = JSON.parse(holiday.restDay);
+
+				for (var i = 0; i < monthDay; i++) {
+					// 状态
+					if (servicePerformance[keyDay] != undefined) {
+						var state = servicePerformance[keyDay].state;
+					} else {
+						var state = '';
+					}
+
+					// 。循环日期
+					var keyDay = holiday.year + '-' + holiday.month + '-' + (i + 1);
+					// 。当月有考勤记录：true,当月无考勤记录：false
+					if (!$.isEmptyObject(servicePerformance)) {
+						// 。当天有考勤记录：true,当天无考勤记录：false
+						if (servicePerformance[keyDay] != undefined) {
+
+							let oaStart = servicePerformance[keyDay].oaStart;
+							let oaEnd = servicePerformance[keyDay].oaEnd;
+							let oaFinalStart = servicePerformance[keyDay].oaFinalStart;
+							let oaFinalEnd = servicePerformance[keyDay].oaFinalEnd;
+							let result = '';
+							switch (servicePerformance[keyDay].state) {
+							case "n":
+								break;
+							case "o":
+								result = '加';
+								break;
+							case "uo":
+								result = '非加';
+								break;
+							case "u":
+								result = '非';
+								break;
+							default:
+								break;
+							}
+							resultData[i] = {
+								id : servicePerformance[keyDay].id,
+								date : servicePerformance[keyDay].day,
+								weeks : this.getDateWeek(servicePerformance[keyDay].day),
+								startTime : oaFinalStart.substring(0, oaFinalStart.length - 3),
+								endTime : oaFinalEnd.substring(0, oaFinalEnd.length - 3),
+								overtime : '',
+								status : '',
+								absenteeism : servicePerformance[keyDay].absence,
+								absenceFromDuty : '',
+								absence : '',
+								sick : '',
+								paid : '',
+								out : '',
+								clockIn : oaStart.substring(0, oaStart.length - 3) + ' - ' + oaEnd.substring(0, oaEnd.length - 3),
+								result : result
+							}
+						} else {
+							resultData[i] = {
+								date : keyDay,
+								weeks : this.getDateWeek(keyDay),
+								startTime : '',
+								endTime : '',
+								overtime : '',
+								status : '',
+								absenteeism : 8,
+								absenceFromDuty : '',
+								absence : '',
+								sick : '',
+								paid : '',
+								out : '',
+								clockIn : '',
+								result : ''
+							}
+						}
+					} else {
+						resultData[i] = {
+							date : keyDay,
+							weeks : this.getDateWeek(keyDay),
+							startTime : '',
+							endTime : '',
+							overtime : '',
+							status : '',
+							absenteeism : '',
+							absenceFromDuty : '',
+							absence : '',
+							sick : '',
+							paid : '',
+							out : '',
+							clockIn : '',
+							result : ''
+						}
+					}
+					// 。判断休假变红
+					if (jQuery.inArray((i + 1), restDay) != -1) {
+						// red
+						resultData[i]["cellClassName"] = {
+							weeks : 'text-error'
+						}
+						resultData[i]["absenteeism"] = '';
+					}
+				}
+			}
+
+			this.resultData = resultData;
+		},
+		searchPerformance : function() {
+			var that = this;
+			var datePicker = $("#datePicker").find("input").val();
+			var data = {
+				'oaYear' : datePicker.split("-")[0],
+				'oaMonth' : datePicker.split("-")[1]
+			};
+			var url = "/servicePerformance/findAllServicePerformance";
+			var success = function(data) {
+				ajaxStatus = true;
+				// 。校验通过，跳转到［首页］
+				if (data.status == '200') {
+					that.createTable(data.data.servicePerformance, data.data.holiday, data.data.month, datePicker.split("-")[1]);
+				}
+			};
+
+			var cache = false;
+			var alone = true;
+			post(url, data, success, cache, alone);
+		},
+		exportExcel : function() {
+			var that = this;
+			var datePicker = $("#datePicker").find("input").val();
+			var data = {
+				'oaYear' : datePicker.split("-")[0],
+				'oaMonth' : datePicker.split("-")[1]
+			};
+			var url = "/servicePerformance/exportExcel";
+			var success = function(data) {
+				ajaxStatus = true;
+				// 。校验通过，跳转到［首页］
+			};
+
+			var cache = false;
+			var alone = true;
+			get(url, data, success, cache, alone);
+		}
+	// filterTimeStart : function(time) { // 。时间取整
+	// let timeTample=time.split(":")
+	// let [t1, t2] = [
+	// timeTample[0],
+	// timeTample[1]
+	// ]
+	// if (t1 == 11 && t2 <= 30 || (t1 < 11) || (t1 == 12 && t2 >= 30 || t1 >
+	// 12)) {
+	// let i = parseInt(t2)
+	// if (i > 0 && i <= 30) {
+	// t2 = 30;
+	// } else {
+	// // 。小时进位
+	// t2 = `00`;
+	// t1 = parseInt(t1) + 1;
+	// }
+	// } else {
+	// t1 = 12;
+	// t2 = 30
+	// }
+	// return `${t1}:${t2}`;
+	// },
+	// filterTimeEnd : function(time) { // 。时间取整
+	// let timeTample=time.split(":")
+	// let [t1, t2] = [
+	// timeTample[0],
+	// timeTample[1]
+	// ]
+	// if (t1 == 11 && t2 <= 30 || (t1 < 11) || (t1 == 12 && t2 >= 30 || t1 >
+	// 12)) {
+	// let i = parseInt(t2)
+	// if (i > 0 && i <= 30) {
+	// t2 = 00;
+	// } else {
+	// t2 = 30;
+	// }
+	// } else {
+	// t1 = 12;
+	// t2 = 30
+	// }
+	// return `${t1}:${t2}`;
+	// }
+	},
+	created : function() {
+		this.getFormItem();
+		let servicePerformance = JSON.parse($("#servicePerformance").val());
+		let holiday = JSON.parse($("#holiday").val());
+		let month = parseInt($("#month").val());
+		this.createTable(servicePerformance[0], holiday[0], month);
+
+	}
+});

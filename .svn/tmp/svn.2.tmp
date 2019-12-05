@@ -1,0 +1,115 @@
+package com.isolver.service;
+
+import java.sql.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.util.ExcelUtil;
+import com.isolver.dao.servicePerformance.ServicePerformanceRepository;
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.entity.Holiday;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/07
+ * @class servicePerformanceService.java
+ */
+@Service
+public class ServicePerformanceService {
+
+	@Autowired
+	private ServicePerformanceRepository servicePerformanceRepository;
+
+	/**
+	 * 根据用户、考勤开始日期、考勤结束日期，获得当月考勤记录
+	 * 
+	 * @param user          用户
+	 * @param dateStart考勤开始
+	 * @param dateEnd考勤结束
+	 * @return
+	 */
+	public Map<String, ServicePerformanceDto> findservicePerformance(User user, Date dateStart, Date dateEnd) {
+		Map<String, ServicePerformanceDto> map = new HashMap<>();
+		List<ServicePerformanceDto> dtoList = servicePerformanceRepository.findServicePerformanceByUserAndDeleteFlag(user, dateStart, dateEnd, SysStaticConst.NOTDELE);
+		for (ServicePerformanceDto dto : dtoList) {
+			switch (dto.getState()) {
+			case "n":
+				break;
+			case "o":
+				break;
+
+			case "uo":
+				break;
+
+			case "u":
+
+				dto.setAbsence(new Integer(9) - Integer.parseInt(dto.getHour()));
+				break;
+
+			default:
+				break;
+			}
+			map.put(dto.getDay(), dto);
+		}
+		// 。根据日历，计算一天请假的check TODO
+
+		return map;
+	}
+
+	/**
+	 * 通过ID获得一条考勤记录
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public ServicePerformanceDto findOneServicePerformance(Long id) {
+		return servicePerformanceRepository.findservicePerformanceById(id);
+	}
+
+	/**
+	 * 
+	 * @param dtoList
+	 * @param holiday
+	 * @return
+	 */
+	public HSSFWorkbook exportExcel(Map<String, ServicePerformanceDto> dtoList, Holiday holiday) {
+		// excel标题
+		String[] title = { "日期", "考勤开始", "考勤结束", "出勤时间", "加班时间" };
+
+		// sheet名
+		String sheetName = "学生信息表";
+
+		String[][] content = new String[dtoList.size()][];
+		int i = 0;
+		// mapd的遍历
+
+		if (holiday != null) {
+
+		}
+		for (Entry<String, ServicePerformanceDto> entry : dtoList.entrySet()) {
+
+			System.out.println(entry.getKey() + ":" + entry.getValue());
+			content[i] = new String[title.length];
+			content[i][0] = entry.getValue().getDay();
+			content[i][1] = entry.getValue().getOaFinalStart();
+			content[i][2] = entry.getValue().getOaFinalEnd();
+			content[i][3] = entry.getValue().getHour();
+			content[i][4] = entry.getValue().getState();
+			i++;
+
+		}
+		// 创建HSSFWorkbook
+		HSSFWorkbook wb = ExcelUtil.getHSSFWorkbook(sheetName, title, content, null);
+		return wb;
+
+	}
+
+}

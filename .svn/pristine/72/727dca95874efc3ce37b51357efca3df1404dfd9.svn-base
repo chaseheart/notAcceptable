@@ -1,0 +1,29 @@
+package com.isolver.service.wechat;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.claimingExpenses.ClaimingExpensesRepository;
+import com.isolver.entity.ClaimingExpenses;
+import com.isolver.entity.User;
+
+@Service
+public class VerifyService {
+
+	@Autowired
+	private ClaimingExpensesRepository claimingExpensesRepository;
+
+	/**
+	 * 修改密码
+	 * 
+	 * @param passwordForm passwordForm
+	 * @return
+	 */
+	public List<ClaimingExpenses> getClaimingExpensesList(User user) {
+		return claimingExpensesRepository.findByUserAndDeleteFlag(user, SysStaticConst.NOTDELE);
+	}
+
+}

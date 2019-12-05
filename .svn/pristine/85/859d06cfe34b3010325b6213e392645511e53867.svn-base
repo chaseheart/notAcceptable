@@ -1,0 +1,277 @@
+/**
+ * @author 刘志欣
+ * FileUtil.java
+ * 2018年12月14日
+ */
+package com.isolver.common.util;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+public class FileUtil {
+
+	/**
+	 * 删除文件，可以是文件或文件夹
+	 *
+	 * @param fileName 要删除的文件名
+	 * @return 删除成功返回true，否则返回false
+	 */
+	public static boolean delete(String fileName) {
+		File file = new File(fileName);
+		if (!file.exists()) {
+			System.out.println("删除文件失败:" + fileName + "不存在！");
+			return false;
+		} else {
+			if (file.isFile())
+				return deleteFile(fileName);
+			else
+				return deleteDirectory(fileName);
+		}
+	}
+
+	/**
+	 * 删除单个文件
+	 *
+	 * @param fileName 要删除的文件的文件名
+	 * @return 单个文件删除成功返回true，否则返回false
+	 */
+	public static boolean deleteFile(String fileName) {
+		File file = new File(fileName);
+		// 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+		if (file.exists() && file.isFile()) {
+			if (file.delete()) {
+				System.out.println("删除单个文件" + fileName + "成功！");
+				return true;
+			} else {
+				System.out.println("删除单个文件" + fileName + "失败！");
+				return false;
+			}
+		} else {
+			System.out.println("删除单个文件失败：" + fileName + "不存在！");
+			return false;
+		}
+	}
+
+	/**
+	 * 删除目录及目录下的文件
+	 *
+	 * @param dir 要删除的目录的文件路径
+	 * @return 目录删除成功返回true，否则返回false
+	 */
+	public static boolean deleteDirectory(String dir) {
+		// 如果dir不以文件分隔符结尾，自动添加文件分隔符
+		if (!dir.endsWith(File.separator))
+			dir = dir + File.separator;
+		File dirFile = new File(dir);
+		// 如果dir对应的文件不存在，或者不是一个目录，则退出
+		if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
+			System.out.println("删除目录失败：" + dir + "不存在！");
+			return false;
+		}
+		boolean flag = true;
+		// 删除文件夹中的所有文件包括子目录
+		File[] files = dirFile.listFiles();
+		for (int i = 0; i < files.length; i++) {
+			// 删除子文件
+			if (files[i].isFile()) {
+				flag = FileUtil.deleteFile(files[i].getAbsolutePath());
+				if (!flag)
+					break;
+			}
+			// 删除子目录
+			else if (files[i].isDirectory()) {
+				flag = FileUtil.deleteDirectory(files[i].getAbsolutePath());
+				if (!flag)
+					break;
+			}
+		}
+		if (!flag) {
+			System.out.println("删除目录失败！");
+			return false;
+		}
+		// 删除当前目录
+		if (dirFile.delete()) {
+			System.out.println("删除目录" + dir + "成功！");
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * 压缩文件
+	 * 
+	 * @param srcFilePath  压缩源路径
+	 * @param destFilePath 压缩目的路径
+	 */
+	public static void compress(String srcFilePath, String destFilePath) {
+		//
+		File src = new File(srcFilePath);
+
+		if (!src.exists()) {
+			src.mkdirs();
+//			throw new RuntimeException(srcFilePath + "不存在");
+		}
+		File zipFile = new File(destFilePath);
+
+		try {
+
+			FileOutputStream fos = new FileOutputStream(zipFile);
+			ZipOutputStream zos = new ZipOutputStream(fos);
+			String baseDir = "";
+			compressbyType(src, zos, baseDir);
+			zos.close();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
+
+	/**
+	 * 按照原路径的类型就行压缩。文件路径直接把文件压缩，
+	 * 
+	 * @param src
+	 * @param zos
+	 * @param baseDir
+	 */
+	private static void compressbyType(File src, ZipOutputStream zos, String baseDir) {
+
+		if (!src.exists())
+			return;
+		System.out.println("压缩路径" + baseDir + src.getName());
+		// 判断文件是否是文件，如果是文件调用compressFile方法,如果是路径，则调用compressDir方法；
+		if (src.isFile()) {
+			// src是文件，调用此方法
+			compressFile(src, zos, baseDir);
+
+		} else if (src.isDirectory()) {
+			// src是文件夹，调用此方法
+			compressDir(src, zos, baseDir);
+
+		}
+
+	}
+
+	/**
+	 * 压缩文件
+	 */
+	private static void compressFile(File file, ZipOutputStream zos, String baseDir) {
+		if (!file.exists())
+			return;
+		try {
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+			ZipEntry entry = new ZipEntry(baseDir + file.getName());
+			zos.putNextEntry(entry);
+			int count;
+			byte[] buf = new byte[1024];
+			while ((count = bis.read(buf)) != -1) {
+				zos.write(buf, 0, count);
+			}
+			bis.close();
+
+		} catch (Exception e) {
+			// TODO: handle exception
+
+		}
+	}
+
+	/**
+	 * 压缩文件夹
+	 */
+	private static void compressDir(File dir, ZipOutputStream zos, String baseDir) {
+		if (!dir.exists())
+			return;
+		File[] files = dir.listFiles();
+		if (files.length == 0) {
+			try {
+				zos.putNextEntry(new ZipEntry(baseDir + dir.getName() + File.separator));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		for (File file : files) {
+			compressbyType(file, zos, baseDir + dir.getName() + File.separator);
+		}
+	}
+
+	/**
+	 * Default buff byte size
+	 *
+	 */
+	private static final int DEFAULT_BUFF_SIZE = 1024;
+
+	public static void decompress(String srcPath) throws Exception {
+		decompress(new File(srcPath));
+	}
+
+	public static void decompress(File srcFile) throws Exception {
+		File baseFile = srcFile.getParentFile();
+		decompress(srcFile, baseFile);
+	}
+
+	public static void decompress(String srcPath, String destPath) throws Exception {
+		decompress(new File(srcPath), new File(destPath));
+	}
+
+	public static void decompress(File srcFile, File destFile) throws Exception {
+		CheckedInputStream cis = new CheckedInputStream(new FileInputStream(srcFile), new CRC32());
+		ZipInputStream zis = new ZipInputStream(cis);
+		doDecompress(destFile, zis);
+		zis.close();
+	}
+
+	private static void doDecompress(File destFile, ZipInputStream zis) throws Exception {
+		ZipEntry zipEntry = null;
+		while ((zipEntry = zis.getNextEntry()) != null) {
+			String dir = destFile.getPath() + File.separator + zipEntry.getName();
+			File dirFile = new File(dir);
+			fileProber(dirFile);
+			if (zipEntry.isDirectory()) {
+				dirFile.mkdirs();
+			} else {
+				doDecompressFile(dirFile, zis);
+			}
+			zis.closeEntry();
+		}
+	}
+
+	private static void doDecompressFile(File destFile, ZipInputStream zis) throws Exception {
+		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(destFile));
+		int len;
+		byte[] buff = new byte[DEFAULT_BUFF_SIZE];
+		while ((len = zis.read(buff, 0, DEFAULT_BUFF_SIZE)) != -1) {
+			bos.write(buff, 0, len);
+		}
+		bos.close();
+	}
+
+	public static void fileProber(File dirFile) {
+		File parentFile = dirFile.getParentFile();
+		if (!parentFile.exists()) {
+			fileProber(parentFile);
+			parentFile.mkdirs();
+		}
+	}
+
+	public static File makeZip(String filePath, String filename, String zipPath) {// 64位二进制对象
+
+		// 打压缩包
+		FileUtil.compress(filePath, zipPath + filename);
+		// 删除源文件
+		FileUtil.deleteDirectory(filePath);
+		File zipfile = new File(zipPath + filename);
+		return zipfile;
+
+	}
+}

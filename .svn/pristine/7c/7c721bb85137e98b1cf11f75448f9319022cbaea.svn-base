@@ -1,0 +1,21 @@
+package com.isolver.dao.claimingExpenses;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.ClaimingExpenses;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/12
+ * @class ClaimingExpensesRepository.java
+ */
+@Repository
+public interface ClaimingExpensesRepository extends JpaRepository<ClaimingExpenses, Long> {
+
+	public List<ClaimingExpenses> findByUserAndDeleteFlag(User user, Boolean deleteFlag);
+
+}

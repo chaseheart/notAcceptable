@@ -1,0 +1,53 @@
+package com.isolver.common.util;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
+
+public class Dateutil {
+	
+	/**
+	 * 当前时间LocalDate转Date
+	 * @return
+	 */
+	public static Date NowLocalDateToDate() {
+		LocalDate localDate = LocalDate.now();
+		return Date.from(localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant());
+	}
+	
+	/**
+	 * 任意时间LocalDate转Date
+	 * @return
+	 */
+	public static Date LocalDateToDate(Integer year, Integer month, Integer day ) {
+		LocalDate localDate = LocalDate.of(year, month, day);
+		return Date.from(localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant());
+	}
+	
+	/**
+	 * 任意时间LocalDate转Date
+	 * @return
+	 */
+	public static Long LocalDateToTimestamp(Integer year, Integer month, Integer day ) {
+		LocalDate localDate = LocalDate.of(year, month, day);
+		return localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli();
+	}
+	
+	/**
+	 * Date转LocalDate
+	 * @return
+	 */
+	public static LocalDate DateToLocalDate(Date date ) {
+		return date.toInstant().atZone(ZoneOffset.ofHours(8)).toLocalDate();
+	}
+	
+	/**
+	 * Date转LocalDate
+	 * @return
+	 */
+	public static LocalDateTime DateToLocalDateTime (Date date) {
+		return date.toInstant().atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
+	}
+	
+}

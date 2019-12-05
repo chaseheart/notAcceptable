@@ -1,0 +1,50 @@
+package com.isolver.dao.hiFlow.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+
+import com.isolver.dao.hiFlow.HiFlowRepositoryCustom;
+import com.isolver.dto.wechat.ApproveHistoryDto;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class ServicePerformanceRepositoryImpl.java
+ */
+public class HiFlowRepositoryImpl implements HiFlowRepositoryCustom {
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@SuppressWarnings("unchecked")
+	public List<ApproveHistoryDto> approveHistory(Long userId, Boolean deleteFlag) {
+		List<ApproveHistoryDto> spDto = new ArrayList<>();
+		String sql = " SELECT "
+				   + " a.ru_flow_id as ruFlowId , "
+				   + " '报销申请' AS name,"
+				   + " b.username AS dealPerson, "
+				   + " ( CASE WHEN a.operate IS NULL THEN '通过' END ) AS operate "
+				   + " FROM hi_flow a " 
+				   + " LEFT JOIN USER b ON a.deal_people = b.id "
+				   + " AND b.delete_flag = :deleteFlag "
+				   + " WHERE a.ru_flow_id IN ( "
+				   + " SELECT DISTINCT ( a.ru_flow_id ) " 
+				   + " FROM claiming_expenses a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id "
+				   + " WHERE b.deal_people = :userId) "
+				   + " ORDER BY a.ru_flow_id ";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("userId", userId);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ApproveHistoryDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+
+}

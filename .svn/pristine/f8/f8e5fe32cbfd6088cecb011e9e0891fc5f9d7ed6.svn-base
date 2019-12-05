@@ -1,0 +1,80 @@
+package com.isolver.dao.servicePerformance.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+
+import com.isolver.dao.servicePerformance.ServicePerformanceRepositoryCustom;
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class ServicePerformanceRepositoryImpl.java
+ */
+public class ServicePerformanceRepositoryImpl implements ServicePerformanceRepositoryCustom {
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@SuppressWarnings("unchecked")
+	public List<ServicePerformanceDto> findServicePerformanceByUserAndDeleteFlag(User user, Date monthStart, Date monthEnd, Boolean deleteFlag) {
+		List<ServicePerformanceDto> spDto = new ArrayList<>();
+		String sql = "";
+		sql += 	"SELECT " + 
+				"	CONCAT( a.id, '' ) AS id, " + 
+				"	CONCAT( a.day, '' ) AS day, " + 
+				"	CONCAT( a.oa_start, '' ) AS oaStart, " + 
+				"	CONCAT( a.oa_end, '' ) AS oaEnd, " + 
+				"	CONCAT( a.oa_final_start, '' ) AS oaFinalStart, " + 
+				"	CONCAT( a.oa_final_end, '' ) AS oaFinalEnd, " + 
+				"	CONCAT( a.version, '' ) AS version, " + 
+				"	CONCAT( TIMESTAMPDIFF( HOUR, a.oa_start, a.oa_end ), '' ) AS hour, " + 
+				"	CONCAT( " + 
+				"CASE " + 
+				"	 " + 
+				"	WHEN oa_final_start BETWEEN '09:00:00'  " + 
+				"	AND '09:30:00'  " + 
+				"	AND TIMESTAMPDIFF( HOUR, a.oa_start, a.oa_end ) >= 9  " + 
+				"	AND oa_final_end BETWEEN '18:00:00'  " + 
+				"	AND '18:30:00' THEN " + 
+				"		'n'  " + 
+				"		WHEN oa_final_start BETWEEN '09:00:00'  " + 
+				"		AND '09:30:00'  " + 
+				"		AND oa_final_end BETWEEN '20:00:00'  " + 
+				"		AND '23:59:00' THEN " + 
+				"			'o'  " + 
+				"			WHEN oa_final_start NOT BETWEEN '09:00:00'  " + 
+				"			AND '09:30:00'  " + 
+				"			AND oa_final_end BETWEEN '20:00:00'  " + 
+				"			AND '23:59:00' THEN " + 
+				"				'uo' ELSE 'u'  " + 
+				"			END, " + 
+				"			''  " + 
+				"		) AS state  " + 
+				"FROM " + 
+				"service_performance a"+ 
+				"	WHERE" + 
+				"	a.user = :user " + 
+				"	AND a.day BETWEEN :monthStart AND :monthEnd " + 
+				"	AND a.delete_flag = :deleteFlag" + 
+				" ORDER BY a.day ";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("user", user);
+		query.setParameter("monthStart", monthStart);
+		query.setParameter("monthEnd", monthEnd);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ServicePerformanceDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+
+}

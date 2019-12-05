@@ -1,0 +1,97 @@
+package com.isolver.service.wechat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.claimingExpenses.ClaimingExpensesRepository;
+import com.isolver.dao.department.DepartmentRepository;
+import com.isolver.dao.fileInfo.FileInfoRepository;
+import com.isolver.dao.role.RoleRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dto.DepartDto;
+import com.isolver.dto.UserDto;
+import com.isolver.entity.ClaimingExpenses;
+import com.isolver.entity.Role;
+import com.isolver.entity.User;
+
+@Service
+public class VerifyService {
+
+	@Autowired
+	private ClaimingExpensesRepository claimingExpensesRepository;
+
+	@Autowired
+	private FileInfoRepository fileInfoRepository;
+
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private RoleRepository roleRepository;
+
+	/** 表名(file_info用) **/
+	private static final String TABLENAME = "claiming_expenses";
+
+	/**
+	 * 我的申请
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public List<ClaimingExpenses> getClaimingExpensesList(User user) {
+		return claimingExpensesRepository.findByUserAndDeleteFlag(user, SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 申请历史
+	 * 
+	 * @param passwordForm passwordForm
+	 * @return
+	 */
+	public List<ClaimingExpenses> getClaimingExpensesHistoryList(User user) {
+		return claimingExpensesRepository.findByUserAndDeleteFlagEnd(user, SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 申请详情
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Map<String, Object> getAppliocationDetail(Long id) {
+		Map<String, Object> resultMap = new HashMap<>();
+		List<DepartDto> departDto = departmentRepository.findAllByDeleteflag(SysStaticConst.NOTDELE);
+		Role role = roleRepository.findOne(Long.valueOf(3));
+		List<UserDto> userDto = userRepository.findByRoleDeleteFlag(role, SysStaticConst.NOTDELE);
+		resultMap.put("depart", departDto);
+		resultMap.put("user", userDto);
+		resultMap.put("imgList", fileInfoRepository.findByTableNameAndTableIdAndDeleteFlag(TABLENAME, id.toString(), SysStaticConst.NOTDELE));
+		resultMap.put("formData", claimingExpensesRepository.findByIdAndDeleteFlag(id, SysStaticConst.NOTDELE));
+		return resultMap;
+	}
+
+	/**
+	 * 申请详情
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Map<String, Object> getAppliocationDetailView(Long id) {
+		Map<String, Object> resultMap = new HashMap<>();
+		List<DepartDto> departDto = departmentRepository.findAllByDeleteflag(SysStaticConst.NOTDELE);
+		Role role = roleRepository.findOne(Long.valueOf(3));
+		List<UserDto> userDto = userRepository.findByRoleDeleteFlag(role, SysStaticConst.NOTDELE);
+		resultMap.put("depart", departDto);
+		resultMap.put("user", userDto);
+		resultMap.put("imgList", fileInfoRepository.findByTableNameAndTableIdAndDeleteFlag(TABLENAME, id.toString(), SysStaticConst.NOTDELE));
+		resultMap.put("formData", claimingExpensesRepository.findByIdAndDeleteFlagEdit(id, SysStaticConst.NOTDELE));
+		return resultMap;
+	}
+
+}

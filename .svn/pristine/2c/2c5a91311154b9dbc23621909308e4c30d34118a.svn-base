@@ -1,0 +1,100 @@
+package com.isolver.service;
+
+import java.sql.Timestamp;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.util.Timeutil;
+import com.isolver.dao.hiFlow.HiFlowRepository;
+import com.isolver.dao.oaFlow.OaFlowRepository;
+import com.isolver.dao.ruFlow.RuFlowRepository;
+import com.isolver.dao.servicePerformance.ServicePerformanceRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dao.vacation.VacationRepository;
+import com.isolver.entity.HiFlow;
+import com.isolver.entity.OaFlow;
+import com.isolver.entity.RuFlow;
+import com.isolver.entity.ServicePerformance;
+import com.isolver.entity.User;
+import com.isolver.entity.Vacation;
+import com.isolver.form.HolidayForm;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/14
+ * @class HolidayService.java
+ */
+@Service
+public class HolidayService {
+
+	@Autowired
+	private ActivityService activityService;
+	@Autowired
+	private OaFlowRepository oaFlowRepository;
+	@Autowired
+	private ServicePerformanceRepository servicePerformanceRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private RuFlowRepository ruFlowRepository;
+	@Autowired
+	private VacationRepository vacationRepository;
+	@Autowired
+	private HiFlowRepository hiFlowRepository;
+
+	/**
+	 * 录入并启动新流程
+	 * 
+	 * @param formInputList
+	 * @param prevAssignJson 预处理人组
+	 * @param assignId
+	 * @param userId
+	 */
+
+	public void startFlow(HolidayForm holidayForm, User user) {
+
+		OaFlow oaFlow = oaFlowRepository.findOne(1l);
+		ServicePerformance servicePerformance = servicePerformanceRepository.findOne(Long.valueOf(holidayForm.getServicePerformance()));
+		User assigner = userRepository.findOne(Long.valueOf(holidayForm.getAssigner()));
+		RuFlow ruFlow = new RuFlow();
+		// 。存进ru的act id
+		String runFlowId = activityService.startActivity(oaFlow);
+		ruFlow.setActRunFlowId(runFlowId);
+		ruFlow.setFlowId(oaFlow);
+		ruFlow.setState(2);
+		ruFlow.setServicePerformance(servicePerformance);
+		ruFlow.setDealPeople(assigner);
+		ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+
+		HiFlow hiFlow = new HiFlow();
+		hiFlow.setActId(oaFlow.getActId());
+		hiFlow.setState(1);
+		hiFlow.setApplication(user);
+		hiFlow.setDealPeople(assigner);
+		hiFlow.setRuFlowId(ruFlow);
+		hiFlow.setInsertUserId(user.getId());
+		hiFlow.setInsertTime(Timeutil.getTimestamp());
+		hiFlow.setUpdateUserId(user.getId());
+		hiFlow.setUpdateTime(Timeutil.getTimestamp());
+		hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		hiFlowRepository.saveAndFlush(hiFlow);
+
+		Vacation vacation = new Vacation();
+		vacation.setUser(user);
+		vacation.setVacationType(Integer.parseInt(holidayForm.getType()));
+		vacation.setVacationStart(Timestamp.valueOf(holidayForm.getDate().replaceAll("/", "-") + " " + holidayForm.getTimeStart() + ":00"));
+		vacation.setVacationEnd(Timestamp.valueOf(holidayForm.getDate().replaceAll("/", "-") + " " + holidayForm.getTimeEnd() + ":00"));
+		vacation.setHasDocument(holidayForm.getBill()!=null?true:false);
+		vacation.setVacationContent(holidayForm.getReason());
+		vacation.setVacationMark(holidayForm.getContent());
+		vacation.setRuFlow(ruFlow);
+		vacation.setInsertUserId(user.getId());
+		vacation.setInsertTime(Timeutil.getTimestamp());
+		vacation.setUpdateUserId(user.getId());
+		vacation.setUpdateTime(Timeutil.getTimestamp());
+		vacation.setDeleteFlag(SysStaticConst.NOTDELE);
+		vacationRepository.saveAndFlush(vacation);
+	}
+}

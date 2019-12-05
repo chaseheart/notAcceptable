@@ -1,0 +1,115 @@
+package com.isolver.service.wechat;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.Result;
+import com.isolver.dao.menu.MenuRepository;
+import com.isolver.dao.menuSetting.MenuSettingRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dto.wechat.MenuDto;
+import com.isolver.entity.Menu;
+import com.isolver.entity.MenuSetting;
+import com.isolver.entity.User;
+
+@Service
+public class MenuSettingService {
+
+	@Autowired
+	private MenuSettingRepository menuSettingRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private MenuRepository menuRepository;
+
+	// 按每8个一组分割
+	private static final Integer MAX_NUMBER = 8;
+	
+	/**
+	 * 设置menu
+	 * @param userId
+	 * @return
+	 */
+	public Result<Object> setMenu(Long userId) {
+		List<MenuDto> totalData = menuRepository.getInitMenu(userId, SysStaticConst.NOTDELE);
+		return new Result<>(SysStatusCodeConst.SUCCESS, totalData);
+	}
+
+	
+
+	/**
+	 * 保存用户菜单
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public Result<Object> saveMenu(String[] menuArr, Long userId) {
+		ArrayList<MenuSetting> entities = new ArrayList<>();
+		User user = userRepository.findOne(userId);
+		List<MenuSetting> totalData = menuSettingRepository.findByUserId(user, SysStaticConst.NOTDELE);
+		if (totalData.size() > 0) {
+			menuSettingRepository.delete(totalData);
+		}
+
+		Timestamp tm = Dateutil.getTimestamp();
+		for (String menuStr : menuArr) {
+			MenuSetting entity = new MenuSetting();
+			entity.setIsVisible(true);
+			entity.setUserId(user);
+			Menu menu = menuRepository.findOne(Long.parseLong(menuStr.split("-")[1]));
+			entity.setMenuId(menu);
+			entity.setInsertTime(tm);
+			entity.setUpdateTime(tm);
+			entity.setInsertUserId(userId);
+			entity.setUpdateUserId(userId);
+			entity.setDeleteFlag(SysStaticConst.NOTDELE);
+			entity.setVersion(0);
+			entities.add(entity);
+		}
+		menuSettingRepository.save(entities);
+		return new Result<>(SysStatusCodeConst.SUCCESS);
+	}
+
+	/**
+	 * 获取menu
+	 * @param userId
+	 * @return
+	 */
+	public Result<Object> pageMenu(Long userId) {
+		User user = userRepository.findOne(userId);
+		List<Menu> totalData = menuSettingRepository.findMenuByUserId(user, SysStaticConst.NOTDELE);
+		return new Result<>(SysStatusCodeConst.SUCCESS, splitList(totalData));
+	}
+
+	/**
+	 * 计算切分次数
+	 */
+	private Integer countStep(Integer size) {
+		return (size + MAX_NUMBER - 1) / MAX_NUMBER;
+	}
+
+	/**
+	 * 按目标数切割list
+	 * @param totalData
+	 * @return
+	 */
+	public List<List<Menu>> splitList(List<Menu> totalData) {
+		int limit = countStep(totalData.size());
+		List<List<Menu>> mglist = new ArrayList<>();
+		Stream.iterate(0, n -> n + 1).limit(limit).forEach(i -> {
+			mglist.add(totalData.stream().skip(i * MAX_NUMBER).limit(MAX_NUMBER).collect(Collectors.toList()));
+		});
+		return mglist;
+	}
+}

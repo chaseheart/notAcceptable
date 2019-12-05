@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+<script src="./js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="./css/iview/iview.css" />
+<link rel="stylesheet" href="./css/login.css" />
+<script src="./js/vue/vue.min.js"></script>
+<script src="./js/layer/layer.js"></script>
+<script src="./js/common/common.js"></script>
+<script src="./js/iview/iview.min.js"></script>
+
+</head>
+<body class="page">
+	<div id="app" v-cloak>
+		<div class="login-menu">
+			<template> <img src="./images/logo.png"> <i-form
+				ref="userForm" :model="formUser" :rules="ruleValidate"
+				:label-width="80"> <form-item label="用户名" prop="name">
+			<i-input v-model="formUser.name" placeholder="请输入用户名"></i-input> </form-item> <form-item
+				label="密码" prop="pwd"> <i-input type="password"
+				v-model="formUser.pwd" placeholder="请输入密码"></form-item> <form-item>
+			<i-button @click="acceptClick">登录</i-button></form-item></template>
+		</div>
+	</div>
+	<script>
+		var vm = new Vue({
+			el : '#app',
+			data : {
+				role : [ {
+					"code" : "user",
+					"name" : "普通用户"
+				}, {
+					"code" : "admin",
+					"name" : "管理员"
+				} ],
+				formUser : {},
+				ruleValidate : {
+					username : [ {
+						required : true,
+						message : '用户名不能为空',
+						trigger : 'blur'
+					} ],
+					password : [ {
+						required : true,
+						message : '密码不能为空',
+						trigger : 'blur'
+					} ]
+				}
+			},
+			methods : {
+				acceptClick : function() {
+					console.log(vm.formUser.pwd);
+					vm.$refs.userForm.validate(function(valid) {
+						if (valid) {
+							$.SaveForm({
+								url : "/login",
+								param : vm.formUser,
+								json : true,
+								success : function(result) {
+									console.log(result);
+								}
+							});
+						}
+					});
+				}
+			},
+			created : function() {
+
+			}
+		});
+	</script>
+</body>
+</html>

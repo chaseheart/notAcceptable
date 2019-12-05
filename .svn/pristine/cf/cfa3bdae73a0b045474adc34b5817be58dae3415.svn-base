@@ -1,0 +1,235 @@
+package com.isolver.entity;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/06
+ * @class OaFlow.java
+ */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "news")
+@NamedQuery(name = "news.findAll", query = "SELECT o FROM News o")
+@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+public class News implements Serializable {
+	/** ID **/
+	private Long id;
+	/** 标题 **/
+	private String title;
+	/** 导语 **/
+	private String introduction;
+	/** 内容 **/
+	private String content;
+	/** 图片 **/
+	private Long picId;
+	/** 类型 **/
+	private Integer type;
+
+	/** 。插入者 **/
+	private Long insertUserId;
+	/** 。插入时间 **/
+	private Timestamp insertTime;
+	/** 。更新者 **/
+	private Long updateUserId;
+	/** 。更新时间 **/
+	private Timestamp updateTime;
+	/** deleteFlag **/
+	private Boolean deleteFlag;
+	/** 。版本 **/
+	private Integer version;
+
+	/**
+	 * @return the id
+	 */
+	@Id
+	@Column(name = "id", nullable = false)
+	@GeneratedValue
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the title
+	 */
+	@Column(name = "title", nullable = false)
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * @return the introduction
+	 */
+	@Column(name = "introduction")
+	public String getIntroduction() {
+		return introduction;
+	}
+
+	/**
+	 * @param introduction the introduction to set
+	 */
+	public void setIntroduction(String introduction) {
+		this.introduction = introduction;
+	}
+
+	/**
+	 * @return the content
+	 */
+	@Column(name = "content", nullable = false)
+	public String getContent() {
+		return content;
+	}
+
+	/**
+	 * @param content the content to set
+	 */
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	/**
+	 * @return the picId
+	 */
+	@Column(name = "pic_id")
+	public Long getPicId() {
+		return picId;
+	}
+
+	/**
+	 * @param picId the picId to set
+	 */
+	public void setPicId(Long picId) {
+		this.picId = picId;
+	}
+
+	/**
+	 * @return the type
+	 */
+	@Column(name = "type", nullable = false)
+	public Integer getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the insertUserId
+	 */
+	@Column(name = "insertUserId")
+	public Long getInsertUserId() {
+		return insertUserId;
+	}
+
+	/**
+	 * @param insertUserId the insertUserId to set
+	 */
+	public void setInsertUserId(Long insertUserId) {
+		this.insertUserId = insertUserId;
+	}
+
+	/**
+	 * @return the insertTime
+	 */
+	@Column(name = "insertTime")
+	public Timestamp getInsertTime() {
+		return insertTime;
+	}
+
+	/**
+	 * @param insertTime the insertTime to set
+	 */
+	public void setInsertTime(Timestamp insertTime) {
+		this.insertTime = insertTime;
+	}
+
+	/**
+	 * @return the updateUserId
+	 */
+	@Column(name = "updateUserId")
+	public Long getUpdateUserId() {
+		return updateUserId;
+	}
+
+	/**
+	 * @param updateUserId the updateUserId to set
+	 */
+	public void setUpdateUserId(Long updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+
+	/**
+	 * @return the updateTime
+	 */
+	@Column(name = "updateTime")
+	public Timestamp getUpdateTime() {
+		return updateTime;
+	}
+
+	/**
+	 * @param updateTime the updateTime to set
+	 */
+	public void setUpdateTime(Timestamp updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	/**
+	 * @return the deleteFlag
+	 */
+	@Column(name = "deleteFlag")
+	public Boolean getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	/**
+	 * @param deleteFlag the deleteFlag to set
+	 */
+	public void setDeleteFlag(Boolean deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+
+	/**
+	 * @return the version
+	 */
+	@Version
+	@Column(name = "version")
+	public Integer getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version the version to set
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+}

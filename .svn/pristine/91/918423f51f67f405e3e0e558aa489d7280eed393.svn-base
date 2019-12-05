@@ -1,0 +1,21 @@
+package com.isolver.common.config;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
+
+@ControllerAdvice
+@RestController
+public class MyExceptionHandler{
+	
+	@ExceptionHandler(Exception.class)
+	public String handlerAll(Exception e,HttpServletRequest request,HttpServletResponse response) {
+		String statuscode = HttpStatus.INTERNAL_SERVER_ERROR.toString();
+		response.setStatus(500);
+		return statuscode;
+	}
+}

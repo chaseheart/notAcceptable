@@ -1,0 +1,14 @@
+package com.isolver.dao.hiFlow;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.isolver.entity.HiFlow;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/18
+ * @class HiflowRepository.java
+ */
+public interface HiFlowRepository extends JpaRepository<HiFlow, Long>, HiFlowRepositoryCustom {
+
+}

@@ -1,0 +1,134 @@
+package com.isolver.common.constant;
+
+/**
+ * 系统常量
+ * 
+ * @author 陈昶宇
+ * @createDate 2018/12/03 14:24:02
+ * 
+ */
+public class SysStaticConst {
+
+	/**
+	 * 失败：0
+	 */
+	public static String FAILEFLAG = "0";
+
+	/**
+	 * 成功：1
+	 */
+	public static String SUCCESSFLAG = "1";
+
+	/**
+	 * 初始版本号
+	 */
+	public static Integer VERSION = 0;
+
+	/**
+	 * 初始deleFlag(未消除):'N'
+	 */
+	public static Boolean NOTDELE = false;
+
+	/**
+	 * deleFlag(消除):'Y'
+	 */
+	public static Boolean ISDELE = true;
+
+	/**
+	 * '-'
+	 */
+	public static String DASH = "-";
+
+	/**
+	 * 下划线
+	 */
+	public static String UNDERLINE = "_";
+
+	/**
+	 * 逗号
+	 */
+	public static String COMMA = ",";
+
+	/**
+	 * 点
+	 */
+	public static String DOT = ".";
+
+	/**
+	 * 斜杠
+	 */
+	public static String SLASH = "/";
+
+	/**
+	 * 删除成功
+	 */
+	public static String DELETESUCCESS = "DeleteSuccess";
+
+	/**
+	 * 删除失败
+	 */
+	public static String DELETEFAILURE = "DeleteFailure";
+
+	/**
+	 * 更新成功
+	 */
+	public static String MODIFYSUCCESS = "ModifySuccess";
+
+	/**
+	 * 更新失败
+	 */
+	public static String MODIFYFAILURE = "ModifyFailure";
+
+	/**
+	 * 新建成功
+	 */
+	public static String INSERTSUCCESS = "InsertSuccess";
+
+	/**
+	 * 新建失败
+	 */
+	public static String INSERTFAILURE = "InsertFailure";
+
+	/**
+	 * 3:无分页结果
+	 */
+	public static Integer SUMANDRESULT = 3;
+
+	public static Boolean CHINA = false;
+
+	public static Boolean JAPAN = true;
+
+	/**
+	 * 文件服务器路径："http://localhost:7080/pic"
+	 */
+	public static String FILEURL = "http://IS20190075PC:6080/pic";
+
+	/**
+	 * 压缩包路径
+	 */
+	public static final String ZIPPATH = "C:\\imgweb\\";
+
+	/**
+	 * 压缩包命
+	 */
+	public static final String ZIPNAME = "pic.zip";
+
+	/**
+	 * 图片拓展名：jpg
+	 */
+	public static final String JPG = "jpg";
+	/**
+	 * 图片拓展名：png
+	 */
+	public static final String PNG = "png";
+	/**
+	 * 图片拓展名：gif
+	 */
+	public static final String GIF = "gif";
+	/**
+	 * 图片拓展名： jpeg
+	 */
+	public static final String JPEG = "jpeg";
+
+	public static Integer state2 = 2;
+}

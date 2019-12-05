@@ -1,0 +1,88 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem : {
+			workId : 'IS1907007',
+			user : 'Dong',
+			reason : '',
+			location:'',
+			address:'',
+			contacts:'',
+			type : '',
+			date : '',
+			status : '09:30 - 无记录',
+			content : '',
+			org : '3',
+			depart : '2',
+			assigner : ''
+		},
+		formValidate : {
+			reason : [ {
+				required : true,
+				message : '请输入外出公务事由',
+				trigger : 'blur'
+			} ],
+			location : [ {
+				required : true,
+				message : '请输入外出公务去向',
+				trigger : 'blur'
+			} ],
+			type : [ {
+				required : true,
+				message : '请选择外出公务类型',
+				trigger : 'change'
+			} ],
+			date : [ {
+				required : true,
+				type : 'array',
+				message : '请选择外出时间',
+				trigger : 'change',
+				fields : {
+					0 : {
+						type : "date",
+						message : "请选择外出时间",
+						required : true
+					},
+					1 : {
+						type : "date",
+						message : "请选择外出时间",
+						required : true
+					}
+				}
+			} ],
+		},
+		orgList : [ {
+			value : '1',
+			label : 'ISOLVER集团'
+		}, {
+			value : '2',
+			label : '对日外包模块'
+		}, {
+			value : '3',
+			label : 'ISOLVER上海'
+		} ],
+		departList : [ {
+			value : '1',
+			label : '综合管理部'
+		}, {
+			value : '2',
+			label : '丰通开发室'
+		}, {
+			value : '3',
+			label : 'NDS开发室'
+		} ],
+		assignerList : [ {
+			value : '1',
+			label : 'AAA'
+		}, {
+			value : '2',
+			label : 'BBB'
+		}, {
+			value : '3',
+			label : 'CCC'
+		} ]
+	},
+	methods : {},
+	created : function() {
+	}
+});

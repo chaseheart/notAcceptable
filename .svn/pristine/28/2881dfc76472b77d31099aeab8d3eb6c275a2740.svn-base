@@ -1,0 +1,329 @@
+//var weekDay = [ "日", "一", "二", "三", "四", "五", "六" ];
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem : {},
+		approvalTable : [ {
+			title : '申请号',
+			key : 'id',
+			render : function(h, params) {
+				var functionList = [];
+				var show = h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '#',
+					},
+					on : {
+						click : function() {
+						}
+					}
+				}, params.row.id);
+				functionList.push(show);
+				return h('span', {
+
+				}, functionList);
+			}
+		}, {
+			title : '类型',
+			key : 'type'
+		}, {
+			title : '申请开始时间',
+			key : 'startTime'
+		}, {
+			title : '申请中止时间',
+			key : 'endTime'
+		}, {
+			title : '最终审批者',
+			key : 'lastApproval'
+		}, {
+			title : '审批状态',
+			key : 'approvalStatus'
+		}, {
+			title : '备注',
+			key : 'remarks'
+		} ],
+		approvalData : [],
+		resultTable : [ {
+			title : '考勤日期',
+			key : 'date',
+			render : function(h, params) {
+				var functionList = [];
+				var show = h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###',
+					},
+					on : {
+						click : function() {
+						}
+					}
+				}, params.row.date);
+				var content = h("div", {
+					slot : "content"
+				}, [ h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###',
+					}
+				}, '休假申请'), h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###',
+					}
+				}, '加班申请'), h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###',
+					}
+				}, '非正常考勤申请'), h('a', {
+					props : {
+						type : 'primary',
+					},
+					attrs : {
+						href : '###',
+					}
+				}, '外出公务申请') ])
+				functionList.push(show);
+				functionList.push(content);
+				return h('Poptip', {
+					props : {
+						transfer : true,
+						title : '考勤',
+						size : 'small',
+					},
+				}, functionList);
+			},
+			className : 'table-col-3'
+		}, {
+			title : '星期',
+			key : 'weeks',
+			className : 'table-col-1'
+		}, {
+			title : '勤务开始时间',
+			key : 'startTime',
+			className : 'table-col-5'
+		}, {
+			title : '勤务结束时间',
+			key : 'endTime',
+			className : 'table-col-5'
+		}, {
+			title : '加班',
+			key : 'overtime',
+			className : 'table-col-1'
+		}, {
+			title : '非正常考勤情况',
+			key : 'status',
+			className : 'table-col-5'
+		}, {
+			title : '旷工',
+			key : 'absenteeism',
+			className : 'table-col-1'
+		}, {
+			title : '缺勤',
+			key : 'absenceFromDuty',
+			className : 'table-col-1'
+		}, {
+			title : '事假',
+			key : 'absence',
+			className : 'table-col-1'
+		}, {
+			title : '病假',
+			key : 'sick',
+			className : 'table-col-1'
+		}, {
+			title : '带薪假',
+			key : 'paid',
+			className : 'table-col-3'
+		}, {
+			title : '外出公务',
+			key : 'out',
+			className : 'table-col-3'
+		}, {
+			title : '打卡时间',
+			key : 'clockIn',
+			className : 'table-col-5'
+		}, {
+			title : '照合结果',
+			key : 'result',
+			className : 'table-col-3'
+		} ],
+		resultData : []
+	},
+	methods : {
+		getFormItem : function() {
+			var userData = JSON.parse($("#username").val())[0];
+			var date = new Date();
+			var formItem = {
+				workId : userData.workId,
+				user : userData.username,
+				org : userData.org,
+				depart : userData.depart,
+				year : date.getFullYear().toString(),
+				month : date.getMonth().toString()
+			}
+			this.formItem = formItem;
+		},
+		getDateWeek : function(date) {
+			var day = new Date(Date.parse(date));
+			var today = new Array('日', '一', '二', '三', '四', '五', '六');
+			var week = today[day.getDay()];
+			return week;
+		},
+		createTable : function(servicePerformance, holiday, month) { // 。生成表格
+			let resultData = [];
+			let restDay = JSON.parse(holiday.restDay);
+			for (var i = 0; i < month; i++) {
+				// 。循环日期
+				var keyDay = holiday.year + '-' + holiday.month + '-' + (i + 1);
+				if (servicePerformance[keyDay] != undefined) {
+					let oaStart = servicePerformance[keyDay].oaStart;
+					let oaEnd = servicePerformance[keyDay].oaEnd;
+					let oaFinalStart = servicePerformance[keyDay].oaFinalStart;
+					let oaFinalEnd = servicePerformance[keyDay].oaFinalEnd;
+					if (jQuery.inArray(i + 1), restDay) {
+						// red
+					}
+
+					resultData[i] = {
+						date : servicePerformance[keyDay].day,
+						weeks : this.getDateWeek(servicePerformance[keyDay].day),
+						startTime : oaFinalStart.substring(0, oaFinalStart.length - 3),
+						endTime : oaFinalEnd.substring(0, oaFinalEnd.length - 3),
+						overtime : '',
+						status : '',
+						absenteeism : servicePerformance[keyDay].absence,
+						absenceFromDuty : '',
+						absence : '',
+						sick : '',
+						paid : '',
+						out : '',
+						clockIn : oaStart.substring(0, oaStart.length - 3) + ' - ' + oaEnd.substring(0, oaEnd.length - 3),
+						result : ''
+					}
+				} else {
+					resultData[i] = {
+						date : keyDay,
+						weeks : this.getDateWeek(keyDay),
+						startTime : '',
+						endTime : '',
+						overtime : '',
+						status : '',
+						absenteeism : 8,
+						absenceFromDuty : '',
+						absence : '',
+						sick : '',
+						paid : '',
+						out : '',
+						clockIn : '',
+						result : ''
+					}
+				}
+			}
+
+			// for ( let i in servicePerformance) {
+			// let oaStart = servicePerformance[i].oaStart;
+			// let oaEnd = servicePerformance[i].oaEnd;
+			// let oaFinalStart = servicePerformance[i].oaFinalStart;
+			// let oaFinalEnd = servicePerformance[i].oaFinalEnd;
+			// resultData[i] = {
+			// date : servicePerformance[i].day,
+			// weeks : this.getDateWeek(servicePerformance[i].day),
+			// startTime : oaFinalStart.substring(0, oaFinalStart.length - 3),
+			// endTime : oaFinalEnd.substring(0, oaFinalEnd.length - 3),
+			// overtime : '',
+			// status : '',
+			// absenteeism : servicePerformance[i].absence,
+			// absenceFromDuty : '',
+			// absence : '',
+			// sick : '',
+			// paid : '',
+			// out : '',
+			// clockIn : oaStart.substring(0, oaStart.length - 3) + ' - ' +
+			// oaEnd.substring(0, oaEnd.length - 3),
+			// result : ''
+			// }
+			// }
+			this.resultData = resultData;
+		},
+		searchPerformance : function() {
+			var that = this;
+			var data = {
+				'oaYear' : this.formItem.year,
+				'oaMonth' : this.formItem.month
+			};
+			console.log(data)
+			var url = "/servicePerformance/findAllServicePerformance";
+			var success = function(data) {
+				ajaxStatus = true;
+				// 。校验通过，跳转到［首页］
+				if (data.status == '200') {
+					that.createTable(data.data);
+				}
+			};
+
+			var cache = false;
+			var alone = true;
+			post(url, data, success, cache, alone);
+		}
+	// filterTimeStart : function(time) { // 。时间取整
+	// let timeTample=time.split(":")
+	// let [t1, t2] = [
+	// timeTample[0],
+	// timeTample[1]
+	// ]
+	// if (t1 == 11 && t2 <= 30 || (t1 < 11) || (t1 == 12 && t2 >= 30 || t1 >
+	// 12)) {
+	// let i = parseInt(t2)
+	// if (i > 0 && i <= 30) {
+	// t2 = 30;
+	// } else {
+	// // 。小时进位
+	// t2 = `00`;
+	// t1 = parseInt(t1) + 1;
+	// }
+	// } else {
+	// t1 = 12;
+	// t2 = 30
+	// }
+	// return `${t1}:${t2}`;
+	// },
+	// filterTimeEnd : function(time) { // 。时间取整
+	// let timeTample=time.split(":")
+	// let [t1, t2] = [
+	// timeTample[0],
+	// timeTample[1]
+	// ]
+	// if (t1 == 11 && t2 <= 30 || (t1 < 11) || (t1 == 12 && t2 >= 30 || t1 >
+	// 12)) {
+	// let i = parseInt(t2)
+	// if (i > 0 && i <= 30) {
+	// t2 = 00;
+	// } else {
+	// t2 = 30;
+	// }
+	// } else {
+	// t1 = 12;
+	// t2 = 30
+	// }
+	// return `${t1}:${t2}`;
+	// }
+	},
+	created : function() {
+		this.getFormItem();
+		let servicePerformance = JSON.parse($("#servicePerformance").val());
+		let holiday = JSON.parse($("#holiday").val());
+		let month = parseInt($("#month").val());
+		this.createTable(servicePerformance[0], holiday[0], month);
+
+	}
+});

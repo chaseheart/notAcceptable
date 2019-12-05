@@ -1,0 +1,21 @@
+package com.isolver.dao.vacation;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.Vacation;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/15
+ * @class VacationRepository.java
+ */
+@Repository
+public interface VacationRepository extends JpaRepository<Vacation, Long> {
+	
+	
+	public List<Vacation> findByVacationStartBetween(Timestamp startTime,Timestamp endTime);
+}

@@ -1,0 +1,25 @@
+package com.isolver.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.department.DepartmentRepository;
+import com.isolver.dto.DepartDto;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/25
+ * @class DepartmentService.java
+ */
+@Service
+public class DepartmentService {
+	@Autowired
+	private DepartmentRepository departmentRepository;
+
+	public List<DepartDto> getDepartList() {
+		return departmentRepository.findAllByDeleteflag(SysStaticConst.NOTDELE);
+	}
+}

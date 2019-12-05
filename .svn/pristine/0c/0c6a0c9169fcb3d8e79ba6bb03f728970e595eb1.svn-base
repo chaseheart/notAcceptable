@@ -1,0 +1,57 @@
+package com.isolver.service;
+
+import java.sql.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.servicePerformance.ServicePerformanceRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/07
+ * @class servicePerformanceService.java
+ */
+@Service
+public class ServicePerformanceService {
+
+	@Autowired
+	private ServicePerformanceRepository servicePerformanceRepository;
+	@Autowired
+	private UserRepository userRepository;
+
+	public Map<String, ServicePerformanceDto> findservicePerformance(User user, Date dateStart, Date dateEnd) {
+		Map<String, ServicePerformanceDto> map = new HashMap<>();
+		List<ServicePerformanceDto> dtoList = servicePerformanceRepository.findServicePerformanceByUserAndDeleteFlag(user, dateStart, dateEnd, SysStaticConst.NOTDELE);
+		for (ServicePerformanceDto dto : dtoList) {
+			switch (dto.getState()) {
+			case "n":
+				break;
+			case "o":
+				break;
+
+			case "uo":
+				break;
+
+			case "u":
+
+				dto.setAbsence(new Integer(9) - Integer.parseInt(dto.getHour()));
+				break;
+
+			default:
+				break;
+			}
+			map.put(dto.getDay(), dto);
+		}
+		// 。根据日历，计算一天请假的check TODO
+
+		return map;
+	}
+}

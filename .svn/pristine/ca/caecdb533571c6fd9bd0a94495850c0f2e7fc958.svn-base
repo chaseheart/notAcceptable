@@ -1,0 +1,19 @@
+package com.isolver.dao.organization;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.Organization;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/12
+ * @class OrganizationRepository.java
+ */
+@Repository
+public interface OrganizationRepository extends JpaRepository<Organization, Long> {
+
+	public List<Organization> findByDeleteFlag(Boolean deleteFlag);
+}

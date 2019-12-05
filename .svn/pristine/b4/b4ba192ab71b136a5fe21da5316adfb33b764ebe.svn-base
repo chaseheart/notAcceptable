@@ -1,0 +1,17 @@
+package com.isolver.dao.holiday;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.Holiday;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class HolidayRepository.java
+ */
+@Repository
+public interface HolidayManagerRepository extends JpaRepository<Holiday, Long> {
+
+	public Holiday findByYearAndMonthAndType(Integer year, Integer month, Boolean type);
+}

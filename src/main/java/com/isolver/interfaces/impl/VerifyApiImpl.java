@@ -1,0 +1,143 @@
+package com.isolver.interfaces.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.dto.wechat.PendingDtoWechat;
+import com.isolver.entity.User;
+import com.isolver.interfaces.VerifyApi;
+import com.isolver.service.PendingService;
+import com.isolver.service.UserService;
+import com.isolver.service.wechat.VerifyService;
+
+@RestController
+public class VerifyApiImpl implements VerifyApi {
+
+	@Autowired
+	private VerifyService verifyService;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private PendingService pendingService;
+
+	/**
+	 * 取得个人所有报销申请
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> verifyInit(Long userId) {
+		return new Result<>(SysStatusCodeConst.SUCCESS, verifyService.getClaimingExpensesList(userId));
+	}
+
+
+	/**
+	 * 报销审批已完成状态记录取得
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> verifyHistoryInit(Long userId) {
+		return new Result<>(SysStatusCodeConst.SUCCESS, verifyService.getClaimingExpensesHistoryList(userId));
+	}
+
+	/**
+	 * 报销未办审批状态记录取得
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> verifyExamineInit(Long userId) {
+		return new Result<>(SysStatusCodeConst.SUCCESS, verifyService.findAllPendingClaimingExpensesByUserWechat(userId));
+	}
+
+	/**
+	 * 我的申请详情-初始化
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public Result<Object> applyInit(Long id) {
+		return new Result<>(SysStatusCodeConst.SUCCESS, verifyService.getAppliocationDetail(id));
+	}
+
+	/**
+	 * 我的审核详情-初始化
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public Result<Object> examineInit(Long id, Long userId) {
+		return new Result<>(SysStatusCodeConst.SUCCESS, verifyService.getAppliocationDetailVerify(id, userId));
+	}
+
+	/**
+	 * 我的申请详情-修改初始化
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public Result<Object> applyEditInit(Long id, Long userId) {
+		User user = userService.getUserById(userId);
+		return new Result<>(SysStatusCodeConst.SUCCESS, verifyService.getAppliocationDetailView(id, user));
+	}
+	
+	// 。以上代码需修改url回到ClaimingExpensesController
+
+	
+	/**
+	 *根据用户检索所有考勤申请
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> verifyMyInit(Long userId) {
+		User user = userService.getUserById(userId);
+		Map<String, Object> map = pendingService.findAllPendingByUser(user, "%%", "%%");
+		return new Result<>(SysStatusCodeConst.SUCCESS, map);
+	}
+
+	/**
+	 * 根据用户检索所有考勤审批
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> verifyMineInit(Long userId) {
+		User user = userService.getUserById(userId);
+		List<PendingDtoWechat> list = pendingService.findAllPendingByUserForWechat(user);
+		return new Result<>(SysStatusCodeConst.SUCCESS, list);
+	}
+
+	/**
+	 * 根据用户检索所有考勤审批历史
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> examineHistoryInit(Long userId) {
+		return new Result<>(SysStatusCodeConst.SUCCESS, pendingService.findAllPendingSPHistoryByUser(userId));
+	}
+
+	/**
+	 * 根据用户检索所有考勤申请历史
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> applyHistoryInit(Long userId) {
+		User user = userService.getUserById(userId);
+		return new Result<>(SysStatusCodeConst.SUCCESS, verifyService.getApplyHistoryList(user));
+	}
+	
+}

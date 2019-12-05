@@ -1,0 +1,22 @@
+package com.isolver.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.dao.holiday.HolidayManagerRepository;
+import com.isolver.entity.Holiday;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class HolidayService.java
+ */
+@Service
+public class HolidayManageService {
+	@Autowired
+	private HolidayManagerRepository holidayManagerRepository;
+
+	public Holiday findOneMonth(Boolean type, int year, int month) {
+		return holidayManagerRepository.findByYearAndMonthAndType(year, month, type);
+	}
+}

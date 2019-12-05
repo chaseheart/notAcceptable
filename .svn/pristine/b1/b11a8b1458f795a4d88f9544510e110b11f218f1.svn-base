@@ -1,0 +1,69 @@
+package com.isolver.dto.wechat;
+
+import com.isolver.entity.FileInfo;
+
+/**
+ * @author IS1907005
+ * @date 2019/08/20
+ * @class FileInfoDto.java
+ */
+public class FileInfoDto {
+	/** 文件名 **/
+	private String fileName;
+	/** 文件路径 **/
+	private String filePath;
+
+	/**
+	 * @return the fileName
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+
+	/**
+	 * @param fileName the fileName to set
+	 */
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	/**
+	 * @return the filePath
+	 */
+	public String getFilePath() {
+		return filePath;
+	}
+
+	/**
+	 * @param filePath the filePath to set
+	 */
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
+	/**
+	 * FileInfoDto.java
+	 * 
+	 * @param fileName
+	 * @param filePath 2019/08/20
+	 */
+	public FileInfoDto(FileInfo fileInfo) {
+		super();
+		this.fileName = fileInfo.getFileName();
+		this.filePath = fileInfo.getFilePath();
+
+	}
+
+	/**
+	 * FileInfoDto.java
+	 * @param fileName
+	 * @param filePath
+	 * 2019/11/26
+	 */
+	public FileInfoDto(String fileName, String filePath) {
+		super();
+		this.fileName = fileName;
+		this.filePath = filePath;
+	}
+
+}

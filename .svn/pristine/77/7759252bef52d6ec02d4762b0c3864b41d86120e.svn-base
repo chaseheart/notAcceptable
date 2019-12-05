@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>I-Solver</title>
+
+<script src="./js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="./css/iview/iview.css" />
+<link rel="stylesheet" href="./css/main.css" />
+<script src="./js/vue/vue.min.js"></script>
+<script src="./js/layer/layer.js"></script>
+<script src="./js/common/common.js"></script>
+<script src="./js/iview/iview.min.js"></script>
+<script th:src="@{/js/common/ajax.js}"></script>
+</head>
+<body>
+	<div id="app">
+		<template>
+			<modal v-model="modal1" :loading="loading" title="批量审批" :mask-closable="false" :closable="false">
+	        	<i-form :model="formItem"  ref='formItem' :rules="formValidate" :label-width="120"  id="iform">
+	        		<div id = "appDepart">
+						<divider dashed orientation="left">申请部门</divider>
+						<row>
+							<i-col span="11">
+								<form-item label="组织:">
+									<i-select v-model="formItem.org" placeholder="请选择组织" @on-change="getDepart">
+		                				<i-option v-for="item in orgList" :value="item.value" :key="item.value">{{ item.label }}</i-option>
+		            				</i-select>
+								</form-item>
+							</i-col>
+							<i-col span="11">
+								<form-item label="部门:">
+									<i-select v-model="formItem.depart" placeholder="请选择组织" @on-change="getLeader">
+										<i-option v-for="item in departList" :value="item.value" :key="item.value">{{ item.label }}</i-option>
+		            				</i-select>
+								</form-item>
+							</i-col>
+						</row>
+						<row>
+							<i-col span="11">
+								<form-item label="承认者指定:" prop="assigner">
+									<i-select v-model="formItem.assigner" placeholder="请选择审批者">
+										<i-option v-for="item in assignerList" :value="item.value" :key="item.value">{{ item.label }}</i-option>
+		            				</i-select>
+								</form-item>
+							</i-col>
+						</row>
+					</div>
+				</i-form>
+	        	<div slot="footer">
+            		<i-button type="primary" :loading="loading" @click="loading=true,model_asyncOK()" >批准</i-button>
+            		<i-button class="model_back"  @click="model_cancel">返回</i-button>
+        		</div>
+	    	</modal>
+    		<div class="layout">
+    	<div class="layout" style="border-top:0px;">
+        <Sider :style="{position: 'fixed', height: '100vh', left: 0, overflow: 'auto'}">
+            <i-Menu active-name="1-2" theme="dark" width="auto" :open-names="['1']" accordion @on-select="menuSelect">
+            <img src="./images/logo.png" width="180px" class="logo">
+                <Submenu name="1">
+                    <template slot="title">
+                        <Icon type="ios-navigate"></Icon>
+                        	考勤
+                    </template>
+                    <Menu-Item name="/servicePerformance/index">考勤实绩</Menu-Item>
+                </Submenu>
+                <Submenu name="2">
+                    <template slot="title">
+                        <Icon type="ios-keypad"></Icon>
+           					非正常考勤
+                    </template>
+                    <Menu-Item name="/unusualAttendance/index">非正常考勤</Menu-Item>
+                    <Menu-Item name="/workOvertime/index">加班</Menu-Item>
+                    <Menu-Item name="/holiday/index">休假</Menu-Item>
+                    <Menu-Item name="/outBusiness/index">公务外出</Menu-Item>
+                </Submenu>
+                <Submenu name="3">
+                    <template slot="title">
+                        <Icon type="ios-analytics"></Icon>
+                       		设定
+                    </template>
+                    <Menu-Item name="/holidayManage/index">节假日设定</Menu-Item>
+                </Submenu>
+                 <Submenu name="4">
+                    <template slot="title">
+                        <Icon type="ios-analytics"></Icon>
+                       		协同办公
+                    </template>
+                    <Menu-Item name="/workSearch">社内出勤记录</Menu-Item>
+                   	<Menu-Item name="4-2">通讯录</Menu-Item>
+                   	<Menu-Item name="/pending/index">待处理</Menu-Item>
+                </Submenu>
+				<Submenu name="5">
+                    <template slot="title">
+                        <Icon type="ios-analytics"></Icon>
+                       		报销
+                    </template>
+                    <Menu-Item name="/claimingExpenses/index">报销申请</Menu-Item>
+                    <Menu-Item name="/pending/claimingExpensesIndex">报销待处理</Menu-Item>
+                </Submenu>
+            </i-Menu>
+        </Sider>
+        <Layout :style="{marginLeft: '200px'}">
+            <Header class="layout-header-bar">
+            	<a class="logout" href="/login">注销</a>
+            </Header>
+            <Content :style="{padding: '0 16px 16px'}">
+                <Card>
+                    <iframe scrolling="yes" frameborder="0"
+					style="width: 100%; min-height: 800px; overflow: visible; background: #fff;"
+					src="/servicePerformance/index"  id="main" name="iframe">
+					</iframe>
+                </Card>
+            </Content>
+        </Layout>
+    </div>
+		</template>
+	</div>
+	<input id="orgdto" type="hidden" th:value="${orgdto}" />
+	<input id="userList" type="hidden" th:value="${userList}" />
+	<input id="username" type="hidden" th:value="${username}" />
+</body>
+<script src="./js/main/main.js"></script>
+</html>

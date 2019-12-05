@@ -1,0 +1,16 @@
+package com.isolver.dao.workOvertime;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.entity.WorkOvertime;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class HolidayRepository.java
+ */
+@Repository
+public interface WorkOvertimeRepository extends JpaRepository<WorkOvertime, Long> {
+
+}

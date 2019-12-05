@@ -1,0 +1,37 @@
+package com.isolver.dao.servicePerformance;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.entity.ServicePerformance;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/07
+ * @class servicePerformanceRepository.java
+ */
+@Repository
+public interface ServicePerformanceRepository extends JpaRepository<ServicePerformance, Long>, ServicePerformanceRepositoryCustom {
+
+	public List<ServicePerformance> findByUser(User user);
+
+	/**
+	 * 
+	 * @param user
+	 * @param monthStart
+	 * @param monthEnd
+	 * @param deleteFlag
+	 * @return
+	 */
+//	@Query("select new com.isolver.dto.ServicePerformanceDto(a.id as id, a.day as day, a.oaStart as oaStart, a.oaEnd as oaEnd, a.oaFinalStart as oaFinalStart, a.oaFinalEnd as oaFinalEnd, a.version as version) from ServicePerformance a where a.user = :user and a.day BETWEEN :monthStart AND :monthEnd and a.deleteFlag = :deleteFlag")
+//	public List<ServicePerformanceDto> findservicePerformanceByUserAndDeleteFlag(@Param("user") User user, @Param("monthStart") Date monthStart, @Param("monthEnd") Date monthEnd,
+//			@Param("deleteFlag") Boolean deleteFlag);
+}

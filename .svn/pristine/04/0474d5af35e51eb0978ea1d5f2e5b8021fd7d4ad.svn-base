@@ -1,0 +1,44 @@
+package com.isolver.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.sysUser.UserRepository;
+import com.isolver.dto.UserDto;
+import com.isolver.entity.Role;
+import com.isolver.entity.User;
+
+/**
+ * 用户管理
+ * 
+ * @author IS1907006
+ * @date 2019/08/20
+ * @class UserService.java
+ */
+@Service
+public class UserService {
+	
+	@Autowired
+	private UserRepository userRepository;
+
+//	/**	
+//	 * 根据角色id检索用户
+//	 * @param roleId 角色id
+//	 * @return
+//	 */
+//	public List<UserDto> searchUserWithRole(Long roleId){
+//		Role role = new Role(roleId);
+//		return sysUserRepository.findByRole(role, SysStaticConst.NOTDELE);
+//	}
+	/**
+	 * 根据登录id检索用户
+	 * @param loginId 登录id
+	 * @return
+	 */
+	public User getUserByLoginId(String loginId) {
+		return userRepository.findByWorkId(loginId);
+	}
+}

@@ -1,0 +1,30 @@
+package com.isolver.interfaces.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.interfaces.ServicePerformanceApi;
+import com.isolver.service.wechat.WechatServicePerformanceService;
+
+@RestController
+public class ServicePerformanceApiImpl implements ServicePerformanceApi {
+
+	@Autowired
+	private WechatServicePerformanceService servicePerformanceService;
+
+	/**
+	 * 根据用户、考勤开始日期、考勤结束日期，获得当月考勤记录
+	 * 
+	 * @param id      用户id
+	 * @param oaYear  考勤开始日期
+	 * @param oaMonth 考勤结束日期
+	 * @return
+	 */
+	@Override
+	public Result<Object> searchSP(Long id, Integer oaYear, Integer oaMonth) {
+		return new Result<Object>(SysStatusCodeConst.SUCCESS,
+				servicePerformanceService.findServicePerformance(id, oaYear, oaMonth));
+	}
+}

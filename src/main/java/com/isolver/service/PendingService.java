@@ -1,0 +1,490 @@
+package com.isolver.service;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.RepositoryServiceImpl;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.PvmTransition;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.activiti.engine.impl.pvm.process.TransitionImpl;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.ProcessEngineUtil;
+import com.isolver.dao.claimingExpenses.ClaimingExpensesRepository;
+import com.isolver.dao.hiFlow.HiFlowRepository;
+import com.isolver.dao.oaFlowStep.OaFlowStepRepository;
+import com.isolver.dao.outBusiness.OutBusinessRepository;
+import com.isolver.dao.ruFlow.RuFlowRepository;
+import com.isolver.dao.unusualAttendance.UnusualAttendanceRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dao.vacation.VacationRepository;
+import com.isolver.dao.workOvertime.WorkOvertimeRepository;
+import com.isolver.dto.PendingDto;
+import com.isolver.dto.wechat.ApproveHistoryDto;
+import com.isolver.dto.wechat.PendingDtoWechat;
+import com.isolver.entity.HiFlow;
+import com.isolver.entity.OaFlow;
+import com.isolver.entity.OaFlowStep;
+import com.isolver.entity.RuFlow;
+import com.isolver.entity.User;
+
+/**
+ * 	流程处理
+ * 
+ * @author IS1907005
+ * @date 2019/11/21
+ * @class PendingService.java
+ */
+@Service
+public class PendingService {
+
+	private static final Logger logger = LoggerFactory.getLogger(PendingService.class);
+
+	@Autowired
+	private OutBusinessRepository outBusinessRepository;
+	@Autowired
+	private UnusualAttendanceRepository unusualAttendanceRepository;
+	@Autowired
+	private VacationRepository vacationRepository;
+	@Autowired
+	private WorkOvertimeRepository workOvertimeRepository;
+	@Autowired
+	private ClaimingExpensesRepository claimingExpensesRepository;
+	@Autowired
+	private RuFlowRepository ruFlowRepository;
+	@Autowired
+	private HiFlowRepository hiFlowRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	/** act引擎 **/
+	private ProcessEngine processEngine;
+	@Autowired
+	/** ·流程步骤-角色层级对应关系查询 **/
+	private OaFlowStepRepository oaFlowStepRepository;
+
+	/** 休假结束状态 **/
+	private static final Integer FINISHED = 4;
+
+	/**
+	 * ·检索所有待审批申请
+	 * 
+	 * @param dealPeople
+	 * @return
+	 */
+	public Map<String, Object> findAllPendingByUser(User dealPeople, String workId, String username) {
+		Map<String, Object> map = new HashMap<>();
+
+		List<PendingDto> outBusinessList = outBusinessRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE, "%" + workId + "%", "%" + username + "%");
+		map.put("outBusiness", outBusinessList);
+		List<PendingDto> unusualAttendanceList = unusualAttendanceRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE, "%" + workId + "%", "%" + username + "%");
+		map.put("unusualAttendance", unusualAttendanceList);
+		List<PendingDto> vacationList = vacationRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE, "%" + workId + "%", "%" + username + "%");
+		map.put("holiday", vacationList);
+		List<PendingDto> workOvertimeList = workOvertimeRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE, "%" + workId + "%", "%" + username + "%");
+		map.put("workOvertime", workOvertimeList);
+//		List<PendingDto> claimingExpensesList = claimingExpensesRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+//		map.put("claimingExpenses", claimingExpensesList);
+		return map;
+	}
+
+	/**
+	 * ·检索所有待审批申请
+	 * 
+	 * @param dealPeople
+	 * @return
+	 */
+	public Map<String, Object> findAllPendingClaimingExpensesByUser(User dealPeople, String workId, String username) {
+		Map<String, Object> map = new HashMap<>();
+//
+//		List<PendingDto> outBusinessList = outBusinessRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+//		map.put("outBusiness", outBusinessList);
+//		List<PendingDto> unusualAttendanceList = unusualAttendanceRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+//		map.put("unusualAttendance", unusualAttendanceList);
+//		List<PendingDto> vacationList = vacationRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+//		map.put("holiday", vacationList);
+//		List<PendingDto> workOvertimeList = workOvertimeRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE);
+//		map.put("workOvertime", workOvertimeList);
+		List<PendingDto> claimingExpensesList = claimingExpensesRepository.findApplicationDtoByUndo(dealPeople, SysStaticConst.NOTDELE, "%" + workId + "%", "%" + username + "%");
+		map.put("claimingExpenses", claimingExpensesList);
+		return map;
+	}
+
+	/**
+	 * ·检索审批历史
+	 * 
+	 * @param dealPeople
+	 * @return
+	 */
+	public Map<String, Object> findAllPendingSPHistoryByUser(Long userId) {
+		Map<String, Object> map = new HashMap<>();
+
+		List<ApproveHistoryDto> outBusinessList = hiFlowRepository.approveHistoryOutBusiness(userId, SysStaticConst.NOTDELE);
+		map.put("outBusiness", outBusinessList);
+		List<ApproveHistoryDto> unusualAttendanceList = hiFlowRepository.approveHistoryUnusualAttendance(userId, SysStaticConst.NOTDELE);
+		map.put("unusualAttendance", unusualAttendanceList);
+		List<ApproveHistoryDto> vacationList = hiFlowRepository.approveHistoryVacation(userId, SysStaticConst.NOTDELE);
+		map.put("holiday", vacationList);
+		List<ApproveHistoryDto> workOvertimeList = hiFlowRepository.approveHistoryOvertime(userId, SysStaticConst.NOTDELE);
+		map.put("workOvertime", workOvertimeList);
+		return map;
+	}
+
+	/**
+	 * ·检索我的报销申请
+	 * 
+	 * @param dealPeople
+	 * @return
+	 */
+	public List<PendingDto> findMyPendingClaimingExpenses(User user) {
+		return claimingExpensesRepository.findMyApplicationDto(user);
+	}
+
+	/**
+	 * ·启动流程
+	 * @param assigner 下一步处理人
+	 * @param oaFlow 申请流程
+	 * @param user 申请者
+	 * @return
+	 */
+	public RuFlow startFlow(User assigner, OaFlow oaFlow , User user) {
+		RuFlow ruFlow = new RuFlow();
+		Timestamp tm = Dateutil.getTimestamp();
+		// ·后面的步骤
+		List<OaFlowStep> oaFlowStepList = oaFlowStepRepository.getNextStepLevel(user.getRole().getLevel(), oaFlow.getId());
+		// ·存在下一步时
+		if(oaFlowStepList.size() > 0) {
+			/** activiti 启动 **/
+			RuntimeService runtimeService = processEngine.getRuntimeService();
+			ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(oaFlow.getActId());// act id
+			String runFlowId = processInstance.getId();// 存进ru的act id
+			
+			/** ·runtime **/
+			// act 运行 id
+			ruFlow.setActRunFlowId(runFlowId);
+			// act 定义 id
+			ruFlow.setFlowId(oaFlow);
+			// ·当前待处理步骤 状态
+			ruFlow.setState(oaFlowStepList.get(0).getFlowState());
+			// ·当前待处理人
+			ruFlow.setDealPeople(assigner);
+			// ·上一步处理者(此处即为申请者)
+			ruFlow.setDealPeopleNow(user);
+			
+			ruFlow.setInsertUserId(user.getId());
+			ruFlow.setInsertTime(tm);
+			ruFlow.setUpdateUserId(user.getId());
+			ruFlow.setUpdateTime(tm);
+			ruFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+			ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+			
+			/**history **/
+			HiFlow hiFlow = new HiFlow();
+			// act 运行 id
+			hiFlow.setActId(runFlowId);
+			// ·该历史步骤 状态(此处一定为申请)
+			hiFlow.setState(1);
+			// ·流程申请人
+			hiFlow.setApplication(user);
+			// 20191128 ccy add 当前处理人和fix 申请人 start
+			hiFlow.setDealPeopleNow(user);
+			hiFlow.setDealPeople(user);
+			// 20191128 ccy add 当前处理人和fix 申请人 end
+			
+			hiFlow.setRuFlowId(ruFlow);
+			hiFlow.setInsertUserId(user.getId());
+			hiFlow.setInsertTime(tm);
+			hiFlow.setUpdateUserId(user.getId());
+			hiFlow.setUpdateTime(tm);
+			hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+			hiFlowRepository.saveAndFlush(hiFlow);
+			
+			/** ·act流程执行 **/
+			// ·步骤数
+			int stepNum =  ruFlow.getState() - hiFlow.getState();
+			for (int i = 0; i < stepNum; i ++) {
+				ProcessEngineUtil.getProcessEngine().getTaskService()
+				.complete(ProcessEngineUtil.getProcessEngine().getTaskService().createTaskQuery().processInstanceId(ruFlow.getActRunFlowId()).singleResult().getId());
+			}
+			
+		}
+		return ruFlow;
+	}
+	
+	
+	/**
+	 * 批量审批
+	 * 
+	 * @param assign        下一步审批人
+	 * @param ruFlowIdArray 流程id数组
+	 * @param user          当前审批人
+	 * @return
+	 */
+	public List<String> nextStepbenth(User assign, String[] ruFlowIdArray, User user) {
+
+		List<String> errMsg = new ArrayList<>();
+		for (String ruFlow : ruFlowIdArray) {
+			try {
+				Long ruFlowId = Long.valueOf(ruFlow);
+				nextStep(assign, ruFlowId, user);
+			} catch (Exception e) {
+				logger.error(ruFlow + "审批失败", e);
+				errMsg.add(ruFlow + ": 审批失败");
+				continue;
+			}
+		}
+		return errMsg;
+
+	}
+
+	/**
+	 * ·下一步骤
+	 * 
+	 * @param assign   下一步审批人
+	 * @param ruFlowId 流程id
+	 * @param user     当前处理人用户
+	 */
+	public Boolean nextStep(User assign, Long ruFlowId, User user) {
+		Boolean endFlg = false;
+		// ·运行流程
+		RuFlow ruFlow = ruFlowRepository.findOne(ruFlowId);
+		// ·后面的步骤
+		List<OaFlowStep> oaFlowStepList = oaFlowStepRepository.getNextStepLevel(user.getRole().getLevel(), ruFlow.getFlowId().getId());
+		
+		Timestamp tm = Dateutil.getTimestamp();
+		/** history  **/
+		HiFlow hiFlow = new HiFlow();
+		// act id
+		hiFlow.setActId(ruFlow.getActRunFlowId());
+		// ·状态
+		hiFlow.setState(ruFlow.getState());
+		// ·申请人
+		hiFlow.setApplication(userRepository.findOne(ruFlow.getInsertUserId()));
+		// ·下一步审批人
+		hiFlow.setDealPeople(ruFlow.getDealPeople());
+		// ·当前审批人
+		hiFlow.setDealPeopleNow(ruFlow.getDealPeopleNow());
+		// ·运行流程
+		hiFlow.setRuFlowId(ruFlow);
+
+		hiFlow.setInsertUserId(user.getId());
+		hiFlow.setInsertTime(tm);
+		hiFlow.setUpdateUserId(user.getId());
+		hiFlow.setUpdateTime(tm);
+		hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		hiFlowRepository.saveAndFlush(hiFlow);
+		/** runtime  **/
+		// ·非结束
+		if(oaFlowStepList.size() > 0) {
+			ruFlow.setState(oaFlowStepList.get(0).getFlowState());
+			// ·当前待处理人
+			ruFlow.setDealPeople(assign);
+		}
+		// ·结束
+		else {
+			ruFlow.setState(ruFlow.getState() + 1);
+			endFlg = true;
+		}
+		// ·流程更新者
+		ruFlow.setDealPeopleNow(user);
+		ruFlow.setUpdateUserId(user.getId());
+		ruFlow.setUpdateTime(tm);
+		ruFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+		/** activiti **/
+		// ·步骤数
+		int stepNum = ruFlow.getState() - hiFlow.getState();
+		for (int i = 0; i < stepNum; i ++) {
+			ProcessEngineUtil.getProcessEngine().getTaskService()
+			.complete(ProcessEngineUtil.getProcessEngine().getTaskService().createTaskQuery().processInstanceId(ruFlow.getActRunFlowId()).singleResult().getId());
+		}
+		return endFlg;
+		
+	}
+
+	/**
+	 * · 拒绝申请
+	 * 
+	 * @param ruFlowId 流程id
+	 * @param user     审批者
+	 */
+	public void refuseApply(Long ruFlowId, User user) {
+		RuFlow ruFlow = ruFlowRepository.findOne(ruFlowId);
+		Timestamp tm = Dateutil.getTimestamp();
+		HiFlow hiFlow = new HiFlow();
+		// act id
+		hiFlow.setActId(ruFlow.getActRunFlowId());
+		// ·状态
+		hiFlow.setState(ruFlow.getState());
+		// ·申请人
+		User application = userRepository.findOne(ruFlow.getInsertUserId());
+		hiFlow.setApplication(application);
+		// ·下一步审批人
+		hiFlow.setDealPeople(ruFlow.getDealPeople());
+		// ·当前审批人
+		hiFlow.setDealPeopleNow(ruFlow.getDealPeopleNow());
+		// ·运行流程
+		hiFlow.setRuFlowId(ruFlow);
+		// ·操作
+		hiFlow.setOperate("拒绝");
+
+		hiFlow.setInsertUserId(user.getId());
+		hiFlow.setInsertTime(tm);
+		hiFlow.setUpdateUserId(user.getId());
+		hiFlow.setUpdateTime(tm);
+		hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		hiFlowRepository.saveAndFlush(hiFlow);
+
+		ruFlow.setState(0);
+		ruFlow.setDealPeople(application);
+		ruFlow.setDealPeopleNow(user);
+		ruFlow.setUpdateUserId(user.getId());
+		ruFlow.setUpdateTime(tm);
+		ruFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+		// act
+		closeFlow(ruFlow.getActRunFlowId(), "拒绝");
+	}
+
+	/**
+	 * · 驳回申请
+	 * 
+	 * @param ruFlowId 流程id
+	 * @param user     审批者
+	 */
+	public void rejectApply(Long ruFlowId, User user) {
+		RuFlow ruFlow = ruFlowRepository.findOne(ruFlowId);
+		Timestamp tm = Dateutil.getTimestamp();
+		HiFlow hiFlow = new HiFlow();
+		// act id
+		hiFlow.setActId(ruFlow.getActRunFlowId());
+		// ·状态
+		hiFlow.setState(ruFlow.getState());
+		// ·申请人
+		User application = userRepository.findOne(ruFlow.getInsertUserId());
+		hiFlow.setApplication(application);
+		// ·下一步审批人
+		hiFlow.setDealPeople(ruFlow.getDealPeople());
+		// ·当前审批人
+		hiFlow.setDealPeopleNow(ruFlow.getDealPeopleNow());
+		// ·运行流程
+		hiFlow.setRuFlowId(ruFlow);
+		// ·操作
+		hiFlow.setOperate("驳回");
+
+		hiFlow.setInsertUserId(user.getId());
+		hiFlow.setInsertTime(tm);
+		hiFlow.setUpdateUserId(user.getId());
+		hiFlow.setUpdateTime(tm);
+		hiFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		hiFlowRepository.saveAndFlush(hiFlow);
+
+		ruFlow.setState(1);
+		ruFlow.setDealPeople(application);
+		ruFlow.setDealPeopleNow(user);
+		ruFlow.setUpdateUserId(user.getId());
+		ruFlow.setUpdateTime(tm);
+		ruFlow.setDeleteFlag(SysStaticConst.NOTDELE);
+		ruFlow = ruFlowRepository.saveAndFlush(ruFlow);
+		// act
+		rollBack(ruFlow.getActRunFlowId(), "userTask1");
+	}
+
+	/**
+	 * 流程终止
+	 * 
+	 * @param actRunFlowId actRu 的 Id
+	 * @param reason       原因
+	 */
+	public void closeFlow(String actRunFlowId, String reason) {
+		// activiti 流程结束
+		ProcessEngineUtil.getProcessEngine().getRuntimeService().deleteProcessInstance(actRunFlowId, reason);
+	}
+
+	/**
+	 * 回滚
+	 * 
+	 * @param processInstanceId actRu 的 Id
+	 * @param destTaskKey       第一步id （此处一定为‘userTask1’）
+	 */
+	public void rollBack(String processInstanceId, String destTaskKey) {
+		Map<String, Object> variables;
+		// ·初始化ProcessEngine
+		ProcessEngine processEngine = ProcessEngineUtil.getProcessEngine();
+		ExecutionEntity entity = (ExecutionEntity) processEngine.getRuntimeService().createExecutionQuery().executionId(processInstanceId).singleResult();
+
+		ProcessDefinitionEntity definition = (ProcessDefinitionEntity) ((RepositoryServiceImpl) processEngine.getRepositoryService()).getDeployedProcessDefinition(entity.getProcessDefinitionId());
+		variables = entity.getProcessVariables();
+
+		// ·当前节点
+		ActivityImpl currActivityImpl = definition.findActivity(entity.getActivityId());
+		// ·目标节点
+		ActivityImpl nextActivityImpl = ((ProcessDefinitionImpl) definition).findActivity(destTaskKey);
+
+		if (currActivityImpl != null) {
+			List<PvmTransition> pvmTransitions = currActivityImpl.getOutgoingTransitions();
+			List<PvmTransition> oriPvmTransitions = new ArrayList<>();
+			for (PvmTransition transition : pvmTransitions) {
+				oriPvmTransitions.add(transition);
+			}
+			// ·清除出口
+			pvmTransitions.clear();
+			// ·建立新出口
+			List<TransitionImpl> transitionImpls = new ArrayList<>();
+			TransitionImpl tImpl = currActivityImpl.createOutgoingTransition();
+			tImpl.setDestination(nextActivityImpl);
+			transitionImpls.add(tImpl);
+
+			List<Task> list = processEngine.getTaskService().createTaskQuery().processInstanceId(entity.getProcessInstanceId()).taskDefinitionKey(entity.getActivityId()).list();
+			for (Task task : list) {
+				processEngine.getTaskService().complete(task.getId(), variables);
+			}
+
+			for (TransitionImpl transitionImpl : transitionImpls) {
+				currActivityImpl.getOutgoingTransitions().remove(transitionImpl);
+			}
+
+			for (PvmTransition pvm : oriPvmTransitions) {
+				pvmTransitions.add(pvm);
+			}
+
+		}
+	}
+
+	/**
+	 * 获取除报销外所有申请
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public List<PendingDtoWechat> findAllPendingByUserForWechat(User user) {
+		List<PendingDtoWechat> resultList = new ArrayList<>();
+		List<PendingDtoWechat> outBusinessList = outBusinessRepository.getDataByUser(user, SysStaticConst.NOTDELE, FINISHED);
+		List<PendingDtoWechat> unusualAttendanceList = unusualAttendanceRepository.getDataByUser(user, SysStaticConst.NOTDELE, FINISHED);
+		List<PendingDtoWechat> vacationList = vacationRepository.getDataByUser(user, SysStaticConst.NOTDELE, FINISHED);
+		List<PendingDtoWechat> workOvertimeList = workOvertimeRepository.getDataByUser(user, SysStaticConst.NOTDELE, FINISHED);
+		resultList.addAll(outBusinessList);
+		resultList.addAll(unusualAttendanceList);
+		resultList.addAll(vacationList);
+		resultList.addAll(workOvertimeList);
+		resultList = resultList.stream().sorted(Comparator.comparing(PendingDtoWechat::getAppStartTime)).collect(Collectors.toList());
+		return resultList;
+	}
+}

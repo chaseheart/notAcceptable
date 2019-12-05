@@ -1,0 +1,87 @@
+package com.isolver.common.util;
+
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+
+
+public class Timeutil {
+	
+	/**
+	 * 获取当前Long型毫秒级时间
+	 * @return
+	 */
+	public static Long getMilliSecond() {
+		Long milliSecond = Instant.now().toEpochMilli();
+		return milliSecond;
+	}
+	
+	/**
+	 * 获取当前Long型秒级时间
+	 * @return
+	 */
+	public static Long getSecond() {
+		Long milliSecond = Instant.now().getEpochSecond();
+		return milliSecond;
+	}
+	
+	/**
+	 * 获取当前Timestamp型毫秒级时间
+	 * @return
+	 */
+	public static Timestamp getTimestamp() {
+		Timestamp milliSecond = new Timestamp(getMilliSecond());
+		return milliSecond;
+	}
+	
+	/**
+	 * timestamp转Date
+	 * @param milliSecond timestamp类型数据
+	 * @return date类型数据
+	 */
+	public static Date timestampToDate(Timestamp milliSecond) {
+		Date date = new Date();
+		date = milliSecond;
+		return date;
+	}
+	
+	/**
+	 * date转字符串 yyyy-MM-dd HH:mm:ss
+	 * @param date date类型数据
+	 * @return 字符串
+	 */
+	public static String dateToStr(Date date) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String dateStr = simpleDateFormat.format(date);
+		return dateStr;
+	}
+	
+	/**
+	 * date转字符串 yyyy-MM-dd
+	 * @param date date类型数据
+	 * @return 字符串
+	 */
+	public static String datesToStr(Date date) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String dateStr = simpleDateFormat.format(date);
+		return dateStr;
+	}
+	
+	/**
+	 * 检测字符串是否符合 yyyy-MM-dd
+	 * @param date
+	 * @return
+	 */
+	public static boolean checkDateString(String date) {
+		try {
+			new SimpleDateFormat("yyyy-MM-dd").parse(date);
+			
+		} catch (ParseException e) {
+			
+			return false;
+		}
+		return true;
+	}
+}

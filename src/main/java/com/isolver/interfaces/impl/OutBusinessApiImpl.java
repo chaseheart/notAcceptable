@@ -1,0 +1,126 @@
+package com.isolver.interfaces.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Result;
+import com.isolver.dto.OrgDto;
+import com.isolver.entity.User;
+import com.isolver.form.OutBusinessForm;
+import com.isolver.interfaces.OutBusinessApi;
+import com.isolver.service.OrganizationService;
+import com.isolver.service.OutBusinessService;
+import com.isolver.service.PendingService;
+import com.isolver.service.ServicePerformanceService;
+import com.isolver.service.UserService;
+
+@RestController
+public class OutBusinessApiImpl implements OutBusinessApi {
+	
+	@Autowired
+	private ServicePerformanceService servicePerformanceService;
+
+	@Autowired
+	private OrganizationService organizationService;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private OutBusinessService outBusinessService;
+	
+	@Autowired
+	private PendingService pendingService;
+
+	/**
+	 * 外出公务申请 - 初始化
+	 * 
+	 * @return
+	 */
+	@Override
+	public Result<Object> ApplicationInit(Long ruFlowId) {
+		List<OrgDto> orgdto = organizationService.findAllOrg();
+		Map<String, Object> map = servicePerformanceService.getServicePerformaneAndOutBusinessForm(ruFlowId);
+		map.put("org", orgdto);
+		return new Result<>(SysStatusCodeConst.SUCCESS, map);
+	}
+
+	/**
+	 * 外出公务提交申请
+	 * @param outBusinessForm
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> Application(OutBusinessForm outBusinessForm, Long userId) {
+		User user = userService.getUserById(userId);
+		outBusinessService.startFlow(outBusinessForm, user);
+		return new Result<>(SysStatusCodeConst.SUCCESS);
+	}
+
+	/**
+	 * 外出公务审批
+	 * @param assigner
+	 * @param ruFlow
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> dealApplication(String assigner, String ruFlow, Long userId) {
+		User user = userService.getUserById(userId);
+		Long ruFlowId = Long.valueOf(ruFlow);
+		if (user.getRole().getLevel() != 3) {
+			Long assignerId = Long.valueOf(assigner);
+			User assignerUser = userService.getUserById(assignerId);
+			outBusinessService.nextStep(assignerUser, ruFlowId, user);
+		} else {
+			outBusinessService.nextStep(user, ruFlowId, user);
+		}
+		return new Result<>(SysStatusCodeConst.SUCCESS);
+	}
+
+	/**
+	 * 外出公务提交再申请
+	 * @param outBusinessForm
+	 * @param userId
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public Result<Object> reApplication(OutBusinessForm outBusinessForm, Long userId, Long id) {
+		User user = userService.getUserById(userId);
+		outBusinessService.restartFlow(outBusinessForm, user, id);
+		return new Result<>(SysStatusCodeConst.SUCCESS);
+	}
+
+	/**
+	 * 外出公务驳回
+	 * @param ruFlow
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> rejectFlow(Long ruFlow, Long userId) {
+		User user = userService.getUserById(userId);
+		pendingService.rejectApply(ruFlow, user);
+		return new Result<>(SysStatusCodeConst.SUCCESS);
+	}
+
+	/**
+	 * 外出公务拒絕
+	 * @param ruFlow
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Result<Object> refuseApply(Long ruFlow, Long userId) {
+		User user = userService.getUserById(userId);
+		pendingService.refuseApply(ruFlow, user);
+		return new Result<>(SysStatusCodeConst.SUCCESS);
+	}
+	
+}
