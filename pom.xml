@@ -126,11 +126,11 @@
 			<artifactId>activiti-simple-workflow</artifactId>
 			<version>5.22.0</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>dcharts-widget</artifactId>
 			<version>0.10.0</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.activiti</groupId>
 			<artifactId>activiti-explorer</artifactId>
