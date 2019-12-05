@@ -5,9 +5,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -58,7 +56,6 @@ public class ExcelController {
 	private HolidayManageService holidayManageService;
 	@Autowired
 	private SalaryService salaryService;
-
 	/**
 	 * 考勤数据上传
 	 * 
@@ -204,50 +201,11 @@ public class ExcelController {
 		for (int i = 1; i < result.size(); i++) {
 			content = (List<String>) result.get(i);
 			System.err.println(content);
-			String workId = content.get(2);
+			String workId = content.get(1);
 			User user = userService.findUserByworkId(workId);
 			System.err.println(workId);
-			salaryService.setSalary(user, header, content, userId, date);
+			salaryService.setSalary(user, header, content,userId,date);
 		}
 		return new Result<>();
-	}
-
-	/**
-	 * 薪资上传
-	 * 
-	 * @param file
-	 * @param id
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	@SuppressWarnings("unchecked")
-	@RequestMapping(method = RequestMethod.POST, value = "/importExcelUser")
-	public Result<Object> importExcelUser(@RequestParam("excelFile") MultipartFile file) throws IOException {
-
-		Long userId = AuthenticationFacade.getUserId();
-
-		Sheet sheet = new Sheet(1, 0);
-		List<Object> result = EasyExcelFactory.read(file.getInputStream(), sheet);
-		// tittle
-		List<String> header = (List<String>) result.get(0);
-		// 内容
-		List<String> content = new ArrayList<>();
-		System.err.println(header);
-		Map<String, Integer> map = new HashMap<>();
-		int success = 0;
-		int failure = 0;
-		for (int i = 1; i < result.size(); i++) {
-			content = (List<String>) result.get(i);
-			System.err.println(content);
-			if (userService.setUserList(content, userId)) {
-				success++;
-			} else {
-				failure++;
-			}
-		}
-		map.put("success", success);
-		map.put("failure", failure);
-
-		return new Result<>(map);
 	}
 }

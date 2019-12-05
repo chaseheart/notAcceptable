@@ -85,14 +85,13 @@ public class SalaryService {
 			salary.setDeleteFlag(SysStaticConst.NOTDELE);
 			salaryRepository.saveAndFlush(salary);
 		} else {
-			Salary entity=new Salary();
-			entity.setUserId(user);
-			entity.setDate(date);
-			entity.setSalary("[" + JSON.toJSONString(header) + JSON.toJSONString(data) + "]");
-			entity.setUpdateUserId(insertUserId);
-			entity.setUpdateTime(Dateutil.getTimestamp());
-			entity.setDeleteFlag(SysStaticConst.NOTDELE);
-			salaryRepository.saveAndFlush(entity);
+			salary.setUserId(user);
+			salary.setDate(date);
+			salary.setSalary("[" + JSON.toJSONString(header) + JSON.toJSONString(data) + "]");
+			salary.setUpdateUserId(insertUserId);
+			salary.setUpdateTime(Dateutil.getTimestamp());
+			salary.setDeleteFlag(SysStaticConst.NOTDELE);
+			salaryRepository.saveAndFlush(salary);
 		}
 	}
 }

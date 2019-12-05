@@ -10,7 +10,7 @@ public class ProcessEngineUtilConst {
 	/**
 	 * jdbc地址
 	 */
-	public static String  JDBCURL= "jdbc:mysql://localhost:3306/oa";
+	public static String  JDBCURL= "jdbc:mysql://192.168.100.220:3306/oa";
 //	public static String  JDBCURL= "jdbc:mysql://192.168.100.24:3306/oadb";
 	/**
 	 * jdbc引擎

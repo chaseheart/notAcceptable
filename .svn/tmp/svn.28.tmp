@@ -62,34 +62,6 @@
             		<i-button class="model_back"  @click="modal_confirm_cancel">取消</i-button>
         		</div>
 	    	</modal>
-	    	<!-- ·增加/修改组织 模态框  -->
-			<modal v-model="orgModal" :loading="loading" title="编辑组织" :mask-closable="false" :closable="false">
-	        	<i-form :model="orgModalForm" ref='orgModalForm' :rules="orgFormValidation" :label-width="120"  id="orgModalForm">
-	        		<div id = "orgForm">
-						<row>
-							<i-col span="16">
-								<form-item label="部门名称:">
-									<i-input v-model="orgModalForm.orgName" placeholder="请输入组织名称"></i-input>
-								</form-item>
-							</i-col>
-						</row>
-					</div>
-				</i-form>
-	        	<div slot="footer">
-            		<i-button type="primary" :loading="loading">提交</i-button>
-            		<i-button class="model_back" @click="depart_model_cancel">取消</i-button>
-        		</div>
-	    	</modal>
-	    	<!-- confirm -->
-	    	<modal id="deleteConfirm" v-model="modal_delete_confirm" :mask-closable="false" :closable="false" title="提示" >
-	    		<div>
-	    			确认删除该数据?
-				</div>
-	    		<div slot="footer">
-            		<i-button type="primary">确认</i-button>
-            		<i-button @click="modal_delete_confirm_cancel">取消</i-button>
-        		</div>
-	    	</modal>
     		<div class="layout">
     	<div class="layout" style="border-top:0px;">
         <Sider :style="{position: 'fixed', height: '100vh', left: 0, overflow: 'auto'}">
