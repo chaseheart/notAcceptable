@@ -3,6 +3,7 @@ package com.isolver.common.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -12,36 +13,39 @@ import com.isolver.common.util.Encodeutil;
 
 /**
  * spring security
+ * 
  * @author IS1907006
  *
  */
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class BrowerSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	/** spring security 登录用service **/
 	@Autowired
 	private MyUserDetailService userDetailService;
 
-	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
+
 		// 开放url配置
-		http.authorizeRequests().antMatchers("/css/**", "/js/**", "/login", "/fonts/**", "/images/**", "/assets/**","/weixin/**","/error")
-				.permitAll().and().authorizeRequests().anyRequest().authenticated();
+		http.authorizeRequests().antMatchers("/css/**", "/js/**", "/login", "/fonts/**", "/images/**", "/assets/**",
+				"/weixin/**", "/error").permitAll().and().authorizeRequests().anyRequest().authenticated();
 
 		http.headers().frameOptions().disable();
-		
+
 		http.cors();
-		
+
 		// 开启自动配置的登录功能
-		http.formLogin().usernameParameter("name").passwordParameter("pwd").loginPage("/login").defaultSuccessUrl("https://app.oa.wccena.ltd:18080/main");
+		http.formLogin().usernameParameter("name").passwordParameter("pwd")
+				.loginPage("https://app.oa.wccena.ltd:18080/login")
+				.defaultSuccessUrl("https://app.oa.wccena.ltd:18080/main");
 
 		// 开启自动配置的注销功能,默认重定向到/logout?success,修改为"/"
-		http.logout().logoutSuccessUrl("/login");
+		http.logout().logoutSuccessUrl("https://app.oa.wccena.ltd:18080/login");
 
-		//暂时禁用CSRF，否则无法提交表单
-		http.csrf().disable(); 
+		// 暂时禁用CSRF，否则无法提交表单
+		http.csrf().disable();
 	}
 
 	@Override
@@ -49,7 +53,7 @@ public class BrowerSecurityConfig extends WebSecurityConfigurerAdapter {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(userDetailService);
 		// md5加密
-		authProvider.setPasswordEncoder(new PasswordEncoder() { 
+		authProvider.setPasswordEncoder(new PasswordEncoder() {
 			@Override
 			public boolean matches(CharSequence rawPassword, String encodedPassword) {
 				String[] checkArr = encodedPassword.split(",");
