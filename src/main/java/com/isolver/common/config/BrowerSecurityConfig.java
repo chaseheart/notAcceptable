@@ -35,7 +35,7 @@ public class BrowerSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors();
 		
 		// 开启自动配置的登录功能
-		http.formLogin().usernameParameter("name").passwordParameter("pwd").loginPage("/login").defaultSuccessUrl("/main");
+		http.formLogin().usernameParameter("name").passwordParameter("pwd").loginPage("/login").defaultSuccessUrl("https://app.oa.wccena.ltd:18080/main");
 
 		// 开启自动配置的注销功能,默认重定向到/logout?success,修改为"/"
 		http.logout().logoutSuccessUrl("/login");
