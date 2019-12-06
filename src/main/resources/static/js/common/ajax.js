@@ -1,5 +1,5 @@
 //请求路径头部
-var SERVER_URL_HEAD_AJAX = 'http://app.oa.wccena.ltd:18080';
+var SERVER_URL_HEAD_AJAX = 'http://app.oa.wccena.ltd:18888';
 
 //页面加载所要进行的操作
 $(function () {
