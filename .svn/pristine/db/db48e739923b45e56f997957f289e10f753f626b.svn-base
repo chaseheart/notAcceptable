@@ -1,0 +1,176 @@
+package com.isolver.service.wechat;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.Result;
+import com.isolver.common.util.StrUtil;
+import com.isolver.dao.fileInfo.FileInfoRepository;
+import com.isolver.dao.news.NewsRepository;
+import com.isolver.dto.wechat.NewsDto;
+import com.isolver.entity.FileInfo;
+import com.isolver.entity.News;
+import com.isolver.form.wechat.NewsForm;
+
+@Service
+public class NewsService {
+
+	@Autowired
+	private NewsRepository newsRepository;
+
+	@Autowired
+	private FileInfoRepository fileInfoRepository;
+	
+	/** 。表名(图片保存用)   **/
+	private static final String TABLENAME = "news";
+
+	/**
+	 * 获得新闻/通知/贴士
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<News> getNewsList(Integer type) {
+		List<News> resultList = newsRepository.findByTypeAndDeleteFlag(type, SysStaticConst.NOTDELE);
+		return resultList;
+	}
+
+	/**
+	 * 获得新闻/通知/贴士 详细
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public News getNewsDetail(Long id) {
+		News news = newsRepository.findByIdAndDeleteFlag(id, SysStaticConst.NOTDELE);
+		return news;
+	}
+
+	/**
+	 * 获得新闻/通知/贴士
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<News> searchNews(String content, Integer type) {
+		List<News> resultList = newsRepository.findByContent(content, type, SysStaticConst.NOTDELE);
+		return resultList;
+	}
+
+	/**
+	 * 获得新闻/通知/贴士
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<NewsDto> searchNotice(String content, String type) {
+		content = StrUtil.strWithVague(content);
+		List<NewsDto> resultList = newsRepository.getNoticeData(content, type, SysStaticConst.NOTDELE);
+		return resultList;
+	}
+
+	/**
+	 * 获得新闻/通知/贴士 详细
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public NewsDto getPCNewsDetail(Long id) {
+		News news = newsRepository.findByIdAndDeleteFlag(id, SysStaticConst.NOTDELE);
+		FileInfo file = new FileInfo();
+		if (news.getPicId() != null) {
+			file = fileInfoRepository.findOne(news.getPicId());
+		}
+
+		return new NewsDto(news, file);
+	}
+
+	/**
+	 * 删除一条新闻
+	 * @param newsId 通知记录id
+	 * @param userId 用户id
+	 * @return
+	 */
+	public Result<Object> deleteNews(Long newsId, Long userId) {
+		News newsModel = newsRepository.findOne(newsId);
+		News newsEntity = new News();
+		BeanUtils.copyProperties(newsModel, newsEntity);
+		// 。消除flag
+		newsEntity.setDeleteFlag(SysStaticConst.ISDELE);
+		// 。最后更新者
+		newsEntity.setUpdateUserId(userId);
+		// 。最后更新时间
+		newsEntity.setUpdateTime(Dateutil.getTimestamp());
+		newsRepository.saveAndFlush(newsEntity);
+		return new Result<Object>(SysStatusCodeConst.SUCCESS);
+	}
+
+	/**
+	 * 新增通知记录
+	 * @param picId 图片id
+	 * @param userId 用户id
+	 * @param newsForm 通知表单数据
+	 * @return
+	 */
+	public Result<Object> saveData(Long picId, Long userId, NewsForm newsForm) {
+		Timestamp tm = Dateutil.getTimestamp();
+		News entity = new News();
+		if(StringUtils.isNotEmpty(newsForm.getId())) {
+			News model = newsRepository.findOne(Long.parseLong(newsForm.getId()));
+			BeanUtils.copyProperties(model, entity);
+		}else {
+			// 。插入时间
+			entity.setInsertTime(tm);
+			// 。插入者
+			entity.setInsertUserId(userId);
+			// 。消除flag
+			entity.setDeleteFlag(SysStaticConst.NOTDELE);
+		}
+		// 。内容
+		entity.setContent(newsForm.getContent());
+		// 。导语
+		entity.setIntroduction(newsForm.getIntroduction());
+		// 。标题
+		entity.setTitle(newsForm.getTitle());
+		// 。类型
+		entity.setType(newsForm.getType());
+		if(picId.intValue() != 0) {
+			// 。图片
+			entity.setPicId(picId);
+		}else if(newsForm.getFlag()){
+			// 。图片
+			entity.setPicId(null);
+		}
+		// 。最后更新时间
+		entity.setUpdateTime(tm);
+		// 。最后更新者
+		entity.setUpdateUserId(userId);
+		News news = newsRepository.saveAndFlush(entity);
+		
+		if(picId.intValue() != 0) {
+			FileInfo file = fileInfoRepository.findOne(picId);
+			FileInfo fileEntity = new FileInfo();
+			BeanUtils.copyProperties(file, fileEntity);
+			// 。通知表id
+			fileEntity.setTableId(news.getId().toString());
+			// 。通知表
+			fileEntity.setTableName(TABLENAME);
+			// 。最后更新时间
+			fileEntity.setUpdateTime(tm);
+			// 。最后更新者
+			fileEntity.setUpdateUserId(userId);
+			
+			fileInfoRepository.saveAndFlush(fileEntity);
+		}
+		return new Result<Object>(SysStatusCodeConst.SUCCESS);
+	}
+
+}

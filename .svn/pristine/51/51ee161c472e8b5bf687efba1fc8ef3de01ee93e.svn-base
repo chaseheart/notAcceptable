@@ -1,0 +1,50 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem : {
+			title : '',
+			type : '',
+			introduction : '',
+			content : ''
+		},
+		formValidate : {
+			type : [ {
+				required : true,
+				message : '请选择通知类型',
+			} ],
+			title : [ {
+				required : true,
+				message : '请输入通知标题',
+				trigger : 'blur'
+			} ],
+			content : [ {
+				required : true,
+				message : '请输入通知内容',
+				trigger : 'blur'
+			} ],
+		},
+		url:window.location.pathname
+	},
+	methods : {
+		saveData : function(){
+			var that = this;
+			var data = {
+					'content' : that.formItem.content,
+					'type' : that.formItem.type
+			};
+			var url = "/newsManage/saveData";
+			var success = function(data) {
+				ajaxStatus = true;
+				if(data.status == 200){
+					that.resultData = that.dealData(data.data);
+				}
+			};
+			var cache = false;
+			var alone = true;
+			post(url, data, success, cache, alone);
+		}
+	},
+	created : function() {
+		
+	}
+});

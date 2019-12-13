@@ -1,0 +1,101 @@
+package com.isolver.service.wechat;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSON;
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.AESUtil;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.Result;
+import com.isolver.dao.salary.SalaryRepository;
+import com.isolver.dto.wechat.SalaryListDto;
+import com.isolver.entity.Salary;
+import com.isolver.entity.User;
+
+@Service
+public class SalaryService {
+
+	@Autowired
+	private SalaryRepository salaryRepository;
+
+	/**
+	 * 获得休假列表
+	 * 
+	 * @param user
+	 * @param date
+	 * @return
+	 */
+	public List<SalaryListDto> getRecord(User user) {
+		return salaryRepository.getSalaryByUserAndDate(user, SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 删除一条记录
+	 * 
+	 * @param id
+	 * @param userId
+	 * @param version
+	 * 
+	 * @return
+	 */
+	public Result<Object> delOneSalary(Long id, Long userId, Integer version) {
+		Salary salary = salaryRepository.findOne(id);
+		if (salary != null) {
+			Timestamp presentTime = Dateutil.getTimestamp();
+
+			Salary entity = new Salary();
+			BeanUtils.copyProperties(salary, entity);
+			entity.setDeleteFlag(SysStaticConst.ISDELE);
+			entity.setUpdateUserId(userId);
+			entity.setUpdateTime(presentTime);
+			salaryRepository.save(entity);
+			return new Result<>(SysStatusCodeConst.SUCCESS);
+		}
+		return new Result<>(SysStatusCodeConst.NODATA);
+	}
+
+	/**
+	 * 获得一条记录
+	 * 
+	 * @param passwordForm passwordForm
+	 * @return
+	 */
+	public Salary getOneSalary(Long id) {
+		Salary salary = salaryRepository.findOne(id);
+		salary.setSalary(AESUtil.decrypt(salary.getSalary(),salary.getUserId().getWorkId())); 
+		return salary;
+	}
+
+	public void setSalary(User user, List<String> header, List<String> data, Long insertUserId, String date) {
+
+		Salary salary = salaryRepository.findByDateAndUserId(date, user);
+		if (salary == null) {
+			salary = new Salary();
+			salary.setUserId(user);
+			salary.setDate(date);
+			salary.setSalary(AESUtil.encrypt("[" + JSON.toJSONString(header) + JSON.toJSONString(data) + "]", user.getWorkId()));
+			salary.setInsertUserId(insertUserId);
+			salary.setInsertTime(Dateutil.getTimestamp());
+			salary.setUpdateUserId(insertUserId);
+			salary.setUpdateTime(Dateutil.getTimestamp());
+			salary.setDeleteFlag(SysStaticConst.NOTDELE);
+			salaryRepository.saveAndFlush(salary);
+		} else {
+			Salary entity = new Salary();
+			BeanUtils.copyProperties(salary, entity);
+			entity.setUserId(user);
+			entity.setDate(date);
+			entity.setSalary(AESUtil.encrypt("[" + JSON.toJSONString(header) + JSON.toJSONString(data) + "]", user.getWorkId()));
+			entity.setUpdateUserId(insertUserId);
+			entity.setUpdateTime(Dateutil.getTimestamp());
+			entity.setDeleteFlag(SysStaticConst.NOTDELE);
+			salaryRepository.saveAndFlush(entity);
+		}
+	}
+}

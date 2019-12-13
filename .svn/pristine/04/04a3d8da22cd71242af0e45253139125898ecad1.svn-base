@@ -1,0 +1,209 @@
+package com.isolver.entity;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+/**
+ * 流程步骤与角色等级对应关系
+ * @author IS1907011
+ * @date 2019/12/03
+ * @class OaFlowStep.java
+ */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "oaFlowStep")
+@NamedQuery(name = "OaFlowStep.findAll", query = "SELECT o FROM OaFlowStep o")
+@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+public class OaFlowStep implements Serializable {
+	/** ID **/
+	private Long id;
+	/** ·流程 **/
+	private OaFlow flow;
+	/** ·流程步骤(状态号)  **/
+	private Integer flowState;
+	/** ·角色id  **/
+	private Role roleId;
+	
+	
+	
+	/**
+	 * @return the id
+	 */
+	@Id
+	@Column(name = "id")
+	@GeneratedValue
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the flow
+	 */
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "flow", nullable = false)
+	public OaFlow getFlow() {
+		return flow;
+	}
+
+	/**
+	 * @param flow the flow to set
+	 */
+	public void setFlow(OaFlow flow) {
+		this.flow = flow;
+	}
+
+	/**
+	 * @return the flowState
+	 */
+	@Column(name = "flow_state")
+	public Integer getFlowState() {
+		return flowState;
+	}
+
+	/**
+	 * @param flowState the flowState to set
+	 */
+	public void setFlowState(Integer flowState) {
+		this.flowState = flowState;
+	}
+
+	/**
+	 * @return the roleLevel
+	 */
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "role_id", nullable = false)
+	public Role getRoleId() {
+		return roleId;
+	}
+
+	/**
+	 * @param roleLevel the roleLevel to set
+	 */
+	public void setRoleId(Role roleId) {
+		this.roleId = roleId;
+	}
+
+	/** 。插入者 **/
+	private Long insertUserId;
+	/** 。插入时间 **/
+	private Timestamp insertTime;
+	/** 。更新者 **/
+	private Long updateUserId;
+	/** 。更新时间 **/
+	private Timestamp updateTime;
+	/** deleteFlag **/
+	private Boolean deleteFlag;
+	/** 。版本 **/
+	private Integer version;
+
+	/**
+	 * @return the insertUserId
+	 */
+	@Column(name = "insertUserId")
+	public Long getInsertUserId() {
+		return insertUserId;
+	}
+
+	/**
+	 * @param insertUserId the insertUserId to set
+	 */
+	public void setInsertUserId(Long insertUserId) {
+		this.insertUserId = insertUserId;
+	}
+
+	/**
+	 * @return the insertTime
+	 */
+	@Column(name = "insertTime")
+	public Timestamp getInsertTime() {
+		return insertTime;
+	}
+
+	/**
+	 * @param insertTime the insertTime to set
+	 */
+	public void setInsertTime(Timestamp insertTime) {
+		this.insertTime = insertTime;
+	}
+
+	/**
+	 * @return the updateUserId
+	 */
+	@Column(name = "updateUserId")
+	public Long getUpdateUserId() {
+		return updateUserId;
+	}
+
+	/**
+	 * @param updateUserId the updateUserId to set
+	 */
+	public void setUpdateUserId(Long updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+
+	/**
+	 * @return the updateTime
+	 */
+	@Column(name = "updateTime")
+	public Timestamp getUpdateTime() {
+		return updateTime;
+	}
+
+	/**
+	 * @param updateTime the updateTime to set
+	 */
+	public void setUpdateTime(Timestamp updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	/**
+	 * @return the deleteFlag
+	 */
+	@Column(name = "deleteFlag")
+	public Boolean getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	/**
+	 * @param deleteFlag the deleteFlag to set
+	 */
+	public void setDeleteFlag(Boolean deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+
+	/**
+	 * @return the version
+	 */
+	@Version
+	@Column(name = "version")
+	public Integer getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version the version to set
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+}

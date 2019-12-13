@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>I-Solver</title>
+
+<!-- Tell the browser to be responsive to screen width -->
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{/css/iview/iview.css}" rel="stylesheet" />
+<link th:href="@{/css/common.css}" rel="stylesheet" />
+<link th:href="@{/css/modifyPerformance.css}" rel="stylesheet" />
+<!-- jQuery 3 -->
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/js/vue/vue.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/iview/iview.min.js}" type="text/javascript"></script>
+<!-- <script th:src="@{/js/layer/layer.js}" type="text/javascript"></script> -->
+<!-- Bootstrap 3.3.7 -->
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/common/common.js}"></script>
+<script th:src="@{/js/common/ajax.js}"></script>
+</head>
+<body>
+<div id="app" v-cloak>
+		<breadcrumb>
+			<breadcrumb-item to="/">Home</breadcrumb-item>
+			<breadcrumb-item>修改考勤</breadcrumb-item>
+		</breadcrumb>
+		<div class="form-box">
+			<i-form :model="formItem" :label-width="125">
+				<row>
+					<i-col span="8">
+						<form-item label="姓名:"><label v-model="">{{formItem.name}}({{formItem.workId}}) {{formItem.org}}/{{formItem.depart}}</label></form-item>
+					</i-col>
+					<i-col span="8">
+						<form-item label="考勤日期:"><label v-model="">{{formItem.date}}({{formItem.week}})</label></form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<form-item label="休日：">
+            				<checkbox v-model="formItem.rest"></checkbox>
+       				 	</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<form-item label="勤务起止时间:" prop="performanceTime">
+							<time-picker format="HH:mm" :steps="[1, 30, 1]" type="timerange" placement="bottom-end" placeholder="请选择时间段" v-model="formItem.performanceTime"></time-picker>
+						</form-item>
+					</i-col>
+					<i-col span="8">
+						<form-item label="打卡起止时间:" prop="workTime">
+							<time-picker format="HH:mm" :steps="[1, 30, 1]" type="timerange" placement="bottom-end" placeholder="请选择时间段" v-model="formItem.workTime"></time-picker>
+						</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<form-item label="旷工:" prop="unusualAttendance">
+							<i-input v-model="formItem.unusualAttendance" placeholder="请输入旷工时间"></i-input><span class="form-info">小时</span>
+						</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<form-item label="加班:" prop="overtime">
+							<i-input v-model="formItem.overtime" placeholder="请输入加班时间"></i-input><span class="form-info">小时</span>
+						</form-item>
+					</i-col>
+					<i-col span="8">
+						<form-item label="加班项目ID：" prop="overtimeProject">
+							<i-input v-model="formItem.overtimeProject" placeholder="请输入加班项目ID"></i-input>
+						</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<form-item label="早加班:" prop="earlyOvertime">
+							<i-input v-model="formItem.earlyOvertime" placeholder="请输入早加班时间"></i-input><span class="form-info">小时</span>
+						</form-item>
+					</i-col>
+					<i-col span="8">
+						<form-item label="早加班项目ID：" prop="earlyOvertimeProject">
+							<i-input v-model="formItem.earlyOvertimeProject" placeholder="请输入早加班项目ID"></i-input>
+						</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="12">
+						<form-item label="非正常考勤类型:" prop="type">
+							<radio-group v-model="formItem.type">
+                				<radio label="1">迟到/早退</radio>
+                				<radio label="2">忘打卡</radio>
+                				<radio label="3">忘带卡</radio>
+                				<radio label="4">地铁故障</radio>
+            				</radio-group>
+						</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="6">
+						<form-item label="缺勤:" prop="earlyOvertime">
+							<i-input v-model="formItem.earlyOvertime" placeholder="请输入缺勤时间"></i-input><span class="form-info">小时</span>
+						</form-item>
+					</i-col>
+					<i-col span="6">
+						<form-item label="事假：" prop="earlyOvertimeProject">
+							<i-input v-model="formItem.earlyOvertimeProject" placeholder="请输入事假请假时间"></i-input><span class="form-info">小时</span>
+						</form-item>
+					</i-col>
+					<i-col span="6">
+						<form-item label="病假:" prop="earlyOvertime">
+							<i-input v-model="formItem.earlyOvertime" placeholder="请输入病假时间"></i-input><span class="form-info">小时</span>
+						</form-item>
+					</i-col>
+					<i-col span="6">
+						<form-item label="带薪假：" prop="earlyOvertimeProject">
+							<i-input v-model="formItem.earlyOvertimeProject" placeholder="请输入带薪假时间"></i-input><span class="form-info">小时</span>
+						</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<form-item label="外出公务:" prop="earlyOvertime">
+							<i-input v-model="formItem.earlyOvertime" placeholder="请输入外出公务时间"></i-input>
+						</form-item>
+					</i-col>
+				</row>
+				<row>
+					<i-col span="8">
+						<form-item label="备注:" prop="earlyOvertime">
+							<i-input v-model="formItem.earlyOvertime" placeholder="请输入备注"></i-input>
+						</form-item>
+					</i-col>
+				</row>
+				<i-button type="primary" @click="submitApplication('formItem')">申请</i-button>
+			</i-form>
+		</div>
+		<row>
+        	<i-col>
+            	<card>
+                	<p slot="title">注意事项</p>
+                	<p>1. 勤务时间修改后，当天的请假时间、加班时间是不会重新计算的，情人工确认。</p>
+                	<p>2. 可以在这个画面设定每个人的休日情况，但目前尚不能和申请流程关联，仅仅在计算出勤率时起作用。</p>
+                	<p>3. 所谓早加班是指加班时间在0点到9点间的加班，用于填补通宵加班时，少算的那部分。</p>
+                	<p>4. 所有数据都可以擦除。但添加数据必须是有过申请才行。比如：加班就必须有加班申请等。</p>
+            	</card>
+        	</i-col>
+    	</row>
+</div>
+</body>
+<!-- <input id="departdto" type="hidden" th:value="${departdto}" /> -->
+<script src="../js/system/modifyPerformance.js"></script>
+</html>

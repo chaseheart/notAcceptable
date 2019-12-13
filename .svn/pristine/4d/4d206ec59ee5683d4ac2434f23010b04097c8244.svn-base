@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+<script src="./js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="./css/iview/iview.css" />
+<link rel="stylesheet" href="./css/login.css" />
+<script src="./js/vue/vue.min.js"></script>
+<script src="./js/layer/layer.js"></script>
+<script src="./js/common/common.js"></script>
+<script src="./js/iview/iview.min.js"></script>
+
+</head>
+<body class="page">
+	<div id="app" v-cloak>
+		<div class="login-menu">
+			<template> <img src="./images/logo-login.png"> 
+			<i-form th:action="@{/login}" method="post" ref="userForm" :model="formUser" :rules="ruleValidate" :label-width="80"> 
+				<form-item label="用户名" prop="name">
+					 <i-input v-model="formUser.name" placeholder="请输入用户名" name="name"></i-input>
+				</form-item>
+				 <form-item label="密码" prop="pwd"> 
+				 	<i-input type="password" v-model="formUser.pwd" placeholder="请输入密码" name="pwd">
+				 </form-item> 
+				 <form-item>
+				  <i-button html-type="submit" type="primary">登录</i-button>
+				 </form-item>
+				</i-form>
+		  </template>
+		</div>
+	</div>
+	<script  th:src="@{/js/login/login.js}"></script>
+</body>
+</html>

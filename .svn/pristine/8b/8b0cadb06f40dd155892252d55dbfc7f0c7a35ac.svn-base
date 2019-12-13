@@ -1,0 +1,101 @@
+package com.isolver.service;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.Result;
+import com.isolver.dao.department.DepartmentRepository;
+import com.isolver.dao.organization.OrganizationRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dto.DepartDto;
+import com.isolver.dto.DepartOrgDto;
+import com.isolver.entity.Department;
+import com.isolver.entity.Organization;
+import com.isolver.entity.User;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/25
+ * @class DepartmentService.java
+ */
+@Service
+public class DepartmentService {
+	@Autowired
+	private DepartmentRepository departmentRepository;
+
+	@Autowired
+	private OrganizationRepository organizationRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	public List<DepartDto> getDepartList() {
+		return departmentRepository.findAllByDeleteflag(SysStaticConst.NOTDELE);
+	}
+
+	public List<DepartDto> getAimDepartList(Long id) {
+		Organization org = organizationRepository.findOne(id);
+		return departmentRepository.findAllByOrgAndDeleteflag(org, SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 取得所有部门
+	 * 
+	 * @return
+	 */
+	public List<DepartOrgDto> getDepartListWithOrg() {
+		return departmentRepository.findWithOrgByDeleteFlag(SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 新增一条部门
+	 * 
+	 * @return
+	 */
+	public Boolean setNewDepart(String departName, String orgId, Long userId) {
+		Department departModel = departmentRepository.findByDepartNameAndDeleteFlag(departName, SysStaticConst.NOTDELE);
+		Organization org = organizationRepository.findByIdAndDeleteFlag(Long.valueOf(orgId), SysStaticConst.NOTDELE);
+		if (departModel != null || org == null) {
+			return false;
+		}
+		Timestamp tm = Dateutil.getTimestamp();
+		departModel = new Department();
+		departModel.setDepartName(departName);
+		departModel.setOrg(org);
+		departModel.setInsertUserId(userId);
+		departModel.setInsertTime(tm);
+		departModel.setUpdateUserId(userId);
+		departModel.setUpdateTime(tm);
+		departModel.setDeleteFlag(SysStaticConst.NOTDELE);
+		departmentRepository.saveAndFlush(departModel);
+		return true;
+	}
+
+	/**
+	 * 删除一条部门
+	 * 
+	 * @return
+	 */
+	public Result<Object> deleteDepart(Long departId, Long userId) {
+		Department departModel = departmentRepository.findOne(departId);
+		List<User> userList = userRepository.findByDepartAndDeleteFlag(departModel, SysStaticConst.NOTDELE);
+		// 如果该组织下没有人员则可删
+		if (userList.size() == 0) {
+			Department departEntity = new Department();
+			BeanUtils.copyProperties(departModel, departEntity);
+			departEntity.setDeleteFlag(SysStaticConst.ISDELE);
+			departEntity.setUpdateUserId(userId);
+			departEntity.setUpdateTime(Dateutil.getTimestamp());
+			departmentRepository.saveAndFlush(departEntity);
+			return new Result<Object>(SysStatusCodeConst.SUCCESS);
+		}
+		return new Result<Object>(SysStatusCodeConst.DBERROR);
+	}
+}

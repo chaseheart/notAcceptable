@@ -1,0 +1,129 @@
+package com.isolver.dao.oaFlowStep.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+import org.springframework.data.repository.query.Param;
+
+import com.isolver.dao.oaFlowStep.OaFlowStepRepositoryCustom;
+import com.isolver.dto.SysUserDto;
+import com.isolver.entity.OaFlowStep;
+import com.isolver.entity.Role;
+
+/**
+ * ·步骤-角色层级对应更新 查询
+ * 
+ * @author IS1907011
+ * @date 2019/12/03
+ * @class OaFlowStepRepository.java
+ */
+public class OaFlowStepRepositoryImpl implements OaFlowStepRepositoryCustom {
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	/**
+	 * ·检索申请审批人(下一步审批人)
+	 * 
+	 * @param roleId    本人角色Id
+	 * @param flowId   申请流程类型(流程id)
+	 * @param departId 审批者部门id
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<SysUserDto> getNextStepUserList(Role role, Long flowId, Long departId) {
+		List<SysUserDto> userList = new ArrayList<>();
+		String sql = " SELECT" //
+				+ "  CONCAT(a.id, '') as id," //
+				+ "  CONCAT(a.work_id, '') as workId," //
+				+ "  CONCAT(a.username, '') as username,"//
+				+ "  CONCAT(d.org, '') as org,"//
+				+ "  CONCAT(a.depart, '') as depart,"//
+				+ "  CONCAT(a.first_char,'') as firstChart"//
+				+ "  FROM user a "//
+				+ "      LEFT JOIN role R on a.role = R.id "//
+				+ "      LEFT JOIN department d on a.depart = d.id "//
+				+ "  WHERE R.id IN ("//
+				+ "      SELECT RO.role_id "
+				+ "      FROM oa_flow_step RO "//
+				+ "      WHERE RO.flow_state IN ("//
+				+ "			SELECT O.flow_state  "
+				+ "			FROM oa_flow_step O "
+				+ "			WHERE O.flow_state = ("
+				+ "			SELECT COALESCE( ("
+				+ "				SELECT OFS.flow_state "
+				+ "				FROM oa_flow_step OFS "
+				+ "				WHERE OFS.role_id = :roleId "
+				+ "					AND OFS.flow = :flowId ), :startStep "
+				+ "				) + 1 "
+				+ "			) "
+				+ "			AND O.flow = :flowId "
+				+ "		) "
+				+ "		AND RO.flow = :flowId "
+				+ "	)";
+
+		if (departId != null) {
+			sql += "  AND a.depart = :departId";//
+		}
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("roleId", role.getId());
+		query.setParameter("flowId", flowId);
+		//考勤流程如果为管理部,从第二部启动
+		if(role.getIsManager() == true && flowId == 1L) {
+			query.setParameter("startStep", 2);
+		}else {
+			query.setParameter("startStep", 1);
+		}
+		if (departId != null) {
+			query.setParameter("departId", departId);
+		}
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(SysUserDto.class));
+		userList = query.getResultList();
+		return userList;
+	}
+	/**
+	 * 查找本角色之后流程步骤的角色层级对应关系
+	 * 取第一个即为下一步
+	 * @param role	 本角色
+	 * @param flowId 流程定义id
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Integer> getNextStepLevel(Role role, Long flowId){
+		List<Integer> stepList = new ArrayList<>();
+		String sql = " 	SELECT RO.flow_state" //
+				+ "      FROM oa_flow_step RO "//
+				+ "      WHERE RO.flow_state IN ("//
+				+ "			SELECT O.flow_state  "
+				+ "			FROM oa_flow_step O "
+				+ "			WHERE O.flow_state = ("
+				+ "			SELECT COALESCE( ("
+				+ "				SELECT OFS.flow_state "
+				+ "				FROM oa_flow_step OFS "
+				+ "				WHERE OFS.role_id = :roleId "
+				+ "					AND OFS.flow = :flowId ), :startStep "
+				+ "				) + 1 "
+				+ "			) "
+				+ "			AND O.flow = :flowId "
+				+ "		) "
+				+ "		AND RO.flow = :flowId ORDER BY RO.flow_state";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("roleId", role.getId());
+		query.setParameter("flowId", flowId);
+		//考勤流程如果为管理部,从第二部启动
+		if(role.getIsManager() == true && flowId == 1L) {
+			query.setParameter("startStep", 2);
+		}else {
+			query.setParameter("startStep", 1);
+		}
+		query.unwrap(SQLQuery.class);
+		stepList = query.getResultList();
+		return stepList;
+	}
+}

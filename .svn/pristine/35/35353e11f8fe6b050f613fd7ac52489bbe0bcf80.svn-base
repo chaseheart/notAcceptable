@@ -1,0 +1,114 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		resultTable : [ {
+			title : 'ID',
+			key : 'id',
+			className : 'table-col-5'
+		}, {
+			title : '组织名称',
+			key : 'orgName',
+			className : 'table-col-5'
+		}, {
+			title : '操作',
+			key : 'action',
+			align:'center',
+			className : 'table-col-5',
+			render: (h, params) => {
+                return h('div', [
+                    h('Button', {
+                        props: {
+                            type: 'primary',
+                        },
+                        style: {
+                            marginRight: '5px'
+                        },
+                        on: {
+                            click: () => {
+                            	eval(window.top.vm.showOrgModal)('vm.updateOrg',params.row.id,params.row.orgName);
+                            }
+                        }
+                    }, '修改'),
+                    h('Button', {
+                        props: {
+                            type: 'error',
+                        },
+                        on: {
+                            click: () => {
+                            	window.top.vm.modal_delete_confirm = true;
+                            	window.top.vm.currentPage = 'organization';
+                            }
+                        }
+                    }, '删除')
+                ]);
+            }
+		} ],
+		resultData : [],
+		orgList : [],
+		departList : [],
+	},
+	methods : {
+		getOrg : function() {
+			let orgData = $("#orgdto").val() != '' ? JSON.parse($("#orgdto")
+					.val()) : ''
+// console.log(orgData);
+			var resultData = [];
+			var resultItem = {};
+			if (orgData.length != 0) {
+				for ( let i in orgData) {
+					resultItem = {
+						id : orgData[i].id,
+						orgName : orgData[i].orgName,
+					}
+					resultData.push(resultItem);
+				}
+			}
+			this.resultData = resultData;
+		},
+		addNewOrg:function(){
+			eval(window.top.vm.showOrgModal)('vm.insertOrg');
+		},
+		updateOrg:function(orgName,id){
+			var that = this;
+			var data = {
+					'orgName' : orgName,
+					'id' : id
+				};
+				var url = "/orgManage/updateOrg";
+				var success = function(data) {
+					ajaxStatus = true;
+					if (data.data == 'success') {
+						window.location.reload();
+					}else{
+						window.top.vm.$Message.error('部门已存在');
+					}
+				};
+				var cache = false;
+				var alone = true;
+// post(url, data, success, cache, alone);
+				
+		},
+		insertOrg:function(orgName){
+			var that = this;
+			var data = {
+				'orgName' : orgName
+			};
+			var url = "/orgManage/setNewOrg";
+			var success = function(data) {
+				ajaxStatus = true;
+				if (data.data == 'success') {
+					window.location.reload();
+				}else{
+					window.top.vm.$Message.error('部门已存在');
+				}
+			};
+			var cache = false;
+			var alone = true;
+			post(url, data, success, cache, alone);
+			
+		},
+	},
+	created : function() {
+		this.getOrg();
+	}
+});

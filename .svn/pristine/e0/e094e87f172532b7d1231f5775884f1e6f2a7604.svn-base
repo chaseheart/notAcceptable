@@ -1,0 +1,30 @@
+package com.isolver.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.dao.authority.AuthorityRepository;
+import com.isolver.entity.Authority;
+
+/**
+ * ·菜单权限
+ * @date 2019/12/06
+ * @author IS1907011
+ *
+ */
+@Service
+public class AuthorityService {
+	@Autowired
+	private AuthorityRepository authorityRepository;
+	
+	/**
+	 * ·检索所有权限
+	 * @return
+	 */
+	public List<Authority> getAllAuthority() {
+		return authorityRepository.findByOrderByMenuCode();
+	}
+	
+}

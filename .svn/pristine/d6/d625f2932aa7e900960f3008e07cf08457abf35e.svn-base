@@ -1,0 +1,181 @@
+package com.isolver.dao.hiFlow.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+
+import com.isolver.dao.hiFlow.HiFlowRepositoryCustom;
+import com.isolver.dto.wechat.ApproveHistoryDto;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/08
+ * @class ServicePerformanceRepositoryImpl.java
+ */
+public class HiFlowRepositoryImpl implements HiFlowRepositoryCustom {
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	/**
+	 * 检索报销审核历史
+	 * 
+	 * @param user
+	 * @param deleteFlag
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ApproveHistoryDto> approveHistory(Long userId, Boolean deleteFlag) {
+		List<ApproveHistoryDto> spDto = new ArrayList<>();
+		String sql = " SELECT DISTINCT "
+				   + " CONCAT( a.ru_flow_id ,'') AS ruFlowId, "
+				   + " '报销申请' AS name "
+				   + " FROM claiming_expenses a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id "
+				   + " LEFT JOIN ru_flow c ON b.ru_flow_id = c.id "
+				   + " WHERE ( c.state = 6 OR c.state = 0 ) "
+				   + " AND b.ru_flow_id IN ( "
+				   + " SELECT "
+				   + " b.ru_flow_id "
+				   + " FROM claiming_expenses a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id and b.delete_flag = :deleteFlag "
+				   + " WHERE b.deal_people = :userId "
+				   + " and a.user <>2) "
+				   + " order by ruFlowId desc";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("userId", userId);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ApproveHistoryDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+	
+	/**
+	 * 检索非正常考勤审核历史
+	 * 
+	 * @param user
+	 * @param deleteFlag
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ApproveHistoryDto> approveHistoryUnusualAttendance(Long userId, Boolean deleteFlag) {
+		List<ApproveHistoryDto> spDto = new ArrayList<>();
+		String sql = " SELECT DISTINCT "
+				   + " CONCAT( a.ru_flow_id ,'') AS ruFlowId, "
+				   + " '非正常考勤申请' AS name "
+				   + " FROM unusual_attendance a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id "
+				   + " LEFT JOIN ru_flow c ON b.ru_flow_id = c.id "
+				   + " WHERE ( c.state = 4 OR c.state = 0 ) "
+				   + " AND b.ru_flow_id IN ( "
+				   + " SELECT "
+				   + " b.ru_flow_id "
+				   + " FROM unusual_attendance a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id and b.delete_flag = :deleteFlag "
+				   + " WHERE b.deal_people = :userId ) ";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("userId", userId);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ApproveHistoryDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+	
+	/**
+	 * 检索休假审核历史
+	 * 
+	 * @param user
+	 * @param deleteFlag
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ApproveHistoryDto> approveHistoryVacation(Long userId, Boolean deleteFlag) {
+		List<ApproveHistoryDto> spDto = new ArrayList<>();
+		String sql = " SELECT DISTINCT "
+				   + " CONCAT( a.ru_flow_id ,'') AS ruFlowId, "
+				   + " '休假申请' AS name "
+				   + " FROM vacation a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id "
+				   + " LEFT JOIN ru_flow c ON b.ru_flow_id = c.id "
+				   + " WHERE ( c.state = 4 OR c.state = 0 ) "
+				   + " AND b.ru_flow_id IN ( "
+				   + " SELECT "
+				   + " b.ru_flow_id "
+				   + " FROM vacation a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id and b.delete_flag = :deleteFlag "
+				   + " WHERE b.deal_people = :userId ) ";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("userId", userId);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ApproveHistoryDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+	
+	/**
+	 * 检索加班审核历史
+	 * 
+	 * @param user
+	 * @param deleteFlag
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ApproveHistoryDto> approveHistoryOvertime(Long userId, Boolean deleteFlag) {
+		List<ApproveHistoryDto> spDto = new ArrayList<>();
+		String sql = " SELECT DISTINCT "
+				   + " CONCAT( a.ru_flow_id ,'') AS ruFlowId, "
+				   + " '加班申请' AS name "
+				   + " FROM work_overtime a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id "
+				   + " LEFT JOIN ru_flow c ON b.ru_flow_id = c.id "
+				   + " WHERE ( c.state = 4 OR c.state = 0 ) "
+				   + " AND b.ru_flow_id IN ( "
+				   + " SELECT "
+				   + " b.ru_flow_id "
+				   + " FROM work_overtime a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id and b.delete_flag = :deleteFlag "
+				   + " WHERE b.deal_people = :userId ) ";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("userId", userId);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ApproveHistoryDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+	
+	/**
+	 * 检索外出公务审核历史
+	 * 
+	 * @param user
+	 * @param deleteFlag
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ApproveHistoryDto> approveHistoryOutBusiness(Long userId, Boolean deleteFlag) {
+		List<ApproveHistoryDto> spDto = new ArrayList<>();
+		String sql = " SELECT DISTINCT "
+				   + " CONCAT( a.ru_flow_id ,'') AS ruFlowId, "
+				   + " '外出公务申请' AS name "
+				   + " FROM out_business a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id "
+				   + " LEFT JOIN ru_flow c ON b.ru_flow_id = c.id "
+				   + " WHERE ( c.state = 4 OR c.state = 0 ) "
+				   + " AND b.ru_flow_id IN ( "
+				   + " SELECT "
+				   + " b.ru_flow_id "
+				   + " FROM out_business a "
+				   + " LEFT JOIN hi_flow b ON a.ru_flow_id = b.ru_flow_id and b.delete_flag = :deleteFlag "
+				   + " WHERE b.deal_people = :userId ) ";
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("userId", userId);
+		query.setParameter("deleteFlag", deleteFlag);
+		query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(ApproveHistoryDto.class));
+		spDto = query.getResultList();
+		return spDto;
+	}
+}

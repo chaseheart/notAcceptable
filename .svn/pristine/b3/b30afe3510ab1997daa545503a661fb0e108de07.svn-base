@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>I-Solver</title>
+
+<!-- Tell the browser to be responsive to screen width -->
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{/css/iview/iview.css}" rel="stylesheet" />
+<link th:href="@{/css/common.css}" rel="stylesheet" />
+<link th:href="@{/css/role.css}" rel="stylesheet" />
+<!-- jQuery 3 -->
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/js/vue/vue.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/iview/iview.min.js}" type="text/javascript"></script>
+<!-- <script th:src="@{/js/layer/layer.js}" type="text/javascript"></script> -->
+<!-- Bootstrap 3.3.7 -->
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/common/common.js}"></script>
+<script th:src="@{/js/common/ajax.js}"></script>
+</head>
+<body>
+<div id="app" v-cloak>
+		<breadcrumb>
+			<breadcrumb-item to="/">Home</breadcrumb-item>
+			<breadcrumb-item>权限设定</breadcrumb-item>
+		</breadcrumb>
+<!-- 		<div class="pageable">
+			<page :total="lineNum" show-elevator show-sizer :page-size-opts='[10, 20, 30]' @on-page-size-change="changeSize" @on-change="changePage"/>
+		</div> -->
+		<i-table size="small" :columns="resultTable" :data="resultData" class="result-table"></i-table>
+</div>
+<input id="roledto" type="hidden" th:value="${roledto}" />
+</body>
+<script src="../js/system/role.js"></script>
+</html>

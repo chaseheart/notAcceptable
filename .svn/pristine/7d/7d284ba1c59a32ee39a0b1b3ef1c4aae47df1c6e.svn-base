@@ -1,0 +1,198 @@
+package com.isolver.service.wechat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.claimingExpenses.ClaimingExpensesRepository;
+import com.isolver.dao.department.DepartmentRepository;
+import com.isolver.dao.fileInfo.FileInfoRepository;
+import com.isolver.dao.hiFlow.HiFlowRepository;
+import com.isolver.dao.oaFlowStep.OaFlowStepRepository;
+import com.isolver.dao.outBusiness.OutBusinessRepository;
+import com.isolver.dao.ruFlow.RuFlowRepository;
+import com.isolver.dao.unusualAttendance.UnusualAttendanceRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dao.vacation.VacationRepository;
+import com.isolver.dao.workOvertime.WorkOvertimeRepository;
+import com.isolver.dto.DepartDto;
+import com.isolver.dto.PendingDto;
+import com.isolver.dto.SysUserDto;
+import com.isolver.entity.ClaimingExpenses;
+import com.isolver.entity.Role;
+import com.isolver.entity.RuFlow;
+import com.isolver.entity.User;
+
+@Service
+public class VerifyService {
+
+	@Autowired
+	private ClaimingExpensesRepository claimingExpensesRepository;
+
+	@Autowired
+	private FileInfoRepository fileInfoRepository;
+
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private RuFlowRepository ruFlowRepository;
+	
+	@Autowired
+	private HiFlowRepository hiFlowRepository;
+
+	@Autowired
+	private OutBusinessRepository outBusinessRepository;
+	
+	@Autowired
+	private UnusualAttendanceRepository unusualAttendanceRepository;
+	
+	@Autowired
+	private VacationRepository vacationRepository;
+	
+	@Autowired
+	private WorkOvertimeRepository workOvertimeRepository;
+	
+	@Autowired
+	private OaFlowStepRepository oaFlowStepRepository;
+
+	/** 表名(file_info用) **/
+	private static final String TABLENAME = "claiming_expenses";
+
+	/**
+	 * 我的申请
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public List<ClaimingExpenses> getClaimingExpensesList(Long user) {
+		return claimingExpensesRepository.findByUserAndDeleteFlag(user, SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 申请历史
+	 * 
+	 * @param passwordForm passwordForm
+	 * @return
+	 */
+	public List<ClaimingExpenses> getClaimingExpensesHistoryList(Long user) {
+		return claimingExpensesRepository.findByUserAndDeleteFlagEnd(user, SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 申请详情
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Map<String, Object> getAppliocationDetail(Long id) {
+		Map<String, Object> resultMap = new HashMap<>();
+
+		RuFlow ruflow = ruFlowRepository.findOne(id);
+		Long claimingExpensesId = claimingExpensesRepository.findByRuFlow(ruflow).getId();
+
+		List<DepartDto> departDto = departmentRepository.findAllByDeleteflag(SysStaticConst.NOTDELE);
+		resultMap.put("history", hiFlowRepository.getByRuFlowId(id));
+		resultMap.put("depart", departDto);
+		resultMap.put("imgList", fileInfoRepository.findByTableNameAndTableIdAndDeleteFlag(TABLENAME,
+				claimingExpensesId.toString(), SysStaticConst.NOTDELE));
+		resultMap.put("formData",
+				claimingExpensesRepository.findByIdAndDeleteFlag(claimingExpensesId, SysStaticConst.NOTDELE));
+		return resultMap;
+	}
+
+	/**
+	   * 报销申请详情
+	 * @param id
+	 * @param userId
+	 * @return
+	 */
+	public Map<String, Object> getAppliocationDetailVerify(Long id, Long userId) {
+		Map<String, Object> resultMap = new HashMap<>();
+		User user = userRepository.findOne(userId);
+		RuFlow ruflow = ruFlowRepository.findOne(id);
+		Long claimingExpensesId = claimingExpensesRepository.findByRuFlow(ruflow).getId();
+		resultMap.put("history", hiFlowRepository.getByRuFlowId(id));
+		resultMap.put("user", oaFlowStepRepository.getNextStepUserList(user.getRole(),
+				ruflow.getFlowId().getId(), null));
+		resultMap.put("finalStepFlg", oaFlowStepRepository.getNextStepLevel(user.getRole(), ruflow.getFlowId().getId()));
+		resultMap.put("imgList", fileInfoRepository.findByTableNameAndTableIdAndDeleteFlag(TABLENAME,
+				claimingExpensesId.toString(), SysStaticConst.NOTDELE));
+		resultMap.put("formData",
+				claimingExpensesRepository.findByIdAndDeleteFlag(claimingExpensesId, SysStaticConst.NOTDELE));
+		return resultMap;
+	}
+
+	/**
+	 * 申请详情
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Map<String, Object> getAppliocationDetailView(Long ruFlowId, User user) {
+		Map<String, Object> resultMap = new HashMap<>();
+		List<DepartDto> departDto = departmentRepository.findAllByDeleteflag(SysStaticConst.NOTDELE);
+
+		RuFlow ruflow = ruFlowRepository.findOne(ruFlowId);
+		Long claimingExpensesId = claimingExpensesRepository.findByRuFlow(ruflow).getId();
+		// 。检索上级用户
+		List<SysUserDto> userDto = oaFlowStepRepository.getNextStepUserList(user.getRole(), ruflow.getFlowId().getId(), null);
+		resultMap.put("history", hiFlowRepository.getByRuFlowId(ruFlowId));
+		resultMap.put("depart", departDto);
+		resultMap.put("user", userDto);
+		resultMap.put("imgList", fileInfoRepository.findByTableNameAndTableIdAndDeleteFlag(TABLENAME,
+				claimingExpensesId.toString(), SysStaticConst.NOTDELE));
+		resultMap.put("formData",
+				claimingExpensesRepository.findByIdAndDeleteFlagEdit(claimingExpensesId, SysStaticConst.NOTDELE));
+		return resultMap;
+	}
+
+	/**
+	 * 。检索所有待审批报销申请 - 微信
+	 * 
+	 * @param dealPeople
+	 * @return
+	 */
+	public Map<String, Object> findAllPendingClaimingExpensesByUserWechat(Long dealPeople) {
+		Map<String, Object> map = new HashMap<>();
+		List<PendingDto> claimingExpensesList = claimingExpensesRepository.findApplicationDtoByUndoWechat(dealPeople,
+				SysStaticConst.NOTDELE);
+		map.put("claimingExpenses", claimingExpensesList);
+		return map;
+	}
+
+	/**
+	 * 考勤申请历史
+	 * 
+	 * @param passwordForm passwordForm
+	 * @return
+	 */
+	public Map<String, Object> getApplyHistoryList(User user) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("unusualAttendance",
+				unusualAttendanceRepository.findByUserAndDeleteFlagEnd(user, SysStaticConst.NOTDELE));
+		map.put("vacation", vacationRepository.findByUserAndDeleteFlagEnd(user, SysStaticConst.NOTDELE));
+		map.put("overtime", workOvertimeRepository.findByUserAndDeleteFlagEnd(user, SysStaticConst.NOTDELE));
+		map.put("outBuiness", outBusinessRepository.findByUserAndDeleteFlagEnd(user, SysStaticConst.NOTDELE));
+		return map;
+	}
+	
+	/**
+	 * 查找本角色之后流程步骤的角色层级对应关系
+	 * 取第一个即为下一步
+	 * @param role	 本角色
+	 * @param flowId 流程定义id
+	 * @return
+	 */
+	public List<Integer> getNextStepLevel(Role role, Long flowId){
+		return oaFlowStepRepository.getNextStepLevel(role, flowId);
+	}
+
+}

@@ -1,0 +1,75 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		nFlow : '',
+		nPeFlow : '',
+		reFlow : '',
+		allRole : '',
+		clickObj : '',
+		clickNo : ''
+	},
+	methods : {
+		getItem : function(list, stepId){
+			var result = [];
+			for(let i in list){
+				if(stepId == list[i].stepId){
+					result.push(parseInt(list[i].id));
+				}
+			}
+			return result;
+		},
+		getChecked : function(id, arr){
+			return jQuery.inArray(id, arr)!=-1;
+		},
+		stepRoleOperate : function(obj){
+			let formId = $(obj.currentTarget).parents(".form-box").attr("id");
+			var data = [];
+			var roleArr = this.allRole;
+			if(formId == "normalFlow" || formId == "reFlow" ){
+				let holder = $(obj.currentTarget).parent();
+				let stepId = holder.parent().find("p").index(holder) + 1;
+				let list;
+				if(formId == "normalFlow"){
+					list = this.getItem(this.nFlow, stepId);
+					this.clickObj = 'normalFlow';
+				}else{
+					list = this.getItem(this.reFlow, stepId);
+					this.clickObj = 'reFlow';
+				}
+				this.clickNo = stepId;
+				for(let i in roleArr){
+					let checked = this.getChecked(roleArr[i].id, list);
+					data.push({
+						id : roleArr[i].id,
+						roleName : roleArr[i].roleName,
+						_checked : checked
+					});
+				}
+			}else if(formId == "peFlow"){
+				let holder = $(obj.currentTarget).parent();
+				let stepId = holder.parent().find("p").index(holder);
+				let list = this.getItem(this.nPeFlow, stepId);
+				for(let i in roleArr){
+					let checked = this.getChecked(roleArr[i].id, list);
+					data.push({
+						id : roleArr[i].id,
+						roleName : roleArr[i].roleName,
+						_checked : checked
+					});
+				}
+				this.clickObj = 'peFlow';
+				this.clickNo = stepId;
+			}
+			window.top.vm.roleModalTableData = data;
+			window.top.vm.roleModal = true;
+		}
+	},
+	created : function() {
+		let initData = $("#data").val() != '' ? JSON.parse($("#data").val()) : '';
+		this.nFlow = initData.normalFlow;
+		this.nPeFlow = initData.normalPeFlow;
+		this.reFlow = initData.reFlow;
+		this.allRole = initData.allRole;
+		console.log(initData);
+	}
+});

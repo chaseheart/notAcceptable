@@ -1,0 +1,79 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		resultTable : [ {
+			title : 'ID',
+			key : 'id',
+			className : 'table-col-5'
+		}, {
+			title : '部门名称',
+			key : 'departName',
+			className : 'table-col-5'
+		}, {
+			title : '所属',
+			key : 'org',
+			className : 'table-col-5'
+		}, {
+			title : '操作',
+			key : 'action',
+			align:'center',
+			className : 'table-col-5',
+			render: (h, params) => {
+                return h('div', [
+                    h('Button', {
+                        props: {
+                            type: 'primary',
+                        },
+                        style: {
+                            marginRight: '5px'
+                        },
+                        on: {
+                            click: () => {
+                            	window.top.vm.departModal = true;
+                            }
+                        }
+                    }, '修改'),
+                    h('Button', {
+                        props: {
+                            type: 'error',
+                        },
+                        on: {
+                            click: () => {
+                            	window.top.vm.modal_delete_confirm = true;
+                            	window.top.vm.currentPage = 'department';
+                            }
+                        }
+                    }, '删除')
+                ]);
+            }
+		}  ],
+		resultData : [],
+		orgList : [],
+		departList : [],
+	},
+	methods : {
+		getDepart : function() {
+			let departdto = $("#departdto").val() != '' ? JSON.parse($(
+					"#departdto").val()) : ''
+			var resultData = [];
+			var resultItem = {};
+			if (departdto.length != 0) {
+				for ( let i in departdto) {
+					resultItem = {
+						id : departdto[i].id,
+						departName : departdto[i].departName,
+						org : departdto[i].orgName
+					}
+					resultData.push(resultItem);
+				}
+			}
+			this.resultData = resultData;
+		},
+		addNewDepart:function(){
+			window.top.vm.departModal = true;
+		}
+	},
+	created : function() {
+		this.getDepart();
+	}
+});

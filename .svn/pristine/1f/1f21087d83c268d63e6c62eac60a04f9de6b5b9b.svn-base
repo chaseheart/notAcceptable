@@ -1,0 +1,49 @@
+package com.isolver.dao.oaFlowStep;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.isolver.dto.OaFlowStepDto;
+import com.isolver.entity.OaFlowStep;
+
+
+
+/**
+ * 查询流程步骤与角色等级对应关系
+ * @author IS1907011
+ * @date 2019/12/03
+ * @class OaFlowStepRepository.java
+ */
+public interface OaFlowStepRepository extends JpaRepository<OaFlowStep,Long>, OaFlowStepRepositoryCustom{
+	
+	/**
+	 * 查找本角色之后流程步骤的角色层级对应关系
+	 * 取第一个即为下一步
+	 * @param level	 本角色层级
+	 * @param flowId 流程定义id
+	 * @return
+	 */
+	@Query("SELECT o FROM OaFlowStep o WHERE o.flow.id =:flowId AND o.flowState > (SELECT b.flowState From OaFlowStep b Where b.roleId.id =:roleId AND b.flow.id =:flowId) ORDER BY o.flowState")
+	public List<OaFlowStep> getNextStepLevel(@Param("roleId") Long roleId, @Param("flowId") Long flowId);
+	
+	/**
+	 * 根据流程类型检索流程步骤对应角色
+	 * @param flowId 流程类型
+	 * @param deleteFlag 消除flg
+	 * @return
+	 */
+	@Query("select new com.isolver.dto.OaFlowStepDto(CONCAT(a.roleId.id, '') as id, a.roleId.roleName as roleName, CONCAT(a.flowState, '') as stepId) from OaFlowStep a where a.flow.id = :flowId AND a.type = :type AND a.deleteFlag = :deleteFlag")
+	public List<OaFlowStepDto> getDataByFlowType(@Param("flowId") Long flowId, @Param("type") Integer type, @Param("deleteFlag") Boolean deleteFlag);
+	
+	/**
+	 * 根据流程类型检索流程步骤对应角色(报销用)
+	 * @param flowId 流程类型
+	 * @param deleteFlag 消除flg
+	 * @return
+	 */
+	@Query("select new com.isolver.dto.OaFlowStepDto(CONCAT(a.roleId.id, '') as id, a.roleId.roleName as roleName, CONCAT(a.flowState, '') as stepId) from OaFlowStep a where a.flow.id = :flowId AND a.deleteFlag = :deleteFlag")
+	public List<OaFlowStepDto> getDataByFlowTypeForRe(@Param("flowId") Long flowId, @Param("deleteFlag") Boolean deleteFlag);
+}

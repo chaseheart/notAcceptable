@@ -1,0 +1,15 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		
+	},
+	methods : {
+		test : function(){
+		},
+		stepRoleOperate:function(){
+			window.top.vm.roleModal = true;
+		}
+	},
+	created : function() {
+	}
+});

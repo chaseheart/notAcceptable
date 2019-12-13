@@ -1,0 +1,105 @@
+package com.isolver.controller.sys;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.isolver.common.config.AuthenticationFacade;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.JsonUtil;
+import com.isolver.common.util.Result;
+import com.isolver.dto.RoleDto;
+import com.isolver.entity.Role;
+import com.isolver.entity.User;
+import com.isolver.form.RoleForm;
+import com.isolver.service.AuthorityService;
+import com.isolver.service.RoleService;
+import com.isolver.service.UserService;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/29
+ * @class OrgManageController.java
+ */
+@RestController
+@RequestMapping(value = "/roleManage")
+public class RoleManageController {
+
+	@Autowired
+	private RoleService roleService;
+	
+	@Autowired
+	/** ·权限检索 **/
+	private AuthorityService authorityService;
+	
+	@Autowired
+	private UserService userService;
+	
+	/**
+	 * main初始化数据
+	 * 
+	 * @return
+	 */
+	@PreAuthorize("hasRole('ROLE_3-5')")
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView(String id) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("system/role");
+		modelAndView.addObject("menuList", JsonUtil.objectToJSON(authorityService.getAllAuthority()));
+		modelAndView.addObject("roledto", JsonUtil.objectToJSON(roleService.getAllRole()));
+		return modelAndView;
+	}
+	/**
+	 * ·获取角色列表
+	 * @return
+	 */
+	@RequestMapping(value = "/getAllRole", method = RequestMethod.GET)
+	public Result<List<Role>> getAllRole(){
+		return new Result<>(roleService.getAllRole());
+	}
+	
+	/**
+	 * ·检索角色信息和角色权限
+	 * @param roleId
+	 * @return
+	 */
+	@RequestMapping(value = "/searchRoleInfo", method = RequestMethod.POST)
+	public Result<RoleDto> searchRoleInfo(Long roleId){
+		return new Result<>(roleService.getRoleInfo(roleId));
+	}
+	
+	/**
+	 * ·删除角色（含有用户则失败：600）
+	 * @param roleId 角色id
+	 * @param version 版本
+	 * @return
+	 */
+	@RequestMapping(value = "/deleteRole", method = RequestMethod.POST)
+	public Result<Object> deleteRole(Long roleId,int version){
+		Long userId = AuthenticationFacade.getUserId();
+		Boolean result = roleService.deleteRole(roleId, version, userId);
+		if(result) {
+			return new Result<>(SysStatusCodeConst.SUCCESS);
+		}else {
+			return new Result<>(SysStatusCodeConst.FAILED);
+		}
+	}
+	
+	/**
+	 * ·新增修改角色 （form中id为空则为新增）
+	 * @param roleForm 角色表单
+	 * @return
+	 */
+	@RequestMapping(value = "/saveRole", method = RequestMethod.POST)
+	public Result<Object> saveRole(@ModelAttribute RoleForm roleForm){
+		Long userId = AuthenticationFacade.getUserId();
+		roleService.saveRole(roleForm, userId);
+		return new Result<>(SysStatusCodeConst.SUCCESS);
+	}
+}

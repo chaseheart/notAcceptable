@@ -1,0 +1,29 @@
+package com.isolver.controller.sys;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/29
+ * @class OrgManageController.java
+ */
+@RestController
+@RequestMapping(value = "/stepRole")
+public class StepRoleController {
+
+	/**
+	 * 通知页面初期化
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView() {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("system/stepRole");
+		return modelAndView;
+	}
+}

@@ -1,0 +1,18 @@
+package com.isolver.dao.oaFlowStep;
+
+import java.util.List;
+
+import com.isolver.dto.SysUserDto;
+
+public interface OaFlowStepRepositoryCustom {
+	
+	/**
+	 * ·检索申请审批人(下一步审批人)
+	 * @param roleId 本人角色
+	 * @param flowId 申请流程类型(流程id)
+	 * @param departId 审批者部门id
+	 * @return
+	 */
+	public List<SysUserDto> getNextStepUserList(Long roleId,Long flowId, Long departId);
+
+}

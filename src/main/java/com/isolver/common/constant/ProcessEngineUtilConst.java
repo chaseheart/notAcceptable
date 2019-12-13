@@ -10,8 +10,8 @@ public class ProcessEngineUtilConst {
 	/**
 	 * jdbc地址
 	 */
+//	public static String  JDBCURL= "jdbc:mysql://IS20190075PC:3306/oadb";
 	public static String  JDBCURL= "jdbc:mysql://192.168.100.220:3306/oa";
-//	public static String  JDBCURL= "jdbc:mysql://192.168.100.24:3306/oadb";
 	/**
 	 * jdbc引擎
 	 */
@@ -23,6 +23,7 @@ public class ProcessEngineUtilConst {
 	/**
 	 * 数据库密码
 	 */
+//	public static String  JDBCPASSWORD = "123456";
 	public static String  JDBCPASSWORD = "1qaz@WSX";
 	
 	

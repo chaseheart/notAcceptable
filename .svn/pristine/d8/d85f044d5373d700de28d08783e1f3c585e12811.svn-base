@@ -1,0 +1,87 @@
+package com.isolver.controller.sys;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.isolver.common.config.AuthenticationFacade;
+import com.isolver.common.constant.MessageConst;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.JsonUtil;
+import com.isolver.common.util.Result;
+import com.isolver.service.DepartmentService;
+import com.isolver.service.RoleService;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/29
+ * @class OrgManageController.java
+ */
+@RestController
+@RequestMapping(value = "/departManage")
+public class DepartManageController {
+
+	@Autowired
+	private DepartmentService departmentService;
+
+	@Autowired
+	private RoleService roleService;
+
+	/**
+	 * main初始化数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView(String id) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("system/depart");
+		modelAndView.addObject("departdto", JsonUtil.objectToJSON(departmentService.getDepartListWithOrg()));
+		return modelAndView;
+	}
+
+	/**
+	 * main初始化数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/searchAll", method = RequestMethod.POST)
+	public Result<Object> searchAll() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("depart", departmentService.getDepartListWithOrg());
+		map.put("role", roleService.getAllRole());
+		return new Result<>(map);
+	}
+
+	/**
+	 * 新增部门
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/setNewDepart", method = RequestMethod.POST)
+	public Result<Object> setNewDepart(String departName, String org) {
+		Long userId = AuthenticationFacade.getUserId();
+		if (departmentService.setNewDepart(departName, org, userId)) {
+			return new Result<>(SysStatusCodeConst.SUCCESS);
+		} else {
+			return new Result<>(SysStatusCodeConst.NODATA, MessageConst.USEREXISTED);
+		}
+
+	}
+
+	/**
+	 * 删除一条部门
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/deleteDepart", method = RequestMethod.POST)
+	public Result<Object> deleteDepart(Long departId) {
+		Long userId = AuthenticationFacade.getUserId();
+		return departmentService.deleteDepart(departId, userId);
+	}
+}

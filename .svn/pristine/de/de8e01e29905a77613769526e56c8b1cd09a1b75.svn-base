@@ -1,0 +1,48 @@
+package com.isolver.service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.oaFlowStep.OaFlowStepRepository;
+import com.isolver.dao.role.RoleRepository;
+
+/**
+ * ·配置步骤角色
+ * 
+ * @date 2019/12/06
+ * @author IS1907011
+ *
+ */
+@Service
+public class StepRoleService {
+
+	@Autowired
+	private OaFlowStepRepository oaFlowStepRepository;
+	
+	@Autowired
+	private RoleRepository rolepRepository;
+	
+	/** 。勤务流程类型id **/
+	private final static Long FLOWID = 1L;
+
+	/** 。报销流程类型id **/
+	private final static Long RFLOWID = 2L;
+
+	public Map<String, Object> init() {
+		Map<String, Object> initMap = new HashMap<>();
+		// 。获取勤务流程步骤角色对应
+		initMap.put("normalFlow", oaFlowStepRepository.getDataByFlowType(FLOWID, SysStaticConst.ISNOTMANAGEMENT, SysStaticConst.NOTDELE));
+		// 。获取人事勤务流程步骤角色对应
+		initMap.put("normalPeFlow", oaFlowStepRepository.getDataByFlowType(FLOWID, SysStaticConst.ISMANAGEMENT, SysStaticConst.NOTDELE));
+		// 。获取报销流程步骤角色对应
+		initMap.put("reFlow", oaFlowStepRepository.getDataByFlowTypeForRe(RFLOWID, SysStaticConst.NOTDELE));
+		// 。获取报销流程步骤角色对应
+		initMap.put("allRole", rolepRepository.findAll());
+		return initMap;
+	}
+
+}

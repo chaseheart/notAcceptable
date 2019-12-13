@@ -1,0 +1,67 @@
+package com.isolver.form;
+
+/**
+ * 
+ * @author IS1907011
+ *
+ */
+public class RoleForm {
+	/** id **/
+	private String id ;
+	/**	角色名 **/
+	private String roleName;
+	/** version **/
+	private String version;
+	/**	权限 **/
+	private String authority;
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+	/**
+	 * @return the roleName
+	 */
+	public String getRoleName() {
+		return roleName;
+	}
+	/**
+	 * @param roleName the roleName to set
+	 */
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+	/**
+	 * @return the version
+	 */
+	public String getVersion() {
+		return version;
+	}
+	/**
+	 * @param version the version to set
+	 */
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	/**
+	 * @return the authority
+	 */
+	public String getAuthority() {
+		return authority;
+	}
+	/**
+	 * @param authority the authority to set
+	 */
+	public void setAuthority(String authority) {
+		this.authority = authority;
+	}
+	
+	
+}

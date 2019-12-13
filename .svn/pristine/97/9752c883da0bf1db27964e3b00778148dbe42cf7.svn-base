@@ -1,0 +1,186 @@
+package com.isolver.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.isolver.common.config.AuthenticationFacade;
+import com.isolver.common.constant.HtmlConst;
+import com.isolver.common.util.JsonUtil;
+import com.isolver.common.util.Result;
+import com.isolver.dto.OrgDto;
+import com.isolver.dto.ServicePerformanceDto;
+import com.isolver.dto.UserDto;
+import com.isolver.entity.OaFlowStep;
+import com.isolver.entity.User;
+import com.isolver.form.HolidayForm;
+import com.isolver.service.HolidayService;
+import com.isolver.service.OrganizationService;
+import com.isolver.service.ServicePerformanceService;
+import com.isolver.service.UserService;
+
+@RestController
+@RequestMapping(value = "/holiday")
+public class HolidayController {
+
+	private static final Logger logger = LoggerFactory.getLogger(HolidayController.class);
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private ServicePerformanceService servicePerformanceService;
+
+	@Autowired
+	private OrganizationService organizationService;
+
+	@Autowired
+	private HolidayService holidayService;
+
+	/**
+	 * 休假初始化数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView(String id) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("holiday");
+		Long userId = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(userId);
+		// ·该角色是否有后续步骤
+		List<Integer> rolelist = userService.getNextUser(user);
+		modelAndView.addObject("username", JsonUtil.getJsonArray(new UserDto(user,rolelist.size() == 0)));
+		List<OrgDto> orgdto = organizationService.findAllOrg();
+		modelAndView.addObject("orgdto", JsonUtil.getJsonArray(orgdto));
+		if (!"undefined".equals(id) && null != id) {
+			Long ids = Long.parseLong(id);
+			ServicePerformanceDto servicePerformanceDto = servicePerformanceService.findOneServicePerformance(ids);
+			modelAndView.addObject("servicePerformance", JsonUtil.getJsonArray(servicePerformanceDto));
+		}
+		modelAndView.addObject("html", HtmlConst.SUBMMITBUTTON);
+		modelAndView.addObject("type", HtmlConst.APPLICATION);
+		return modelAndView;
+
+	}
+
+	/**
+	 * 休假初始化数据（审批页面）
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pending", method = RequestMethod.GET)
+	public ModelAndView indexView2(String ruFlowId) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("holiday");
+		Long userId = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(userId);
+		// ·该角色是否有后续步骤
+		List<Integer> rolelist = userService.getNextUser(user);
+		modelAndView.addObject("username", JsonUtil.getJsonArray(new UserDto(user,rolelist.size() == 0)));
+		List<OrgDto> orgdto = organizationService.findAllOrg();
+		modelAndView.addObject("orgdto", JsonUtil.getJsonArray(orgdto));
+		if (!"undefined".equals(ruFlowId) && null != ruFlowId) {
+			Long ids = Long.parseLong(ruFlowId);
+			Map<String, Object> map = servicePerformanceService.getServicePerformaneAndVacationForm(ids);
+			modelAndView.addObject("vacation", JsonUtil.objectToJSON(map.get("vacationDto")));
+			modelAndView.addObject("servicePerformance", JsonUtil.getJsonArray(map.get("servicePerformanceDto")));
+			modelAndView.addObject("ruFlowId", ruFlowId);
+		}
+		modelAndView.addObject("html", HtmlConst.PENDINGBUTTON);
+		modelAndView.addObject("type", HtmlConst.PENDING);
+		return modelAndView;
+
+	}
+	
+	/**
+	 * 休假初始化数据（再申请页面）
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/mine", method = RequestMethod.GET)
+	public ModelAndView indexViewMine(String ruFlowId,String type) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("holiday");
+		Long userId = AuthenticationFacade.getUserId();
+		User user = userService.getUserById(userId);
+		// ·该角色是否有后续步骤
+		List<Integer> rolelist = userService.getNextUser(user);
+		modelAndView.addObject("username", JsonUtil.getJsonArray(new UserDto(user,rolelist.size() == 0)));
+		List<OrgDto> orgdto = organizationService.findAllOrg();
+		modelAndView.addObject("orgdto", JsonUtil.getJsonArray(orgdto));
+		if (!"undefined".equals(ruFlowId) && null != ruFlowId) {
+			Long ids = Long.parseLong(ruFlowId);
+			Map<String, Object> map = servicePerformanceService.getServicePerformaneAndVacationForm(ids);
+			modelAndView.addObject("vacation", JsonUtil.objectToJSON(map.get("vacationDto")));
+			modelAndView.addObject("servicePerformance", JsonUtil.getJsonArray(map.get("servicePerformanceDto")));
+			modelAndView.addObject("ruFlowId", ruFlowId);
+		}
+		if(type.equals(HtmlConst.APPLICATIONAGAIN)) {
+			modelAndView.addObject("html", HtmlConst.SUBMMITAGAINBUTTON);
+			modelAndView.addObject("type", HtmlConst.APPLICATIONAGAIN);
+		}
+		return modelAndView;
+
+	}
+
+	/**
+	 * 休假提交申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/application/{model}/{ruFlowId}", method = RequestMethod.POST)
+	public Result<Object> Application(@ModelAttribute HolidayForm holidayForm,
+			@PathVariable String model, @PathVariable String ruFlowId) {
+		try {
+			Long id = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(id);
+			if(model.equals(HtmlConst.APPLICATIONAGAIN)) {
+				holidayService.restartFlow(holidayForm, user, Long.valueOf(ruFlowId));
+			}else {
+				holidayService.startFlow(holidayForm, user);
+			}
+			
+			return new Result<>();
+		} catch (Exception e) {
+			logger.error("提交申请失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 休假审批
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/dealApplication", method = RequestMethod.POST)
+	public Result<Object> dealApplication(String assigner, String ruFlow) {
+		try {
+			Long id = AuthenticationFacade.getUserId();
+			User user = userService.getUserById(id);
+			Long ruFlowId = Long.valueOf(ruFlow);
+			if (user.getRole().getLevel() != 3) {
+				Long assignerId = Long.valueOf(assigner);
+				User assignerUser = userService.getUserById(assignerId);
+
+				holidayService.nextStep(assignerUser, ruFlowId, user);
+			} else {
+				holidayService.nextStep(user, ruFlowId, user);
+			}
+
+			return new Result<>();
+		} catch (Exception e) {
+			logger.error("提交申请失败", e);
+			throw new RuntimeException(e);
+		}
+	}
+}

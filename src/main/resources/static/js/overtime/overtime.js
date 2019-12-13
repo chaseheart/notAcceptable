@@ -16,9 +16,9 @@ var vm = new Vue({
 		disabled_flg:false,
 		formValidate : {
 			date : [ {
+				validator: validateDate,
 				required : true,
 				type : 'date',
-				message : '请选择加班日期',
 				trigger : 'change'
 			} ],
 			time : [ {
@@ -73,9 +73,6 @@ var vm = new Vue({
 	methods : {
 		getFormItem : function(servicePerformance) {
 			let userData = JSON.parse($("#username").val())[0];
-			if(userData.role==3){
-				$("#appDepart").remove();
-			}
 			let day = this.formItem.date;
 			let status = '暂无打卡记录';
 			if(servicePerformance!=''){
@@ -85,7 +82,7 @@ var vm = new Vue({
 			}
 			let formItem = {}
 			if($("#overTime").val() != undefined && $("#overTime").val() != ''){
-				let overTime = JSON.parse($("#overTime").val())[0];
+				let overTime = JSON.parse($("#overTime").val());
 				formItem = {
 						workId : overTime.userWorkId,
 						user : overTime.username,
@@ -267,7 +264,7 @@ var vm = new Vue({
 					var success = function(data) { 
 						ajaxStatus=true;         
 						window.top.vm.$Message.success('提交申请成功');
-						window.location="/pending/index"
+						window.location="/pending/index";
 					};
 					var cache = false;
 					var alone = true;
@@ -285,6 +282,13 @@ var vm = new Vue({
 			servicePerformance = JSON.parse($("#servicePerformance").val())[0];
 		}
 		this.getFormItem(servicePerformance);
-		this.getTypeAndHtml($("#type").val(),$("#html").val());
+		let userData = JSON.parse($("#username").val())[0];
+		if(userData.isEnd == true){
+			$("#appDepart").remove();
+		}
+		//初次申请，没有后续申请者，不允许申请
+		if(!(userData.isEnd == true && $("#type").val() == 'write')){
+			this.getTypeAndHtml($("#type").val(),$("#html").val());
+		}
 	}
 });

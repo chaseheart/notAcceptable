@@ -1,0 +1,148 @@
+package com.isolver.service;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.dao.role.RoleRepository;
+import com.isolver.dao.roleAuthority.RoleAuthorityRepository;
+import com.isolver.dao.user.UserRepository;
+import com.isolver.dto.AuthorityDto;
+import com.isolver.dto.RoleDto;
+import com.isolver.dto.UserDto;
+import com.isolver.entity.Authority;
+import com.isolver.entity.Role;
+import com.isolver.entity.RoleAuthority;
+import com.isolver.form.RoleForm;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/25
+ * @class RoleService.java
+ */
+@Service
+public class RoleService {
+
+	@Autowired
+	private RoleRepository roleRepository;
+	
+	@Autowired
+	/** ·检索角色权限  **/
+	private RoleAuthorityRepository roleAuthorityRepository;
+	
+	@Autowired
+	/** ·角色检索用户  **/
+	private UserRepository userRepository;
+	/**
+	 * 获取所有角色
+	 * @return
+	 */
+	public List<Role> getAllRole() {
+		return roleRepository.findByDeleteFlag(SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 检索角色信息和角色权限
+	 * @param roleId 角色id
+	 * @return
+	 */
+	public RoleDto getRoleInfo(Long roleId) {
+		Role role = roleRepository.findOne(roleId);
+		List<RoleAuthority> roleAuthorityList = roleAuthorityRepository.findByRole(role);
+		List<AuthorityDto> authorityList = new ArrayList<>();
+		for(RoleAuthority roleAuthority : roleAuthorityList) {
+			authorityList.add(new AuthorityDto(roleAuthority)) ;
+		}
+		
+		return new RoleDto(role,authorityList);
+	}
+	
+	/**
+	 *· 删除角色（如果含有用户，return false）
+	 * @param roleId 角色id
+	 * @param version 版本
+	 * @return
+	 */
+	public Boolean deleteRole( Long roleId, int version, Long userId) {
+		
+		Role role = roleRepository.findOne(roleId);
+		List<UserDto> userList =  userRepository.findByRoleDeleteFlag(role,SysStaticConst.NOTDELE);
+		// ·含有用户时
+		if(userList.size() > 0) {
+			return false;
+		}else {
+			Timestamp tm = Dateutil.getTimestamp();
+			Role entity = new Role();
+			BeanUtils.copyProperties(role, entity);
+			entity.setUpdateUserId(userId);
+			entity.setUpdateTime(tm);
+			entity.setVersion(version);
+			entity.setDeleteFlag(SysStaticConst.ISDELE);
+			roleRepository.saveAndFlush(entity);
+			return true;
+		}
+	}
+	
+	/**
+	 * ·新增修改角色 （form中id为空则为新增）
+	 * @param roleForm 角色表单
+	 * @param userId 修改人id
+	 */
+	public void saveRole(RoleForm roleForm , Long userId) {
+		Role entity = new Role();
+		Timestamp tm = Dateutil.getTimestamp();
+		// id为空时
+		if(!StringUtils.isBlank(roleForm.getId())) {
+			Role role = roleRepository.findOne(Long.parseLong(roleForm.getId()));
+			BeanUtils.copyProperties(role, entity);
+			entity.setVersion(Integer.parseInt(roleForm.getVersion()));
+		}else {
+			entity.setInsertUserId(userId);
+			entity.setInsertTime(tm);
+			entity.setDeleteFlag(SysStaticConst.NOTDELE);
+		}
+		entity.setUpdateUserId(userId);
+		entity.setUpdateTime(tm);
+		entity.setIsManager(Boolean.parseBoolean(roleForm.getIsManager()));
+		entity.setRoleName(roleForm.getRoleName());
+		Role resultEntity = roleRepository.saveAndFlush(entity);
+		// ·角色权限保存 （全删再增）
+		String [] authorityArray  = roleForm.getAuthority().split(SysStaticConst.COMMA);
+		List<RoleAuthority> roleAuthorityList = roleAuthorityRepository.findByRole(resultEntity);
+		roleAuthorityRepository.delete(roleAuthorityList);
+		List<RoleAuthority> newRoleAuthorityList = new ArrayList<>();
+		for (String authorityId : authorityArray) {
+			if(StringUtils.isBlank(authorityId)) {
+				continue;
+			}
+			Authority authority = new Authority();
+			authority.setId(Long.parseLong(authorityId));
+			authority.setVersion(1);
+			
+			RoleAuthority roleAuthority = new RoleAuthority();
+			// ·权限
+			roleAuthority.setAuthority(authority);
+			// ·角色
+			roleAuthority.setRole(resultEntity);
+
+			roleAuthority.setInsertUserId(userId);
+			roleAuthority.setInsertTime(tm);
+			roleAuthority.setUpdateUserId(userId);
+			roleAuthority.setUpdateTime(tm);
+			roleAuthority.setDeleteFlag(SysStaticConst.NOTDELE);
+			newRoleAuthorityList.add(roleAuthority);
+		}
+		if(newRoleAuthorityList.size() > 0) {
+			roleAuthorityRepository.save(newRoleAuthorityList);
+			roleAuthorityRepository.flush();
+		}
+		
+	}
+}

@@ -1,0 +1,13 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		
+	},
+	methods : {
+		test : function(){
+			alert(1);
+		}
+	},
+	created : function() {
+	}
+});

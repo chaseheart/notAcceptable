@@ -1,0 +1,55 @@
+package com.isolver.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.dao.role.RoleRepository;
+import com.isolver.dao.roleAuthority.RoleAuthorityRepository;
+import com.isolver.dto.AuthorityDto;
+import com.isolver.dto.RoleDto;
+import com.isolver.entity.Role;
+import com.isolver.entity.RoleAuthority;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/25
+ * @class RoleService.java
+ */
+@Service
+public class RoleService {
+
+	@Autowired
+	private RoleRepository roleRepository;
+	
+	@Autowired
+	/** ·检索角色权限  **/
+	private RoleAuthorityRepository roleAuthorityRepository;
+	
+	/**
+	 * 获取所有角色
+	 * @return
+	 */
+	public List<Role> getAllRole() {
+		return roleRepository.findByDeleteFlag(SysStaticConst.NOTDELE);
+	}
+
+	/**
+	 * 检索角色信息和角色权限
+	 * @param roleId 角色id
+	 * @return
+	 */
+	public RoleDto getRoleInfo(Long roleId) {
+		Role role = roleRepository.findOne(roleId);
+		List<RoleAuthority> roleAuthorityList = roleAuthorityRepository.findByRole(role);
+		List<AuthorityDto> authorityList = new ArrayList<>();
+		for(RoleAuthority roleAuthority : roleAuthorityList) {
+			authorityList.add(new AuthorityDto(roleAuthority)) ;
+		}
+		
+		return new RoleDto(role,authorityList);
+	}
+}

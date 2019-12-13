@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>无权限</title>
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<link rel="stylesheet" th:href="@{/css/iview/iview.css}" />
+<link rel="stylesheet" th:href="@{/css/common.css}" />
+<script th:src="@{/js/vue/vue.min.js}"></script>
+<script th:src="@{/js/layer/layer.js}"></script>
+<script th:src="@{/js/common/common.js}"></script>
+<script th:src="@{/js/iview/iview.min.js}"></script>
+</head>
+<body class="page">
+	<div class="image-box">
+		<img th:src="@{/images/no-role.png}" />
+		<div style="text-align: center; margin-bottom: 10px;">对不起，您没有权限</div>
+		<div id="app" v-cloak>
+			<i-button type="primary" @click="logout">返回首页</i-button>
+		</div>
+	</div>
+	<script>
+		var vm = new Vue({
+			el : '#app',
+			data : {},
+			methods : {
+				logout : function() {
+					top.window.location.href = "/logout";
+				}
+			},
+			created : function() {
+			}
+		});
+	</script>
+</body>
+</html>

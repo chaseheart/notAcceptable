@@ -1,0 +1,98 @@
+package com.isolver.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.isolver.common.constant.SysStaticConst;
+import com.isolver.common.constant.SysStatusCodeConst;
+import com.isolver.common.util.Dateutil;
+import com.isolver.common.util.Result;
+import com.isolver.dao.department.DepartmentRepository;
+import com.isolver.dao.organization.OrganizationRepository;
+import com.isolver.dto.DepartDto;
+import com.isolver.dto.OrgDto;
+import com.isolver.entity.Department;
+import com.isolver.entity.Organization;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/12
+ * @class OrganizationService.java
+ */
+@Service
+public class OrganizationService {
+	@Autowired
+	private OrganizationRepository organizationRepository;
+
+	@Autowired
+	private DepartmentRepository departmentRepository;
+
+	public List<OrgDto> findAllOrg() {
+
+		List<Organization> orgList = organizationRepository.findByDeleteFlag(SysStaticConst.NOTDELE);
+		List<OrgDto> orgdtoList = new ArrayList<>();
+		for (Organization o : orgList) {
+			List<DepartDto> departDto = departmentRepository.findAllByOrgAndDeleteflag(o, SysStaticConst.NOTDELE);
+			OrgDto orgDto = new OrgDto(o, departDto);
+			orgdtoList.add(orgDto);
+		}
+		return orgdtoList;
+	}
+
+	public Boolean setNewOrg(String orgName, Long userId) {
+		List<Organization> orgList = organizationRepository.findByOrgNameAndDeleteFlag(orgName, SysStaticConst.NOTDELE);
+		if (orgList.size() == 0) {
+			Organization org = new Organization();
+			org.setOrgName(orgName);
+			org.setInsertUserId(userId);
+			org.setInsertTime(Dateutil.getTimestamp());
+			org.setUpdateUserId(userId);
+			org.setUpdateTime(Dateutil.getTimestamp());
+			org.setDeleteFlag(SysStaticConst.NOTDELE);
+			organizationRepository.saveAndFlush(org);
+			return true;
+		}
+		return false;
+
+	}
+
+	public Boolean updateOrg(String orgName, Long userId, String orgId) {
+		List<Organization> orgList = organizationRepository.findByOrgNameAndDeleteFlag(orgName, SysStaticConst.NOTDELE);
+		if (orgList.size() == 0) {
+			Organization org = organizationRepository.findOne(Long.valueOf(orgId));
+			Organization entity = new Organization();
+			BeanUtils.copyProperties(org, entity);
+			entity.setOrgName(orgName);
+			entity.setUpdateUserId(userId);
+			entity.setUpdateTime(Dateutil.getTimestamp());
+			organizationRepository.saveAndFlush(org);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 删除一条组织
+	 * 
+	 * @return
+	 */
+	public Result<Object> deleteOrg(Long orgId, Long userId) {
+		Organization orgModel = organizationRepository.findOne(orgId);
+		List<Department> departList = departmentRepository.findByOrgAndDeleteFlag(orgModel, SysStaticConst.NOTDELE);
+		//如果组织下没有部门
+		if (departList.size() == 0) {
+			Organization orgEntity = new Organization();
+			BeanUtils.copyProperties(orgModel, orgEntity);
+			orgEntity.setDeleteFlag(SysStaticConst.ISDELE);
+			orgEntity.setUpdateUserId(userId);
+			orgEntity.setUpdateTime(Dateutil.getTimestamp());
+			organizationRepository.saveAndFlush(orgEntity);
+			return new Result<Object>(SysStatusCodeConst.SUCCESS);
+		}
+		return new Result<Object>(SysStatusCodeConst.DBERROR);
+	}
+}

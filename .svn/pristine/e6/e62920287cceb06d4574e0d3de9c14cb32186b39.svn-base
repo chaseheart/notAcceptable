@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>500</title>
+
+<script src="./js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="./css/iview/iview.css" />
+<link rel="stylesheet" href="./css/common.css" />
+<script src="./js/vue/vue.min.js"></script>
+<script src="./js/layer/layer.js"></script>
+<script src="./js/common/common.js"></script>
+<script src="./js/iview/iview.min.js"></script>
+</head>
+<body class="page">
+	<div class="image-box">
+		<img src="./images/500.png" />
+		<h1 style="text-align: center; margin-left: 0px;">500</h1>
+		<div style="text-align: center; margin-bottom: 10px;">抱歉，服务器出错了，请联系管理员</div>
+		<div id="app" v-cloak>
+			<i-button type="primary" @click="logout">返回首页</i-button>
+		</div>
+	</div>
+	<script>
+		var vm = new Vue({
+			el : '#app',
+			data : {},
+			methods : {
+				logout : function() {
+					top.window.location.href = "/logout";
+				}
+			},
+			created : function() {
+			}
+		});
+	</script>
+</body>
+</html>

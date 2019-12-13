@@ -1,0 +1,55 @@
+package com.isolver.controller.sys;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.isolver.common.util.JsonUtil;
+import com.isolver.common.util.Result;
+import com.isolver.dto.RoleDto;
+import com.isolver.service.AuthorityService;
+import com.isolver.service.RoleService;
+
+/**
+ * @author IS1907005
+ * @date 2019/11/29
+ * @class OrgManageController.java
+ */
+@RestController
+@RequestMapping(value = "/roleManage")
+public class RoleManageController {
+
+	@Autowired
+	private RoleService roleService;
+	
+	@Autowired
+	/** ·权限检索 **/
+	private AuthorityService authorityService;
+	
+	/**
+	 * main初始化数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView indexView(String id) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("system/role");
+		modelAndView.addObject("menuList", JsonUtil.objectToJSON(authorityService.getAllAuthority()));
+		modelAndView.addObject("roledto", JsonUtil.objectToJSON(roleService.getAllRole()));
+		return modelAndView;
+	}
+	
+	/**
+	 * ·检索角色信息和角色权限
+	 * @param roleId
+	 * @return
+	 */
+	@RequestMapping(value = "/searchRoleInfo", method = RequestMethod.POST)
+	public Result<RoleDto> searchRoleInfo(Long roleId){
+		return new Result<>(roleService.getRoleInfo(roleId));
+	}
+	
+}

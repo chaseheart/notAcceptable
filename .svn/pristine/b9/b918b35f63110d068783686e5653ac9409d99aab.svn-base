@@ -1,0 +1,113 @@
+var vm = new Vue({
+	el : '#app',
+	data : {
+		formItem:{
+			content:'',
+			type:''
+		},
+		resultTable : [ {
+			title : 'ID',
+			key : 'id',
+			className : 'table-col-5'
+		}, {
+			title : '通知标题',
+			key : 'title',
+			className : 'table-col-5'
+		}, {
+			title : '通知类型', //1:新闻 2:通知 3:贴士
+			key : 'type',
+			className : 'table-col-5'
+		}, {
+			title : '操作',
+			key : 'action',
+			align:'center',
+			className : 'table-col-5',
+			render: (h, params) => {
+                return h('div', [
+                	h('Button', {
+                        style: {
+                            marginRight: '5px'
+                        },
+                        on: {
+                            click: () => {
+                            	window.location.href = "/newsManage/detail?id='" + params.rows.id + "'";
+                            }
+                        }
+                    }, '详情'),
+                    h('Button', {
+                        props: {
+                            type: 'primary',
+                        },
+                        style: {
+                            marginRight: '5px'
+                        },
+                        on: {
+                            click: () => {
+//                            	window.top.vm.departModal = true;
+                            }
+                        }
+                    }, '修改'),
+                    h('Button', {
+                        props: {
+                            type: 'error',
+                        },
+                        on: {
+                            click: () => {
+//                            	window.top.vm.modal_delete_confirm = true;
+//                            	window.top.vm.currentPage = 'department';
+                            }
+                        }
+                    }, '删除')
+                ]);
+            }
+		}  ],
+		resultData : [],
+		orgList : [],
+		departList : [],
+	},
+	methods : {
+		dealData : function(data){
+			var resultData = [];
+			var resultItem = {};
+			if (data.length != 0) {
+				for(let i in data){
+					resultItem = {
+							id : data[i].id,
+							title : data[i].title,
+							type : data[i].type
+					};
+					resultData.push(resultItem);
+				}
+			}
+			return resultData;
+		},
+		// 。初期化
+		getNotice : function(){
+			let data = $("#data").val() != '' ? JSON.parse($("#data").val()) : '';
+			// 。处理初期化数据
+			this.resultData = this.dealData(data);
+		},
+		
+		// 。检索 
+		searchData : function(){
+			var that = this;
+			var data = {
+				'content' : that.formItem.content,
+				'type' : that.formItem.type
+			};
+			var url = "/newsManage/searchData";
+			var success = function(data) {
+				ajaxStatus = true;
+				if(data.status == 200){
+					that.resultData = that.dealData(data.data);
+				}
+			};
+			var cache = false;
+			var alone = true;
+			post(url, data, success, cache, alone);
+		},
+	},
+	created : function() {
+		this.getNotice();
+	}
+});
