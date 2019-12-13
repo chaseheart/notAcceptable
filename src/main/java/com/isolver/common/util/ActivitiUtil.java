@@ -18,6 +18,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * activiti工具类
@@ -27,7 +28,9 @@ import org.slf4j.LoggerFactory;
 public class ActivitiUtil {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ActivitiUtil.class);
-
+	
+	@Autowired
+	private static ProcessEngine processEngine;
 
 	/**
 	 * 获取当前流程的下一个节点
@@ -36,7 +39,7 @@ public class ActivitiUtil {
 	 * @return
 	 */
 	public static String getNextNode(String procInstanceId) {
-		ProcessEngine processEngine = ProcessEngineUtil.getProcessEngine();
+//		ProcessEngine processEngine = ProcessEngineUtil.getProcessEngine();
 		// 1、首先是根据流程ID获取当前任务：
 		List<Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(procInstanceId).list();
 		String nextId = "";
@@ -78,7 +81,7 @@ public class ActivitiUtil {
 	 */
 	public static Integer getAllStepNum(String processDefinitionKey) {
 		Integer num = 0;
-		ProcessEngine processEngine = ProcessEngineUtil.getProcessEngine();
+//		ProcessEngine processEngine = ProcessEngineUtil.getProcessEngine();
 		// 获取流程定义集合
 		List<ProcessDefinition> processDefinitionList = processEngine.getRepositoryService()
 				.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).orderByProcessDefinitionVersion().desc().list();
