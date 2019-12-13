@@ -147,9 +147,13 @@ var vm = new Vue({
 					var url = "/claimingExpenses/application";
 
 					var success = function(data) {
-						ajaxStatus=true;         
-						window.top.vm.$Message.success('提交申请成功');
-						window.location="/claimingExpenses/indexMine"
+						ajaxStatus=true;
+						if(data.status == 200){
+							window.top.vm.$Message.success('提交申请成功');
+							window.location="/claimingExpenses/indexMine"
+						}else if(data.status == 604){
+							window.top.vm.$Message.error(data.data);
+						}
 					};
 					if ($("#type").val() == "writeAgain"){
 						var url = "/claimingExpenses/applicationAgain/" + $("#ruFlowId").val();
@@ -219,8 +223,13 @@ var vm = new Vue({
 					var url = "/claimingExpenses/dealApplication";
 					var success = function(data) { 
 						ajaxStatus=true;         
-						window.top.vm.$Message.success('提交成功');
-						window.location="/pending/claimingExpensesIndex"
+						if(data.status == 200){
+							window.top.vm.$Message.success('提交成功');
+							window.location="/pending/claimingExpensesIndex"
+						}else if(data.status == 604){
+							window.top.vm.$Message.error(data.data);
+						}
+						
 					};
 					var cache = false;
 					var alone = true;
@@ -280,28 +289,3 @@ var vm = new Vue({
 });
 
 
-//图片放大
-    $("#outerdiv").hide();
-    $(function(){
-        $("img").mouseover(function(){
-            $(this).css("cursor","pointer");
-        });
-
-        $("img").click(function(){
-            var _this = $(this);//将当前的pimg元素作为_this传入函数
-            imgShow("#outerdiv", "#bigimg", _this);
-        });
-    });
-
-    function imgShow(outerdiv, bigimg, _this) {
-    	$('#app').css('filter','blur(1.5px)');
-        var src = _this.attr("src");//获取当前点击的pimg元素中的src属性
-        $("#outerdiv").attr("display", "block");
-        $("#bigimg").attr("src", src);//设置#bigimg元素的src属性
-        $("#outerdiv").fadeIn("fast");
-
-        $("#outerdiv").click(function () {//再次点击淡出消失弹出层
-            $(this).fadeOut("fast");
-            $('#app').css('filter','blur(0px)');
-        });
-    }

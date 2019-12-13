@@ -14,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.isolver.common.constant.SysStaticConst;
 import com.isolver.common.util.Dateutil;
@@ -43,6 +44,7 @@ import com.isolver.entity.UnusualAttendance;
 import com.isolver.entity.User;
 import com.isolver.entity.Vacation;
 import com.isolver.entity.WorkOvertime;
+import com.isolver.form.SPForm;
 import com.isolver.form.WorkConditionForm;
 
 /**
@@ -356,7 +358,7 @@ public class ServicePerformanceService {
 				finalEnd = Dateutil.getEndTime(oaStart, oaEnd);
 			}
 			ServicePerformance sp = servicePerformanceRepository.findByUserAndDay(user, date);
-			//当日有考勤数据，则覆盖
+			// 当日有考勤数据，则覆盖
 			if (sp != null) {
 				ServicePerformance servicePerformance = new ServicePerformance();
 				BeanUtils.copyProperties(sp, servicePerformance);
@@ -402,5 +404,16 @@ public class ServicePerformanceService {
 			}
 		}
 		return failure;
+	}
+
+	public void updateServicePerformanceByRole(@RequestBody List<SPForm> spFormList) {
+		for (SPForm sp : spFormList) {
+			ServicePerformance servicePerformance = servicePerformanceRepository.findOne(Long.valueOf(sp.getId()));
+			servicePerformance.setOaStart(Dateutil.getTime(sp.getStartTime()));
+			servicePerformance.setOaEnd(Dateutil.getTime(sp.getEndTime()));
+			servicePerformance.setOaFinalStart(Dateutil.getTime(sp.getStartTime()));
+			servicePerformance.setOaFinalEnd(Dateutil.getTime(sp.getEndTime()));
+			servicePerformanceRepository.saveAndFlush(servicePerformance);
+		}
 	}
 }

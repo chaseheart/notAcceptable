@@ -155,6 +155,8 @@ var vm = new Vue({
 						if(data.status == 200){
 							window.top.vm.$Message.success('提交申请成功');
 							window.location="/servicePerformance/index";
+						}else if(data.status == 604){
+							window.top.vm.$Message.error(data.data);
 						}else{
 							window.top.vm.$Message.error(data.msg);
 						}

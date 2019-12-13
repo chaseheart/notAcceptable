@@ -62,7 +62,7 @@ public class MessageConst {
 	/**
 	 * 部门名称已存在
 	 */
-	public static String ORGEXISTED = "保存失败:部门名称已存在";
+	public static String DEPARTEXISTED = "保存失败:部门名称已存在";
 
 	/**
 	 * "删除成功"

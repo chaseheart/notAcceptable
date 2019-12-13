@@ -77,82 +77,9 @@ var vm = new Vue({
 				}, functionList);
 			}
 		}, {
-			title : '操作',
-			key : 'id',
-			align:'center',
-			className : 'table-col-3',
-			render : function(h, params) {
-				var functionList = [];
-				var edit = h('Button', {
-					 on: {
-                         click: () => {
-                        	 window.location.href = "/performanceManage/index?id=" + params.row.id;
-                         }
-                     }
-				}, '编辑');
-				functionList.push(edit);
-				return h('span', {
-
-				}, functionList);
-			}
-		}, {
+			 
 			title : '考勤日期',
 			key : 'date',
-			render : function(h, params) {
-				var functionList = [];
-				var show = h('a', {
-					props : {
-						type : 'primary',
-					},
-					attrs : {
-						href : '####',
-					},
-					on : {
-						click : function() {
-						}
-					}
-				}, params.row.date);
-				var content = h("div", {
-					slot : "content"
-				}, [ h('a', {
-					props : {
-						type : 'primary',
-					},
-					attrs : {
-						href : '/holiday/index?id=' + params.row.id,
-					}
-				}, '休假申请'), h('a', {
-					props : {
-						type : 'primary',
-					},
-					attrs : {
-						href : '/workOvertime/index?id=' + params.row.id,
-					}
-				}, '加班申请'), h('a', {
-					props : {
-						type : 'primary',
-					},
-					attrs : {
-						href : '/unusualAttendance/index?id=' + params.row.id,
-					}
-				}, '非正常考勤申请'), h('a', {
-					props : {
-						type : 'primary',
-					},
-					attrs : {
-						href : '/outBusiness/index?id=' + params.row.id,
-					}
-				}, '外出公务申请') ])
-				functionList.push(show);
-				functionList.push(content);
-				return h('Poptip', {
-					props : {
-						transfer : true,
-						title : '考勤',
-						size : 'small',
-					},
-				}, functionList);
-			},
 			className : 'table-col-3'
 		}, {
 			title : '星期',
@@ -161,21 +88,58 @@ var vm = new Vue({
 		}, {
 			title : '勤务开始时间',
 			key : 'startTime',
-			className : 'table-col-5'
+			className : 'table-col-5',
+			render : function(h, params) {
+				var functionList = [];
+				var edit = h('TimePicker', {
+					attrs : {
+						value : params.row.startTime,
+						format : "HH:mm"
+					},
+					on: {
+						'on-change' (event) { // 用来接收选择的值
+							this.vm.resultData[params.index].startTime = event;
+		                }
+					}
+
+				});
+				functionList.push(edit);
+				return h('div', {
+
+				}, functionList);
+			}
 		}, {
 			title : '勤务结束时间',
 			key : 'endTime',
-			className : 'table-col-5'
+			className : 'table-col-5',
+			render : function(h, params) {
+				var functionList = [];
+				var edit = h('TimePicker', {
+					attrs : {
+						value : params.row.endTime,
+						format : "HH:mm"
+					},
+					on: {
+						'on-change' (event) { // 用来接收选择的值
+							 this.vm.resultData[params.index].endTime = event;
+		                }
+					}
+				});
+				functionList.push(edit);
+				return h('div', {
+
+				}, functionList);
+			}
 		}, {
 			title : '加班',
 			key : 'overtime',
 			className : 'table-col-1'
 		}, 
-//		{
-//			title : '非正常考勤情况',
-//			key : 'status',
-//			className : 'table-col-5'
-//		}, 
+// {
+// title : '非正常考勤情况',
+// key : 'status',
+// className : 'table-col-5'
+// },
 		{
 			title : '旷工',
 			key : 'absenteeism',
@@ -204,19 +168,19 @@ var vm = new Vue({
 // title : '事假',
 // key : 'absence',
 // className : 'table-col-1'
-//		}, {
-//			title : '病假',
-//			key : 'sick',
-//			className : 'table-col-1'
-//		}, {
-//			title : '带薪假',
-//			key : 'paid',
-//			className : 'table-col-3'
-//		}, {
-//			title : '外出公务',
-//			key : 'out',
-//			className : 'table-col-3'
-//		}, 
+// }, {
+// title : '病假',
+// key : 'sick',
+// className : 'table-col-1'
+// }, {
+// title : '带薪假',
+// key : 'paid',
+// className : 'table-col-3'
+// }, {
+// title : '外出公务',
+// key : 'out',
+// className : 'table-col-3'
+// },
 		
 		{
 			title : '打卡时间',
@@ -439,9 +403,10 @@ var vm = new Vue({
 							default:
 								break;
 							}
-//							if (this.getDateWeek(servicePerformance[keyDay].day) == '六' || this.getDateWeek(servicePerformance[keyDay].day) == '日') {
-//								result = '加';
-//							}
+// if (this.getDateWeek(servicePerformance[keyDay].day) == '六' ||
+// this.getDateWeek(servicePerformance[keyDay].day) == '日') {
+// result = '加';
+// }
 							resultData[i] = {
 								id : servicePerformance[keyDay].id,
 								date : servicePerformance[keyDay].day,
@@ -513,10 +478,11 @@ var vm = new Vue({
 			var that = this;
 			var datePicker = $("#datePicker").find("input").val();
 			var data = {
-				'oaYear' : datePicker.split("-")[0],
-				'oaMonth' : datePicker.split("-")[1]
+				oaYear: datePicker.split("-")[0],
+				oaMonth : datePicker.split("-")[1],
+				workId : this.formItem.workId
 			};
-			var url = "/servicePerformance/findAllServicePerformance";
+			var url = "/servicePerformance/findAllServicePerformanceByWorkId";
 			var success = function(data) {
 				ajaxStatus = true;
 				// 。校验通过，跳转到［首页］
@@ -599,13 +565,42 @@ var vm = new Vue({
 		 */
 		prefixInteger : function(num, m) {
 			return (Array(m).join(0) + num).slice(-m);
-		}
+		},
+		updatePerformance : function() {
+			var that = this;
+			var datePicker = $("#datePicker").find("input").val();
+			var dataList=[];
+			for(let i in this.resultData){
+				let data = {
+					endTime: this.resultData[i].endTime,
+					id: this.resultData[i].id,
+					startTime: this.resultData[i].startTime
+				}
+				dataList.push(data);
+			}
+			var url = "/servicePerformanceManage/ServicePerformance";
+			var success = function(data) {
+				ajaxStatus = true;
+				// 。校验通过，跳转到［首页］
+				if (data.status == '200') {
+					window.top.vm.$Message.success('提交成功');
+					 window.location.reload();
+				}
+			};
+
+			var cache = false;
+			var alone = true;
+			var contentType = 'application/json;charset=utf-8';
+			post(url, JSON.stringify(dataList), success, cache, alone,
+					contentType);
+			}
 	},
 	created : function() {
 		this.getFormItem();
 		let servicePerformance = JSON.parse($("#servicePerformance").val() == '' ? '[]' : $("#servicePerformance").val());
 		let holiday = JSON.parse($("#holiday").val());
 		let month = parseInt($("#month").val());
+		this.formItem.date=$("#date").val()
 		this.createTable(servicePerformance[0], holiday, month);
 
 	}

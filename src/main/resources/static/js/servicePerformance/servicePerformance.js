@@ -1,3 +1,15 @@
+
+//check 日期
+const validateDate = (rule, value, callback) => {
+	let val = $("#datePicker").find("input").val();
+	var reg = /^\d{4}-((0{0,1}([1-9]))|(1(0|1|2)))$/
+    if (!reg.test(val)) {
+        return callback(new Error('请输入正确的年月'));
+    } else {
+        callback();
+    }
+   
+};
 //var weekDay = [ "日", "一", "二", "三", "四", "五", "六" ];
 var vm = new Vue({
 	el : '#app',
@@ -5,6 +17,12 @@ var vm = new Vue({
 		openDrawer : false,
 		formItem : {
 			date : new Date()
+		},
+		formValidate :{
+			date : [ {
+				validator: validateDate,
+				 trigger: 'blur' ,
+			}]
 		},
 		approvalTable : [ {
 			title : '申请号',
@@ -41,9 +59,11 @@ var vm = new Vue({
 		}, {
 			title : '申请开始时间',
 			key : 'startTime',
+			type: 'html',
 			className : 'table-col-6'
 		}, {
 			title : '申请中止时间',
+			type: 'html',
 			key : 'endTime',
 			className : 'table-col-6'
 		}, {
@@ -315,8 +335,8 @@ var vm = new Vue({
 					let data = {
 						id : vacation[i].appId,
 						type : this.getApplicationType("vacation", vacation[i].typeDetail),
-						startTime : vacation[i].appStart,
-						endTime : vacation[i].appEnd,
+						startTime : vacation[i].appStart.replace(" ","<br/>"),
+						endTime : vacation[i].appEnd.replace(" "," <br/> "),
 						lastApproval : vacation[i].assigner,
 						approvalStatus : this.getStatus(vacation[i].state),
 						remarks : vacation[i].content,
@@ -494,26 +514,30 @@ var vm = new Vue({
 			this.resultData = resultData;
 		},
 		searchPerformance : function() {
-			var that = this;
-			var datePicker = $("#datePicker").find("input").val();
-			var data = {
-				'oaYear' : datePicker.split("-")[0],
-				'oaMonth' : datePicker.split("-")[1]
-			};
-			var url = "/servicePerformance/findAllServicePerformance";
-			var success = function(data) {
-				ajaxStatus = true;
-				// 。校验通过，跳转到［首页］
-				if (data.status == '200') {
-					that.createTable(data.data.servicePerformance, data.data.holiday, data.data.month, datePicker.split("-")[1]);
-					console.log(data);
-					that.getApprovalData(data.data.app);
-				}
-			};
-
-			var cache = false;
-			var alone = true;
-			post(url, data, success, cache, alone);
+			this.$refs['formItem'].validate((valid)=>{
+				if (valid) {
+					var that = this;
+					var datePicker = $("#datePicker").find("input").val();
+					var data = {
+						'oaYear' : datePicker.split("-")[0],
+						'oaMonth' : datePicker.split("-")[1]
+					};
+					var url = "/servicePerformance/findAllServicePerformance";
+					var success = function(data) {
+						ajaxStatus = true;
+						// 。校验通过，跳转到［首页］
+						if (data.status == '200') {
+							that.createTable(data.data.servicePerformance, data.data.holiday, data.data.month, datePicker.split("-")[1]);
+							console.log(data);
+							that.getApprovalData(data.data.app);
+						}
+					};
+		
+					var cache = false;
+					var alone = true;
+					post(url, data, success, cache, alone);
+			}
+			})
 		},
 		exportExcel : function() {
 			$("#exportForm").attr('action', $("#exportForm").attr('action') + '/' + this.formItem.workId + '/' + this.formItem.date.getUTCFullYear() + '/' + this.formItem.date.getMonth());
@@ -594,3 +618,4 @@ var vm = new Vue({
 
 	}
 });
+

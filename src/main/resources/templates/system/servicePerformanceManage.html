@@ -57,7 +57,7 @@
 					<i-col span="8">
 						<i-button @click="searchPerformance">检索</i-button>
 						<i-button @click="exportExcel">考勤状况(个人)打印</i-button>
-						<i-button @click="openDrawer = true" type="primary">查看当月申请</i-button>
+						<i-button @click="updatePerformance" type="primary">更新</i-button>
 					</i-col>
 				</row>
 			</i-form>
@@ -82,6 +82,7 @@
 	<input id="holiday" type="hidden" th:value="${holiday}" />
 	<input id="month" type="hidden" th:value="${month}" />
 	<input id="map" type="hidden" th:value="${map}" />
+	<input id="date" type="hidden" th:value="${date}" />
 	<script th:src="@{/js/system/servicePerformanceManage.js}"></script>
 </body>
 </html>

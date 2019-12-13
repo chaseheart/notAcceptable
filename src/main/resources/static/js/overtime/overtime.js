@@ -16,9 +16,9 @@ var vm = new Vue({
 		disabled_flg:false,
 		formValidate : {
 			date : [ {
-				validator: validateDate,
 				required : true,
 				type : 'date',
+				message : '请选择加班日期',
 				trigger : 'change'
 			} ],
 			time : [ {
@@ -172,9 +172,13 @@ var vm = new Vue({
 					 let ruFlowId = $("#ruFlowId").val() == ''?0:$("#ruFlowId").val()
 					 var url = "/workOvertime/application/"+$("#type").val()+"/"+ruFlowId ;
 					 var success = function(data) { 
-						 ajaxStatus=true;         
-						 window.top.vm.$Message.success('提交成功');
-						 window.location="/servicePerformance/index"
+						 ajaxStatus=true;
+						 if(data.status == 200){
+							 window.top.vm.$Message.success('提交成功');
+							 window.location="/servicePerformance/index";
+						 }else if(data.status == 604){
+								window.top.vm.$Message.error(data.data);
+						 }
 					 };
 					 var cache = false;
 					 var alone = true;

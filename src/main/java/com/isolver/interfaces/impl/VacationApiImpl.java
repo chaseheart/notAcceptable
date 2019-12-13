@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.druid.util.StringUtils;
 import com.isolver.common.constant.SysStatusCodeConst;
 import com.isolver.common.util.Result;
 import com.isolver.dto.DepartDto;
@@ -84,7 +85,7 @@ public class VacationApiImpl implements VacationApi {
 	public Result<Object> dealApplication(String assigner, String ruFlow, Long userId) {
 		User user = userService.getUserById(userId);
 		Long ruFlowId = Long.valueOf(ruFlow);
-		if (user.getRole().getLevel() != 3) {
+		if (!StringUtils.isEmpty(assigner)) {
 			Long assignerId = Long.valueOf(assigner);
 			User assignerUser = userService.getUserById(assignerId);
 

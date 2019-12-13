@@ -292,7 +292,7 @@ public class ServicePerformanceRepositoryImpl implements ServicePerformanceRepos
 				+ " AS f ON f.user = b.id " + 
 				"	LEFT JOIN ( " + 
 				"SELECT " + 
-				"	FLOOR( SUM( TIMESTAMPDIFF( HOUR, va.vacation_start, va.vacation_end ) ) / 4 ) / 2 AS plAbsence, " + 
+				"	SUM( TIMESTAMPDIFF( HOUR, va.vacation_start, va.vacation_end ) ) AS plAbsence, " + 
 				"	u.id  " + 
 				"FROM " + 
 				"	vacation va " + 
@@ -308,7 +308,7 @@ public class ServicePerformanceRepositoryImpl implements ServicePerformanceRepos
 				"	) g ON g.id = b.id " + 
 				"	LEFT JOIN ( " + 
 				"SELECT " + 
-				"	FLOOR( SUM( TIMESTAMPDIFF( HOUR, va.vacation_start, va.vacation_end ) ) / 4 ) / 2 AS slAbsence, " + 
+				"	SUM( TIMESTAMPDIFF( HOUR, va.vacation_start, va.vacation_end ) ) AS slAbsence, " + 
 				"	u.id  " + 
 				"FROM " + 
 				"	vacation va " + 

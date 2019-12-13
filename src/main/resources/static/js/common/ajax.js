@@ -1,11 +1,6 @@
 //请求路径头部
-<<<<<<< HEAD
 //var SERVER_URL_HEAD_AJAX = 'http://app.oa.wccena.ltd:18080';
 var SERVER_URL_HEAD_AJAX = '';
-=======
-var SERVER_URL_HEAD_AJAX = 'https://app.oa.wccena.ltd:18080';
-
->>>>>>> 94e98388e2f6f417efbba6619f3a45c59810a87e
 //页面加载所要进行的操作
 $(function () {
     //设置ajax当前状态(是否可以发送);
@@ -122,7 +117,7 @@ function postTraditional(url, data, success, cache, alone) {
 function get(url, success, cache, alone) {
     ajax(url, {}, success,cache, alone, false, 'get','json');
 }
-
+ 
 // jsonp跨域请求(get方式提交)
 function jsonp(url, success, cache, alone) {
     ajax(url, {}, success, cache, alone, false, 'get','jsonp');

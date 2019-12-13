@@ -269,3 +269,10 @@ function formatDate (date, fmt) {
 	  return fmt
 }
 
+//text escape
+//html转义字符 → 原字符
+function htmlEscape(text){
+	if(text==''||text==undefined||text==null){return ''}
+    text = text.toString();
+    return $('<div/>').html(text).text();
+}

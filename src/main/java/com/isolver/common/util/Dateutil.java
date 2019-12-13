@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Dateutil {
 
 	/**
@@ -177,7 +179,7 @@ public class Dateutil {
 		LocalDate localDate = LocalDate.of(year, month, 1);
 		return localDate.withDayOfMonth(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
 	}
-	
+
 	/**
 	 * 获取指定月第一天 yyyy-MM-dd
 	 * 
@@ -186,6 +188,7 @@ public class Dateutil {
 	public static Date getTheFirstDayOfMonth(String date) {
 		return stringToDate(getTheFirstDayOfMonthStr(Integer.parseInt(date.split("-")[0]), Integer.parseInt(date.split("-")[0])));
 	}
+
 	/**
 	 * 获取指定月最后一天 yyyy-MM-dd
 	 * 
@@ -283,7 +286,7 @@ public class Dateutil {
 		}
 		Calendar d = Calendar.getInstance();
 		d.setTime(date);
-		d.set(Calendar.HOUR, d.get(Calendar.HOUR) + 1);
+		d.set(Calendar.HOUR_OF_DAY, d.get(Calendar.HOUR_OF_DAY) + 1);
 		d.set(Calendar.MINUTE, 0);
 		d.set(Calendar.SECOND, 0);
 		return d.getTime();
@@ -342,7 +345,7 @@ public class Dateutil {
 			if (minute >= 30) {
 				d.set(Calendar.MINUTE, 30);
 			} else {
-				d.set(Calendar.HOUR, d.get(Calendar.HOUR));
+				d.set(Calendar.HOUR_OF_DAY, d.get(Calendar.HOUR_OF_DAY));
 				d.set(Calendar.MINUTE, 0);
 			}
 			return d.getTime();
@@ -350,8 +353,25 @@ public class Dateutil {
 
 		Calendar d = Calendar.getInstance();
 		d.setTime(dateEnd);
-		d.set(Calendar.HOUR, d.get(Calendar.HOUR));
+		d.set(Calendar.HOUR_OF_DAY, d.get(Calendar.HOUR_OF_DAY));
 		d.set(Calendar.MINUTE, 0);
+		d.set(Calendar.SECOND, 0);
+		return d.getTime();
+	}
+
+	/**
+	 * 转hh-mm
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static Date getTime(String time) {
+		Calendar d = Calendar.getInstance();
+		if (StringUtils.isEmpty(time)) {
+			return null;
+		}
+		d.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time.split(":")[0]));
+		d.set(Calendar.MINUTE, Integer.parseInt(time.split(":")[1]));
 		d.set(Calendar.SECOND, 0);
 		return d.getTime();
 	}
@@ -378,8 +398,8 @@ public class Dateutil {
 			w = 0;
 		return weekDays[w];
 	}
-	
-	public static Integer hourCompareTo(Date dateStart,Date dateEnd) {
+
+	public static Integer hourCompareTo(Date dateStart, Date dateEnd) {
 		Long from2 = dateStart.getTime();
 		Long to2 = dateEnd.getTime();
 		return (int) ((to2 - from2) / (1000 * 60 * 60));

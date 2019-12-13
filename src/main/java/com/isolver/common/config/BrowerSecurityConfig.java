@@ -28,12 +28,9 @@ public class BrowerSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-<<<<<<< HEAD
 //		String hostUrl = "https://app.oa.wccena.ltd:18080";
 		String hostUrl = "";
 
-=======
->>>>>>> 94e98388e2f6f417efbba6619f3a45c59810a87e
 		// 开放url配置
 		http.authorizeRequests().antMatchers("/css/**", "/js/**", "/login", "/fonts/**", "/images/**", "/assets/**",
 				"/weixin/**", "/error").permitAll().and().authorizeRequests().anyRequest().authenticated();
@@ -41,7 +38,6 @@ public class BrowerSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.headers().frameOptions().disable();
 
 		http.cors();
-<<<<<<< HEAD
 
 		// 。开启自动配置的登录功能
 		http.formLogin().usernameParameter("name").passwordParameter("pwd").loginPage(hostUrl + "/login")
@@ -49,16 +45,6 @@ public class BrowerSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// 。开启自动配置的注销功能,默认重定向到/logout?success,修改为"/"
 		http.logout().logoutSuccessUrl(hostUrl + "/login");
-=======
-
-		// 开启自动配置的登录功能
-		http.formLogin().usernameParameter("name").passwordParameter("pwd")
-				.loginPage("https://app.oa.wccena.ltd:18080/login")
-				.defaultSuccessUrl("https://app.oa.wccena.ltd:18080/main");
-
-		// 开启自动配置的注销功能,默认重定向到/logout?success,修改为"/"
-		http.logout().logoutSuccessUrl("https://app.oa.wccena.ltd:18080/login");
->>>>>>> 94e98388e2f6f417efbba6619f3a45c59810a87e
 
 		// 暂时禁用CSRF，否则无法提交表单
 		http.csrf().disable();

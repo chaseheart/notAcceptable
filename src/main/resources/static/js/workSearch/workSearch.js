@@ -22,7 +22,7 @@ var vm = new Vue({
 						type : 'error',
 					},
 					attrs : {
-						href : '/servicePerformanceManage/index?workId='+params.row.id,
+						href : '/servicePerformanceManage/index?workId=' + params.row.id + '&date=' + $("#date").val(),
 						'class' : 'link-error'
 					},
 					on : {
@@ -138,6 +138,7 @@ var vm = new Vue({
 		},
 		searchOA : function() {
 			var that = this;
+			$("#date").val(this.formItem.date.getFullYear() + '-' + (this.formItem.date.getMonth() + 1));
 			let condition = {
 				workId : this.formItem.workId,
 				user : this.formItem.user,
@@ -177,7 +178,8 @@ var vm = new Vue({
 					data : formData,
 					success : function(data) {
 						if (data.status == 200) {
-							console.log("success");
+							indow.top.vm.$Message.success('提交成功');
+							window.top.vm.$Message.error('提交失败 ' + data.msg + '条');
 						}
 					}
 				});

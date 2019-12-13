@@ -96,10 +96,11 @@ public class DepartmentService {
 	public Boolean updateDepart(String id, String departName, String orgId, Long userId) {
 		Department departModel = departmentRepository.findOne(Long.valueOf(id));
 		Organization org = organizationRepository.findByIdAndDeleteFlag(Long.valueOf(orgId), SysStaticConst.NOTDELE);
-		if (departModel == null || org == null) {
+		Department depart = departmentRepository.findByDepartNameAndOrgAndDeleteFlag(departName, org, SysStaticConst.NOTDELE);
+		if (departModel == null || org == null || depart != null) {
 			return false;
 		}
-		Department entity=new Department();
+		Department entity = new Department();
 		BeanUtils.copyProperties(departModel, entity);
 		Timestamp tm = Dateutil.getTimestamp();
 		entity.setDepartName(departName);

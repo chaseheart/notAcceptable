@@ -8,6 +8,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<java.version>1.8</java.version>
 		<thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
 		<thymeleaf-layout-dialect.version>2.3.0</thymeleaf-layout-dialect.version>
 		<thymeleaf-extras-springsecurity4.version>3.0.2.RELEASE</thymeleaf-extras-springsecurity4.version>
@@ -59,6 +60,11 @@
 			<groupId>javax.transaction</groupId>
 			<artifactId>javax.transaction-api</artifactId>
 			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -125,8 +131,11 @@
 			<artifactId>activiti-simple-workflow</artifactId>
 			<version>5.22.0</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.vaadin.addons</groupId> <artifactId>dcharts-widget</artifactId> 
-			<version>0.10.0</version> </dependency> -->
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>dcharts-widget</artifactId>
+			<version>0.10.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.activiti</groupId>
 			<artifactId>activiti-explorer</artifactId>
@@ -216,9 +225,9 @@
 			<artifactId>easyexcel</artifactId>
 			<version>1.1.2-beta4</version>
 		</dependency>
+
 	</dependencies>
 	<build>
-		<defaultGoal>compile</defaultGoal>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

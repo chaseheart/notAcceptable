@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * @author IS1907011
  *
  */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "roleAuthority")
 @NamedQuery(name = "RoleAuthority.findAll", query = "SELECT o FROM RoleAuthority o")
@@ -44,6 +45,8 @@ public class RoleAuthority {
 	private Boolean deleteFlag;
 	/** 。版本 **/
 	private Integer version;
+	
+	
 	
 	/**
 	 * @return the id
